@@ -1,0 +1,98 @@
+import { createClient, groq } from "next-sanity"
+import clientConfig from "./config/client-config"
+
+export async function getLandingPageData() {
+  return createClient(clientConfig).fetch(
+    groq`
+    *[_type == "landingPage"] {
+        ...,}
+      `
+  )
+}
+export async function getAboutPageData() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "aboutPage"]{
+        ...,
+      }`
+  )
+}
+export async function getServicesPageData() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "servicesPage"]{
+        ...,
+      }`
+  )
+}
+
+export async function getBlogs() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "blogs"]{
+        ...,
+      }`
+  )
+}
+export async function getBlog(slug) {
+  return createClient(clientConfig).fetch(`
+  *[_type=="blogs" && slug.current == '${slug}'][0]
+`)
+}
+export async function getBlogsByCategory(key) {
+  return createClient(clientConfig).fetch(`
+  *[_type=="blogs" && '${key}' in blogCategories[]->_ref]
+`)
+}
+export async function getCategories() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "categories"]{
+        ...,
+      }`
+  )
+}
+export async function getTags() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "tags"]{
+        ...,
+      }`
+  )
+}
+
+export async function createQuote(
+  firstName,
+  email,
+  phoneNumber,
+  location,
+  destination,
+  bedrooms,
+  moveType,
+  moveDate
+) {
+  try {
+    return createClient(clientConfig).create({
+      _type: "quote",
+
+      firstName,
+      email,
+      phoneNumber,
+      location,
+      destination,
+      bedrooms,
+      moveDate,
+      moveType,
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function createReview(sentiment, review, name, email) {
+  const client = createClient(clientConfig)
+  
+  return client.create({
+    _type: "review",
+    name,
+    email,
+    sentiment,
+    review,
+    createdAt: new Date().toISOString(),
+  })
+}
