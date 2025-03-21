@@ -38,7 +38,7 @@ const Navbar = () => {
                     </div>
                 </div>
             </div>
-            <div className='md:hidden py-4 my-2 px-2  md:px-8  flex-row justify-center items-center'>
+            <div className='md:hidden py-2 my-2 px-2  md:px-8  flex-row justify-center items-center'>
                 <div className='w-full flex flex-row items-center justify-between'>
                     <Link href='/'>
                         <Image src='/assets/General/logo.svg' width={105} height={48}  alt='Taylor Movers Logo' />
@@ -48,7 +48,7 @@ const Navbar = () => {
             </div>
 
         
-            <div className='hidden md:flex w-full py-4 my-2 px-2  md:px-8  flex-row justify-center items-center'>
+            <div className='hidden md:flex w-full py-2 my-2 px-2  md:px-8  flex-row justify-center items-center'>
                 <div className='max-w-[1720px] w-full flex flex-row justify-between'>
                     <Link href='/'>
                         <Image src='/assets/General/logo.svg' width={205} height={48}  alt='Taylor Movers Logo' />
