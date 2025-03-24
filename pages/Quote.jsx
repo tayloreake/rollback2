@@ -4,6 +4,7 @@ import { toast } from "react-toastify"
 import { createQuote } from "../sanity/sanity-utils"
 import PhoneInput from "react-phone-input-2"
 import ReCAPTCHA from "react-google-recaptcha"
+import PageTitle from "../components/PageTitle"
 
 const Quote = () => {
   const [fname, setFname] = useState("")
@@ -103,16 +104,16 @@ const Quote = () => {
       
 
       // Save to Sanity
-      await createQuote(
-        fname,
-        email,
-        number,
-        location,
-        destination,
-        bedrooms,
-        moveType,
-        moveDate
-      );
+      // await createQuote(
+      //   fname,
+      //   email,
+      //   number,
+      //   location,
+      //   destination,
+      //   bedrooms,
+      //   moveType,
+      //   moveDate
+      // );
 
       setLastSubmissionTime(now);
       toast.success("Quote request submitted successfully! We'll contact you soon.");
@@ -236,7 +237,7 @@ const Quote = () => {
 
   return (
     <div className='w-full h-full flex flex-col items-center justify-center'>
-      <Featured />
+      <PageTitle title={"Quote"} />
       <div className='w-full h-full flex flex-col items-center justify-center max-w-[1440px]'>
         <div className='py-12  flex flex-col px-4'>
           <h1 className='mb-4 md:mb-12 text-xl'>Feel Free To Ask</h1>
