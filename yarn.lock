@@ -2811,7 +2811,7 @@ acorn@^8.9.0:
   resolved "https://registry.npmjs.org/acorn/-/acorn-8.14.1.tgz"
   integrity sha512-OvQ/2pUDKmgfCg++xsTX1wGxfTaszcHVcTctW4UJB4hibJx2HXxxO5UmVgyjMa+ZDsiaf5wWLXYpRWMmBI0QHg==
 
-africastalking@^0.6.2:
+africastalking@^0.6.7:
   version "0.6.7"
   resolved "https://registry.npmjs.org/africastalking/-/africastalking-0.6.7.tgz"
   integrity sha512-CJxJaK0NSzhT3SRbc9Fx3I61AKpW71JeXVsQc8zzV7AZgw0aOlJbggsYlbhCwvjWbzAKa8GEkA+MPTxcW6tptw==

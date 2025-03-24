@@ -8,6 +8,8 @@ import {
   BsLinkedin,
   BsTwitter,
 } from "react-icons/bs"
+import { RiTwitterXLine } from "react-icons/ri";
+
 
 const Footer = () => {
   return (
@@ -30,11 +32,11 @@ const Footer = () => {
                 <BsFacebook size={20} className='text-gray-400' />
               </div>
             </Link>
-            <Link href='https://twitter.com/taylormoverske'>
+            <a href='https://twitter.com/taylormoverske' target="_blank">
               <div className='p-2 w-[44px] h-[44px] border border-[#DB421B] rounded-2xl flex items-center justify-center'>
-                <BsTwitter size={20} className='text-gray-400' />
+                <RiTwitterXLine size={20} className='text-gray-400' />
               </div>
-            </Link>
+            </a>
             <Link href='https://www.linkedin.com/company/taylor-movers-ea/?originalSubdomain=ke'>
               <div className='p-2 w-[44px] h-[44px] border border-[#DB421B] rounded-2xl flex items-center justify-center'>
                 <BsLinkedin size={20} className='text-gray-400' />

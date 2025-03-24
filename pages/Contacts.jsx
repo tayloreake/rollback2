@@ -13,7 +13,7 @@ const Contacts = () => {
   const [message, setMessage] = useState("")
 
   const isValidPhoneNumber = (phoneNumber) => {
-    return /^\+254\d{9}$/.test(phoneNumber)
+    return /^\07\d{8}$/.test(phoneNumber)
   }
 
   const handleSendSMS = async () => {
