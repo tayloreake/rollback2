@@ -128,7 +128,7 @@ const Contacts = () => {
               </p>
             </div>
             <Image
-              src='/assets/Contacts/map.png'
+              src='/assets/Contacts/map2.png'
               alt='map'
               width={669}
               height={368}
@@ -179,7 +179,7 @@ const Contacts = () => {
               </div>
               <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
                 <input
-                  type='email'
+                  type='text'
                   value={number}
                   onChange={(e) => setNumber(e.target.value)}
                   className='px-4 w-full py-2 rounded-xl'
@@ -195,7 +195,7 @@ const Contacts = () => {
               onChange={(e) => setMessage(e.target.value)}
               cols='30'
               rows='10'
-              className='my-4 border border-grey-500 rounded-xl w-full max-w-[351px] md:max-w-[800px]'
+              className='p-3 my-4 border border-grey-500 rounded-xl w-full max-w-[351px] md:max-w-[800px]'
             />
 
             <button

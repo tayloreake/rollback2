@@ -26,7 +26,7 @@ const About = ({ aboutPage }) => {
             <h3 className='text-xl mb-6 text-center w-full md:text-start font-semibold'>
               {data.aboutTitle}
             </h3>
-            <p className='text-center md:text-start max-w-[500px] lg:max-w-[820px]'>
+            <p className='text-center md:text-start max-w-[500px] lg:max-w-[820px] capitalize'>
               {data.aboutDescription}
             </p>
           </div>
@@ -46,9 +46,9 @@ const About = ({ aboutPage }) => {
         <div className='w-full max-w-[1440px] flex flex-col md:flex-row justify-between'>
           <div className='flex flex-col  items-center justify-center md:justify-start'>
             <div className='flex flex-col w-full mb-6 items-center justify-center md:items-start md:justify-start'>
-              <h3 className='text-xl mb-2 text-center w-full md:text-start font-semibold'>
+              <p className='text-xl mb-2 text-center w-full md:text-start font-semibold'>
                 {data.whatWeDoTitle}
-              </h3>
+              </p>
               <hr className='border border-[#DB421B] w-[100px]' />
             </div>
             <p className='text-center md:text-start max-w-[500px] lg:max-w-[820px] md:mr-4'>
