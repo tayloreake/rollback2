@@ -31,19 +31,20 @@ export default async function handler(req, res) {
 
   try {
     // Apply rate limiting
+    // console.log("ENTERED TO THIS PART  ::: ")
     await limiter(req);
 
     const { to, message, recaptchaToken } = req.body;
 
     if (!recaptchaToken) {
-      return res.status(400).json({ success: false, message: 'reCAPTCHA token is required' });
+      // return res.status(400).json({ success: false, message: 'reCAPTCHA token is required' });
     }
 
     // Verify reCAPTCHA
-    // const isHuman = await verifyRecaptcha(recaptchaToken);
-    // if (!isHuman) {
-    //   return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
-    // }
+    const isHuman = await verifyRecaptcha(recaptchaToken);
+    if (!isHuman) {
+      // return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
+    }
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -61,7 +62,6 @@ export default async function handler(req, res) {
     };
 
     await transporter.sendMail(mailOptions);
-    
     return res.status(200).json({ 
       success: true, 
       message: "Email sent successfully" 

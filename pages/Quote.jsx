@@ -52,27 +52,29 @@ const Quote = () => {
       setIsSubmitting(true);
 
       // First send SMS
-      // const smsToken = await recaptchaRef.current.executeAsync();
-      // if (!smsToken) {
-      //   throw new Error('Failed to verify reCAPTCHA for SMS');
-      // }
+      const smsToken = await recaptchaRef.current.executeAsync();
+      if (!smsToken) {
+        throw new Error('Failed to verify reCAPTCHA for SMS');
+      }
 
-      // const smsResponse = await fetch("/api/sendSms", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     to: ["+254743505069"],
-      //     message: messageContent,
-      //     recaptchaToken: smsToken
-      //   }),
-      // });
+      // the default phone number
+      // 254743505069
+      const smsResponse = await fetch("/api/sendSms", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: ["254743505069"],
+          message: messageContent,
+          recaptchaToken: smsToken
+        }),
+      });
 
-      // if (!smsResponse.ok) {
-      //   const errorData = await smsResponse.json();
-      //   throw new Error(errorData.message || 'Failed to send SMS');
-      // }
+      if (!smsResponse.ok) {
+        const errorData = await smsResponse.json();
+        throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
+      }
 
       // Reset reCAPTCHA for email
       // Reset reCAPTCHA for email
@@ -95,7 +97,8 @@ const Quote = () => {
           message: messageContent,
           recaptchaToken: emailToken
         }),
-      });  
+      });
+
       if (!emailResponse.ok) {
         const errorData = await emailResponse.json();
         throw new Error(errorData.message || 'Failed to send email');
@@ -222,11 +225,11 @@ const Quote = () => {
     }
 
     try {
-      // const recaptchaValue = await recaptchaRef.current.executeAsync();
-      // if (!recaptchaValue) {
-      //   toast.error("Please verify that you are human");
-      //   return;
-      // }
+      const recaptchaValue = await recaptchaRef.current.executeAsync();
+      if (!recaptchaValue) {
+        toast.error("Please verify that you are human");
+        return;
+      }
 
       await handleSendMessage();
     } catch (error) {
@@ -277,7 +280,7 @@ const Quote = () => {
                   value={number}
                   onChange={(e) => setNumber(e.target.value)}
                   className='px-4 py-2 w-full rounded-xl'
-                  placeholder="+254700000000"
+                  placeholder="0700000000"
                 />
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                   Phone Number

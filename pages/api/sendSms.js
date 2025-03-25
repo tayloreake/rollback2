@@ -28,6 +28,7 @@ async function verifyRecaptcha(token) {
 }
 
 export default async function handler(req, res) {
+
   if (req.method !== "POST") {
     return res.status(405).json({ success: false, message: "Method not allowed" });
   }
@@ -36,29 +37,27 @@ export default async function handler(req, res) {
     // Apply rate limiting
     await limiter(req);
 
+
     const { to, message, recaptchaToken } = req.body;
 
     if (!recaptchaToken) {
-      return res.status(400).json({ success: false, message: 'reCAPTCHA token is required' });
+      // return res.status(400).json({ success: false, message: 'reCAPTCHA token is required' });
     }
 
     // Verify reCAPTCHA
     const isHuman = await verifyRecaptcha(recaptchaToken);
     if (!isHuman) {
-      return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
+      // return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
     }
 
     const sms = africastalking.SMS;
     const response = await sms.send({ to, message });
-    
     return res.status(200).json({ 
-      success: true, 
+      success: true,
       message: "SMS sent successfully",
       data: response 
     });
   } catch (error) {
-    console.error("Error sending SMS:", error);
-    
     if (error.message === 'Too many requests') {
       return res.status(429).json({ 
         success: false, 
@@ -67,9 +66,9 @@ export default async function handler(req, res) {
     }
 
     return res.status(500).json({ 
-      success: false, 
+      success: false,
       message: "Failed to send SMS",
-      error: error.message 
+      error: error.message
     });
   }
 }

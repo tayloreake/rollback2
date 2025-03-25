@@ -13,7 +13,7 @@ const Contacts = () => {
   const [message, setMessage] = useState("")
 
   const isValidPhoneNumber = (phoneNumber) => {
-    return /^\07\d{8}$/.test(phoneNumber)
+    return /0\d{9}$/.test(phoneNumber)
   }
 
   const handleSendSMS = async () => {
@@ -21,9 +21,10 @@ const Contacts = () => {
 
     try {
       const options = {
-        to: [`+254722355119`],
+        to: [`+254743505069`],
         message: messageContent,
       }
+
       const emailOptions = {
         to: email,
         message: messageContent,
@@ -35,6 +36,11 @@ const Contacts = () => {
         },
         body: JSON.stringify(options),
       })
+      if (!smsResponse.ok) {
+        const errorData = await smsResponse.json();
+        toast.error(errorData.error || errorData.message || 'Failed to send SMS')
+        throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
+      }
       const emailResponse = await fetch("/api/sendEmail", {
         method: "POST",
         headers: {
@@ -45,7 +51,7 @@ const Contacts = () => {
       const smsData = await smsResponse.json()
       const emailData = await emailResponse.json()
 
-      toast.success("Request submitted")
+      // toast.success("Request submitted")
       setFname("")
       setLname("")
       setEmail("")
@@ -78,7 +84,6 @@ const Contacts = () => {
       handleSendSMS()
       // Add your form submission logic here
       toast.success("Your message has been sent")
-      console.log("Form submitted successfully!")
     } else {
       // Phone number does not match the required format, show error message
       toast.error("Phone number does not match the required format +254...")
