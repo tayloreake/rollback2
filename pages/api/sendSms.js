@@ -60,7 +60,7 @@ export default async function handler(req, res) {
   } catch (error) {
     if (error.message === 'Too many requests') {
       return res.status(429).json({ 
-        success: false, 
+        success: false,
         message: 'Too many requests. Please try again later.' 
       });
     }

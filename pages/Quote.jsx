@@ -65,7 +65,7 @@ const Quote = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: ["254743505069"],
+          to: ["254721410517"],
           message: messageContent,
           recaptchaToken: smsToken
         }),

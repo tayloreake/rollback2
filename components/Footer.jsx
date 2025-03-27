@@ -13,14 +13,14 @@ import { RiTwitterXLine } from "react-icons/ri";
 
 const Footer = () => {
   return (
-    <div className='w-full h-full  px-4 py-12 flex flex-col items-center  justify-center bg-slate-200'>
-      <div className='max-w-[1440px] w-full flex flex-col md:flex-row items-center md:justify-between'>
+    <div className='bg-[#182C4D] text-white w-full h-full  px-4 flex flex-col items-center  justify-center'>
+      <div className='pt-12 pb-3 max-w-[1440px] w-full flex flex-col md:flex-row items-start md:justify-between'>
         {/* About */}
-        <div className='flex flex-col items-start'>
-          <h3 className='text-[#DB421B] font-light text-lg mb-4 w-full items-center justify-center text-center md:w-auto'>
+        <div className='flex flex-col items-start pb-6'>
+          <h3 className=' font-bold text-lg mb-3 w-full items-center justify-center text-cnter md:w-auto'>
             About Us
           </h3>
-          <p className='max-w-[390px]  mb-6 text-center md:text-start'>
+          <p className='max-w-[390px]  mb-6 text-cente md:text-start'>
             We specialize in local and international relocations. Taylor Movers
             is a privately held firm committed to excellence through providing
             relocations, transportation, warehousing, expatriate mobility
@@ -45,46 +45,46 @@ const Footer = () => {
           </div>
         </div>
         {/* Services */}
-        <div className='flex flex-col items-start py-6'>
-          <h3 className='text-[#DB421B] font-light text-lg mb-4 w-full items-center justify-center text-center md:w-auto'>
+        <div className='flex flex-col items-start pb-6'>
+          <h3 className=' font-bold text-lg mb-3 w-full items-center justify-center text-center md:w-auto'>
             Our Services
           </h3>
           <div className='flex flex-col justify-between items-start'>
             <Link href='/Services?service=Household Moving&&subservice=Premoving'>
               <div className='flex flex-row items-center '>
-                <BsArrowRight size={20} className='text-[#DB421B] my-2 mr-2' />
+                <BsArrowRight size={20} className=' my-2 mr-2' />
                 <p className=''>Household Moving</p>
               </div>
             </Link>
             <Link href='/Services?service=Office Moving&&subservice=Office Move'>
               <div className='flex flex-row items-center'>
-                <BsArrowRight size={20} className='text-[#DB421B] my-2 mr-2' />
+                <BsArrowRight size={20} className='my-2 mr-2' />
                 <p className=''>Office Moving</p>
               </div>
             </Link>
             <Link href='/Services?service=Corporate Moving&&subservice=Coporate Relocations'>
               <div className='flex flex-row items-center'>
-                <BsArrowRight size={20} className='text-[#DB421B] my-2 mr-2' />
+                <BsArrowRight size={20} className='my-2 mr-2' />
                 <p className=''>Corporate Relocation Services</p>
               </div>
             </Link>
             <Link href='/Services?service=Warehouse Moving&&subservice=Our Warehouse Services'>
               <div className='flex flex-row items-center'>
-                <BsArrowRight size={20} className='text-[#DB421B] my-2 mr-2' />
+                <BsArrowRight size={20} className='my-2 mr-2' />
                 <p className=''>Warehousing</p>
               </div>
             </Link>
           </div>
         </div>
         {/* Quick Links */}
-        <div className='flex flex-col items-start py-6'>
-          <h3 className='text-[#DB421B] font-light text-lg mb-4 w-full items-center justify-center text-center md:w-auto'>
+        <div className='top-0 flex-col items-start pb-6'>
+          <h3 className='font-bold text-lg mb-3 w-full items-center justify-center text-center md:w-auto'>
             Quick Links
           </h3>
           <div className='flex flex-col justify-between items-start w-full '>
             <Link href='/Blog'>
               <div className='flex flex-row items-center'>
-                <BsArrowRight size={20} className='text-[#DB421B] my-2 mr-2' />
+                <BsArrowRight size={20} className='] my-2 mr-2' />
                 <p className=''>Our Blogs</p>
               </div>
             </Link>
@@ -94,31 +94,31 @@ const Footer = () => {
             </div> */}
             <Link href='/Contacts'>
               <div className='flex flex-row items-center'>
-                <BsArrowRight size={20} className='text-[#DB421B] my-2 mr-2' />
+                <BsArrowRight size={20} className='text-[#] my-2 mr-2' />
                 <p className=''>Contact Us</p>
               </div>
             </Link>
           </div>
         </div>
         {/* Contacts */}
-        <div className='flex flex-col items-center md:items-start py-6 w-full max-w-[320px] md:w-fit'>
-          <h3 className='text-[#DB421B] font-light text-lg mb-4 w-full items-center justify-center text-center md:w-auto'>
+        <div className='flex flex-col items-center md:items-start pb-6 w-full max-w-[320px] md:w-fit'>
+          <h3 className=' font-bold text-lg mb-3 w-full items-center justify-center text-center md:w-auto'>
             Business Hours
           </h3>
           <div className='flex flex-col justify-between items-center md:items-start w-full'>
-            <div className='w-full text-slate-700'>
-              <p className='text-center md:text-start'>
+            <div className='w-full '>
+              <p className='md:text-start'>
                 Monday - Friday:
                 <br />
                 09.00 am - 08.00 pm.
               </p>
               <hr className='border border-[#DB421B] w-full md:max-w-[200px] my-6' />
-              <p className='text-center md:text-start'>
+              <p className=' md:text-start'>
                 Saturday - Sunday:
                 <br />
                 09.00 am - 12.00 pm.
               </p>
-              <p className='uppercase text-center md:text-start w-full mt-4'>
+              <p className='md:text-start w-full mt-4'>
                 We are at you&apos;re service
               </p>
             </div>
@@ -144,7 +144,7 @@ const Footer = () => {
           </Link>
         </div>
       </div>
-      <div className="w-full flex items-center justify-center pt-4 text-sm text-slate-600">
+      <div className="w-full flex items-center justify-center py-3 text-sm border-t border-slate-600 opacity-60 hover:opacity-full">
           © All Rights Reserved. Taylor Movers 2023
       </div>
     </div>

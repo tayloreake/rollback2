@@ -21,7 +21,7 @@ const Contacts = () => {
 
     try {
       const options = {
-        to: [`+254743505069`],
+        to: [`+254721410517`],
         message: messageContent,
       }
 
