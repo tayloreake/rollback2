@@ -45,12 +45,12 @@ const Blog = ({ blogs, tags, categories }) => {
                       setStateBlogs(newBlogs)
                     }}
                     className=' mr-6 hover:antialiased cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'>{category.category}</p>
+                    <p className='whitespace-nowrap capitalize'>{category.category}</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                 ))}
             </div>
-            <h3 className='text-[#DB421B] mb-2 mt-8'>Search By Tag</h3>
+            <h3 className='text-[#DB421B] mb-2 mt-3'>Search By Tag</h3>
             <div className='flex flex-row pr-6   w-full overflow-x-auto pb-6 mr-6 '>
               {tags?.length > 0 &&
                 tags?.map((tag) => (
@@ -66,13 +66,13 @@ const Blog = ({ blogs, tags, categories }) => {
 
                       setStateBlogs(newBlogs)
                     }}
-                    className='bg-[#DB421B]/60 rounded-full mr-6 hover:antialiased cursor-pointer w-fit py-2 px-4 flex items-center justify-center text-white'>
+                    className='text-sm bg-[#DB421B]/60 rounded-full mr-6 hover:antialiased cursor-pointer w-fit py-2 px-2 flex items-center justify-center text-white'>
                     <p className='whitespace-nowrap'>{tag.tag}</p>
                   </button>
                 ))}
             </div>
 
-            <div className='flex flex-col w-full mt-12'>
+            <div className='flex flex-col w-full'>
               {stateBlogs?.length > 0 &&
                 stateBlogs?.map((blog) => (
                   <BlogCard key={blog.slug.current} blog={blog} />

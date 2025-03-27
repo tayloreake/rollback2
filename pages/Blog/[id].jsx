@@ -18,7 +18,7 @@ const Blog = ({ blog }) => {
       <PageTitle title={blog.blogTitle} image={urlFor(blog.blogImage).url()} />
       <div className='max-w-[1440px] w-full h-full flex flex-col items-start justify-start py-8 my-4 px-4 md:px-8'>
         <div className='flex flex-col mb-6'>
-          <h2 className='text-2xl mb-6'>{blog.blogTitle}</h2>
+          <h2 className='text-2xl mb-4'>{blog.blogTitle}</h2>
           <PortableText blocks={blog.blogText} />
         </div>
       </div>
