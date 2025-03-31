@@ -65,7 +65,7 @@ const Quote = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: ["254721410517"],
+          to: ["+254721410517"],
           message: messageContent,
           recaptchaToken: smsToken
         }),
@@ -98,7 +98,7 @@ const Quote = () => {
           recaptchaToken: emailToken
         }),
       });
-
+      
       if (!emailResponse.ok) {
         const errorData = await emailResponse.json();
         throw new Error(errorData.message || 'Failed to send email');

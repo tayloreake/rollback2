@@ -56,7 +56,7 @@ export default async function handler(req, res) {
 
     const mailOptions = {
       from: process.env.NEXT_PUBLIC_GMAIL_USERNAME,
-      to,
+      to: to,
       subject: "Taylor Movers Quote Request",
       text: message,
     };
