@@ -73,7 +73,7 @@ const Quote = () => {
 
       if (!smsResponse.ok) {
         const errorData = await smsResponse.json();
-        throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
+        // throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
       }
 
       // Reset reCAPTCHA for email
