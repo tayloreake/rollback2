@@ -1,6 +1,7 @@
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { BiChevronRight } from "react-icons/bi"
+import Accordion from 'react-bootstrap/Accordion';
 
 const Clients = ({ content, urlFor }) => {
   const [info, setInfo] = useState([])
@@ -31,8 +32,191 @@ const Clients = ({ content, urlFor }) => {
     setInfo(newInfo)
   }
 
+  const clients = [
+    {
+      name: "banking and insurance",
+      folder:"banking",
+      logos: [
+        {
+          name: "kcb",
+          logo: 'kcb.png'
+        },
+        {
+          name: "corp",
+          logo: 'corp.jpeg'
+        },
+        {
+          name: "imperial",
+          logo: 'imperial.jpg'
+        },
+        {
+          name: "britam",
+          logo: 'britam.jpg'
+        },
+        {
+          name: "watu credit",
+          logo: 'watu.jpg'
+        },
+        {
+          name: "ncba",
+          logo: 'ncba.jpg'
+        },
+        {
+          name: "family",
+          logo: 'family.jpg'
+        },
+        {
+          name: "aar",
+          logo: 'aar.jpg'
+        }
+      ]
+    },
+    {
+      name: "government and oil",
+      folder:"govtoil",
+      logos: [
+        {
+          name: "knec",
+          logo: 'knec.jpg'
+        },
+        {
+          name: "ict",
+          logo: 'ict.jpg'
+        },
+        {
+          name: "kenha",
+          logo: 'kenha.jpg'
+        },
+        {
+          name: "cbk",
+          logo: 'cbk.jpg'
+        },
+        {
+          name: "kura",
+          logo: 'kura.jpg'
+        },
+        {
+          name: "tourism",
+          logo: 'tourism.jpg'
+        },
+        {
+          name: "national oil",
+          logo: 'national.jpg'
+        },
+        {
+          name: "npsc",
+          logo: 'npsc.jpg'
+        },
+        {
+          name: "epra",
+          logo: 'epra.jpg'
+        },
+        {
+          name: "kemsa",
+          logo: 'kemsa.jpg'
+        }
+      ]
+    },
+    {
+      name: "institutions",
+      folder:"institutions",
+      logos: [
+        {
+          name: "gibb",
+          logo: 'gibb.jpg'
+        },
+        {
+          name: "givep",
+          logo: 'givep.jpg'
+        },
+        {
+          name: "kenha",
+          logo: 'kenha.jpg'
+        },
+        {
+          name: "cbk",
+          logo: 'cbk.jpg'
+        },
+        {
+          name: "kura",
+          logo: 'kura.jpg'
+        },
+        {
+          name: "tourism",
+          logo: 'tourism.jpg'
+        },
+        {
+          name: "national oil",
+          logo: 'national.jpg'
+        },
+        {
+          name: "nacost",
+          logo: 'nacost.jpg'
+        },
+        {
+          name: "unicef",
+          logo: 'unicef.jpg'
+        }
+      ]
+    },
+    {
+      name: "companies/business",
+      folder:"companies",
+      logos: [
+        {
+          name: "cellulant",
+          logo: 'cellulant.jpg'
+        },
+        {
+          name: "inchcape",
+          logo: 'inchcape.jpg'
+        },
+        {
+          name: "jumia",
+          logo: 'jumia.jpg'
+        },
+        {
+          name: "azam",
+          logo: 'azam.jpg'
+        },
+        {
+          name: "davis",
+          logo: 'davis.jpg'
+        },
+        {
+          name: "hp",
+          logo: 'hp.jpg'
+        }
+      ]
+    }
+  ]
+
+  const AccordionItem = ({item}) => {
+
+    return (
+      <Accordion.Item eventKey={"clients-" + item.folder}>
+        <Accordion.Header className="font-bold !capitalize">
+            {item.name}
+        </Accordion.Header>
+
+        <Accordion.Body>
+          {item?.logos?.map((logo)=> (
+            <Image 
+              key={logo.name}
+              alt={logo.name}
+              src={`/assets/clients/${item?.folder}/${logo?.logo}`}
+              width={200}
+              height={100}
+              className="inline-block mb-3 client-logo"
+              style={{width:"200px", marginRight:"7px"}}
+              />
+          ))}
+        </Accordion.Body>
+      </Accordion.Item>
+    )
+  }
   return (
-    <div className='w-full h-full py-12 px-4 md:px-8 flex items-center justify-center'>
+    <div className='w-full h-full py-4 px-4 md:px-8 flex items-center justify-center'>
       <div className='flex flex-col max-w-[1440px] w-full'>
         <h2 className='text-xl font-semibold'>{content.clientsTitle}</h2>
         <hr className='border border-[#DB421B] w-[50px] my-3' />
@@ -40,35 +224,20 @@ const Clients = ({ content, urlFor }) => {
         <p className='max-w-[1400px]'>{content.clientsDescription}</p>
 
         <div className='flex flex-col mt-12'>
-          {info.map((item, index) => (
-            <div
-              key={index}
-              className='flex flex-col'
-              onClick={() => handleClick(item.id)}>
-              <button className='flex items-center   py-2 rounded-md  mb-2'>
-                {item ? (
-                  <BiChevronRight className='transform rotate-90 text-[#DB421B]' />
-                ) : (
-                  <BiChevronRight className='text-[#DB421B]' />
-                )}
-                <p className='text-sm pl-4'>{item.title}</p>
-              </button>
-              {item.open ? (
-                <div className='flex flex-row items-center overflow-x-auto mt-4'>
-                  {item.images.map((image) => (
-                    <Image
-                      key={image}
-                      src={image}
-                      alt='Banking'
-                      width={122}
-                      height={122}
-                      className='w-full max-w-[122px] h-[122px] object-cover mr-4'
-                    />
-                  ))}
-                </div>
-              ) : null}
-            </div>
+        <Accordion
+          className="accordion"
+          id="clients-accordion"
+          defaultActiveKey={"clients-banking"}
+          allowMultipleExpanded={false}
+          uuid={63213}
+        >
+          {clients.map((client) => (
+            <>
+              <AccordionItem item={client}/>
+            </>
           ))}
+
+        </Accordion>                  
         </div>
       </div>
     </div>

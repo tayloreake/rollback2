@@ -20,7 +20,7 @@ const About = ({ aboutPage }) => {
 
       <PageTitle title="About Us" />
 
-      <div className='w-full h-full flex items-center justify-center py-12 md:my-12 px-4 md:px-8'>
+      <div className='w-full h-full flex items-center justify-center py-8 md:my-6 px-4 md:px-8'>
         <div className='w-full max-w-[1440px] flex flex-col items-start md:flex-row'>
           <div className='flex flex-col  items-center justify-center md:justify-start'>
             <h3 className='text-xl mb-6 text-cener w-full md:text-start font-semibold'>
@@ -42,7 +42,7 @@ const About = ({ aboutPage }) => {
           </div>
         </div>
       </div>
-      <div className='w-full h-full flex items-center justify-center py-12 px-4 md:px-8'>
+      <div className='w-full flex items-center justify-center px-4 md:px-8'>
         <div className='w-full max-w-[1440px] flex flex-col md:flex-row justify-between'>
           <div className='flex flex-col  items-center justify-center md:justify-start'>
             <div className='flex flex-col w-full mb-6 items-center justify-center md:items-start md:justify-start'>

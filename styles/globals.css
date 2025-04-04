@@ -48,3 +48,7 @@ body {
   font-weight: 500;
   text-transform: capitalize;
 }
+
+.accordion-header .accordion-button {
+  text-transform: capitalize !important;
+}
