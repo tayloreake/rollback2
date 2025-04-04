@@ -60,7 +60,7 @@ const About = ({ aboutPage }) => {
           </div>
           <div className='flex flex-col md:flex-row  items-center justify-center relative md:justify-evenly md:ml-4 md:h-[500px] bg-[#DB421B] rounded-[800px] text-white w-full max-w-[500px] mt-8 md:mt-0'>
             <Image
-              src={urlFor(data.whatWeDoCard.whatWeDoCardImage).url()}
+              src={"/assets/about/kura42.jpg"}
               width={300}
               height={300}
               alt='Testimonial'
@@ -68,10 +68,10 @@ const About = ({ aboutPage }) => {
             />
             <div className='absolute bottom-0 bg-[#DB421B]/30 text-white flex flex-col max-h-[189px] w-full py-10 px-4 md:px-8 rounded-3xl rounded-tr-none'>
               <h3 className=' text-xl'>
-                {data.whatWeDoCard.whatWeDoCardTitle}
+                {"Started with House Moving"}
               </h3>
               <p className='font-italic text-sm'>
-                {data.whatWeDoCard.whatWeDoCardDescription}
+                {"Largest today in International Moving"}
               </p>
             </div>
           </div>

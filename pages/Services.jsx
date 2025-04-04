@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react"
-import Featured from "../components/Services/Featured"
+import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { generateServicesPageMetadata } from "../SEO/seo"
 import { getServicesPageData } from "../sanity/sanity-utils"
 import { useRouter } from "next/router"
 import PageTitle from "../components/PageTitle"
+import Script from 'next/script';
 
 const Services = ({ content }) => {
   const router = useRouter();
-  
+  const videoRef = useRef(null);
+
+
   useEffect(() => {
     const { service, subservice } = router.query;   
     setType(service)
@@ -19,7 +21,7 @@ const Services = ({ content }) => {
   const [type, setType] = useState("Household Moving")
   const [subType, setSubType] = useState("Premoving")
 
-
+  
 
   // console.log(service, subservice)
 
@@ -48,11 +50,11 @@ const Services = ({ content }) => {
               onClick={() => setType("Household Moving")}
               className='bg-black relative h-full hover:animate-pulse cursor-pointer'>
               <Image
-                src='/assets/services/sa2.png'
+                src='/assets/services/house.jpg'
                 alt='Household Moving'
                 width={419}
                 height={419}
-                className='h-full object-cover max-w-[200px] md:max-w-[419px]'
+                className='max-h-[419px] object-cover max-w-[200px] md:max-w-[419px]'
               />
               <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
                 <h3 className='text-white text-center'>Household Moving</h3>
@@ -61,13 +63,25 @@ const Services = ({ content }) => {
             <div
               onClick={() => setType("Office Moving")}
               className='bg-black relative h-full hover:animate-pulse cursor-pointer'>
-              <Image
-                src='/assets/services/sa3.png'
-                alt='Office Moving'
-                width={419}
-                height={419}
-                className='h-full object-cover max-w-[200px] md:max-w-[419px]'
-              />
+              <video 
+                // ref={"videoRef"}
+                width="320"
+                height="240" 
+                controls
+                autoPlay muted loop
+                playsInline
+                className="max-w-[419px] w-[419px] h-[419px]"
+                >
+                <source 
+                  src="/assets/services/office.mp4" type="video/mp4"/>
+                <source src="/assets/services/office.mov" type="video/mov"/>
+
+                
+                Your browser does not support the video tag.
+              </video>
+              
+              {/* <iframe src="https://www.youtube.com/embed/19g66ezsKAg" allowFullScreen /> */}
+
               <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
                 <h3 className='text-white text-center'>Office Moving</h3>
               </div>
@@ -76,11 +90,11 @@ const Services = ({ content }) => {
               onClick={() => setType("Corporate Moving")}
               className='bg-black relative h-full hover:animate-pulse cursor-pointer'>
               <Image
-                src='/assets/About/sa1.png'
+                src='/assets/services/corporate.jpg'
                 alt='Corporate Moving'
                 width={419}
                 height={419}
-                className='h-full object-cover max-w-[200px] md:max-w-[419px]'
+                className='max-h-[419px] object-cover max-w-[200px] md:max-w-[419px]'
               />
               <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
                 <h3 className='text-white text-center'>Corporate Moving</h3>
@@ -90,11 +104,11 @@ const Services = ({ content }) => {
               onClick={() => setType("Warehouse Moving")}
               className='bg-black relative h-full hover:animate-pulse cursor-pointer'>
               <Image
-                src='/assets/services/saa4.png'
+                src='/assets/services/warehouse.jpg'
                 alt='Warehouse Moving'
                 width={419}
                 height={419}
-                className='h-full object-cover max-w-[200px] md:max-w-[419px]'
+                className='h-[419px] object-cover max-w-[200px] md:max-w-[419px]'
               />
               <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
                 <h3 className='text-white text-center'>Warehouse Moving</h3>
@@ -104,7 +118,7 @@ const Services = ({ content }) => {
 
           {type === "Household Moving" ? (
             <div className='flex flex-col items-start justify-start w-full'>
-              <h3 className='mb-4 text-xl'>Household Moving</h3>
+              <h3 className='font-bold mb-4 text-xl'>Household Moving</h3>
               <h4 className='mb-2 text-[#DB421B] text-lg'>Local Moves</h4>
               <p className='mb-6'>
                 As a full service moving and storage company, we pride ourselves
@@ -136,7 +150,7 @@ const Services = ({ content }) => {
                   <div
                     onClick={() => setSubType("Premoving")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'>Pre Moving Survey</p>
+                    <p className='whitespace-nowrap font-bold underline'>Pre Moving Survey </p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                   <div
@@ -180,7 +194,7 @@ const Services = ({ content }) => {
                   </div>
                 ) : subType === "Quotation" ? (
                   <div className='flex flex-col mt-8 md:mt-0'>
-                    <h4 className='mb-2 text-[#DB421B] text-lg'>
+                    <h4 className='font-[500] mb-2 text-[#DB421B] text-lg'>
                       Quotation Time
                     </h4>
                     <p className='mb-6'>
@@ -199,7 +213,7 @@ const Services = ({ content }) => {
                   </div>
                 ) : subType === "Other Services" ? (
                   <div className='flex flex-col mt-8 md:mt-0'>
-                    <h4 className='mb-2 text-[#DB421B] text-lg'>
+                    <h4 className='font-[500] mb-2 text-[#DB421B] text-lg'>
                       Other Services
                     </h4>
                     <p className='mb-6'>
@@ -239,7 +253,7 @@ const Services = ({ content }) => {
             </div>
           ) : type === "Office Moving" ? (
             <div className='flex flex-col items-start justify-start w-full'>
-              <h3 className='mb-4 text-xl'>Office Relocation Services</h3>
+              <h3 className='font-bold mb-4 text-xl'>Office Relocation Services</h3>
               {/* <h4 className='mb-2 text-[#DB421B] text-lg'>Local Moves</h4> */}
               <p className='mb-6'>
                 Our office relocation services are designed with your
@@ -281,13 +295,13 @@ const Services = ({ content }) => {
                   <div
                     onClick={() => setSubType("Office Move")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'>Office Move</p>
+                    <p className='whitespace-nowrap font-bold underline'>Office Move</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                   <div
                     onClick={() => setSubType("Service List")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'>Service List</p>
+                    <p className='whitespace-nowrap'> Service List</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                 </div>
@@ -332,7 +346,7 @@ const Services = ({ content }) => {
                 ) : subType === "Service List" ? (
                   <div className='flex flex-col mt-8 md:mt-0'>
                     <h4 className='mb-2 text-[#DB421B] text-lg'>
-                      Service List
+                       Service List
                     </h4>
                     <p className='mb-6'>
                       Taylor is a leader in the planning, routing, distribution
@@ -366,7 +380,7 @@ const Services = ({ content }) => {
             </div>
           ) : type === "Corporate Moving" ? (
             <div className='flex flex-col items-start justify-start w-full'>
-              <h3 className='mb-4 text-xl'>
+              <h3 className='font-bold mb-4 text-xl'>
                 Corporate Staff Relocation Services
               </h3>
               {/* <h4 className='mb-2 text-[#DB421B] text-lg'>Local Moves</h4> */}
@@ -384,13 +398,13 @@ const Services = ({ content }) => {
                   <div
                     onClick={() => setSubType("Coporate Relocations")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'>Coporate Relocations</p>
+                    <p className='whitespace-nowrap font-bold underline'>Coporate Relocations</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                   <div
                     onClick={() => setSubType("Coporate Service List")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'>Service List</p>
+                    <p className='whitespace-nowrap'> Service List</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                 </div>
@@ -459,7 +473,7 @@ const Services = ({ content }) => {
             </div>
           ) : type === "Warehouse Moving" ? (
             <div className='flex flex-col items-start justify-start w-full'>
-              <h3 className='mb-4 text-xl'>Warehouse Services</h3>
+              <h3 className='font-bold mb-4 text-xl'>Warehouse Services</h3>
               {/* <h4 className='mb-2 text-[#DB421B] text-lg'>Local Moves</h4> */}
               <p className='mb-6'>
                 Our warehouse is an 11,000 square foot facility located off
@@ -477,13 +491,13 @@ const Services = ({ content }) => {
                   <div
                     onClick={() => setSubType("Our Warehouse Services")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'>Our Warehouse Services</p>
+                    <p className='whitespace-nowrap font-bold underline'>Our Warehouse Services</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                 </div>
                 {subType === "Our Warehouse Services" ? (
                   <div className='flex flex-col mt-8 md:mt-0'>
-                    <h4 className='mb-2 text-[#DB421B] text-lg'>
+                    <h4 className='mb-2 text-[#DB421B] text-lg '>
                       Our Warehouse Services
                     </h4>
                     <p className='mb-6'>

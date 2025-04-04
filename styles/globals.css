@@ -42,3 +42,9 @@ body {
 .rootClassName{
   font-family: 'Montserrat';
 }
+
+
+.h3 {
+  font-weight: 500;
+  text-transform: capitalize;
+}
