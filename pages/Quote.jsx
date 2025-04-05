@@ -364,6 +364,9 @@ const Quote = () => {
                     {" "}
                     More than 6br{" "}
                   </option>
+                  <option onClick={() => setBedrooms("studio")}> Studio </option>
+                  <option onClick={() => setBedrooms("Office")}> Studio </option>
+
                 </select>
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                   Number of bedrooms
