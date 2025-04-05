@@ -31,180 +31,44 @@ const Clients = ({ content, urlFor }) => {
     })
     setInfo(newInfo)
   }
+  const clients = ["banking", 'companies', 'institutions'];
 
-  const clients = [
-    {
-      name: "banking and insurance",
-      folder:"banking",
-      logos: [
-        {
-          name: "kcb",
-          logo: 'kcb.png'
-        },
-        {
-          name: "corp",
-          logo: 'corp.jpeg'
-        },
-        {
-          name: "imperial",
-          logo: 'imperial.jpg'
-        },
-        {
-          name: "britam",
-          logo: 'britam.jpg'
-        },
-        {
-          name: "watu credit",
-          logo: 'watu.jpg'
-        },
-        {
-          name: "ncba",
-          logo: 'ncba.jpg'
-        },
-        {
-          name: "family",
-          logo: 'family.jpg'
-        },
-        {
-          name: "aar",
-          logo: 'aar.jpg'
-        }
-      ]
-    },
-    {
-      name: "government and oil",
-      folder:"govtoil",
-      logos: [
-        {
-          name: "knec",
-          logo: 'knec.jpg'
-        },
-        {
-          name: "ict",
-          logo: 'ict.jpg'
-        },
-        {
-          name: "kenha",
-          logo: 'kenha.jpg'
-        },
-        {
-          name: "cbk",
-          logo: 'cbk.jpg'
-        },
-        {
-          name: "kura",
-          logo: 'kura.jpg'
-        },
-        {
-          name: "tourism",
-          logo: 'tourism.jpg'
-        },
-        {
-          name: "national oil",
-          logo: 'national.jpg'
-        },
-        {
-          name: "npsc",
-          logo: 'npsc.jpg'
-        },
-        {
-          name: "epra",
-          logo: 'epra.jpg'
-        },
-        {
-          name: "kemsa",
-          logo: 'kemsa.jpg'
-        }
-      ]
-    },
-    {
-      name: "institutions",
-      folder:"institutions",
-      logos: [
-        {
-          name: "gibb",
-          logo: 'gibb.jpg'
-        },
-        {
-          name: "givep",
-          logo: 'givep.jpg'
-        },
-        {
-          name: "kenha",
-          logo: 'kenha.jpg'
-        },
-        {
-          name: "cbk",
-          logo: 'cbk.jpg'
-        },
-        {
-          name: "kura",
-          logo: 'kura.jpg'
-        },
-        {
-          name: "tourism",
-          logo: 'tourism.jpg'
-        },
-        {
-          name: "national oil",
-          logo: 'national.jpg'
-        },
-        {
-          name: "nacost",
-          logo: 'nacost.jpg'
-        },
-        {
-          name: "unicef",
-          logo: 'unicef.jpg'
-        }
-      ]
-    },
-    {
-      name: "companies/business",
-      folder:"companies",
-      logos: [
-        {
-          name: "cellulant",
-          logo: 'cellulant.jpg'
-        },
-        {
-          name: "inchcape",
-          logo: 'inchcape.jpg'
-        },
-        {
-          name: "jumia",
-          logo: 'jumia.jpg'
-        },
-        {
-          name: "azam",
-          logo: 'azam.jpg'
-        },
-        {
-          name: "davis",
-          logo: 'davis.jpg'
-        },
-        {
-          name: "hp",
-          logo: 'hp.jpg'
-        }
-      ]
+  // not working... sort out
+  const getImagePaths = (name) => {
+    console.log("THE NAME IS :::: ", name);
+    try{
+      const importedImages = require.context(`../../public/assets/clients/banking`, false, /\.(png|jpe?g|svg)$/);
+      const imgPaths = importedImages.keys().map(importedImages);
+      return imgPaths;
+    } catch(err) {
+      console.log("THE ERR   ", err)
+      return [];
     }
-  ]
+    
+  }
 
+  const bankingImages = require.context(`../../public/assets/clients/banking`, false, /\.(png|jpe?g|svg)$/);
+  const bankingImgPaths = bankingImages.keys().map(bankingImages);
+  const companiesImages = require.context(`../../public/assets/clients/companies`, false, /\.(png|jpe?g|svg)$/);
+  const companiesImgPaths = companiesImages.keys().map(companiesImages);
+  const institutionImages = require.context(`../../public/assets/clients/govtoil`, false, /\.(png|jpe?g|svg)$/);
+  const institutionImgPaths = institutionImages.keys().map(institutionImages);
+  
+  
   const AccordionItem = ({item}) => {
 
     return (
-      <Accordion.Item eventKey={"clients-" + item.folder}>
+      <Accordion.Item eventKey={"clients-" + item.name}>
         <Accordion.Header className="font-bold !capitalize">
             {item.name}
         </Accordion.Header>
 
         <Accordion.Body>
-          {item?.logos?.map((logo)=> (
+          {item.imgPaths.map((src, i) => (
             <Image 
-              key={logo.name}
-              alt={logo.name}
-              src={`/assets/clients/${item?.folder}/${logo?.logo}`}
+              key={`${item.name}-${i}`}
+              alt={`img-${i}`}
+              src={src}
               width={200}
               height={100}
               className="inline-block mb-3 client-logo"
@@ -231,12 +95,11 @@ const Clients = ({ content, urlFor }) => {
           allowMultipleExpanded={false}
           uuid={63213}
         >
-          {clients.map((client) => (
-            <>
-              <AccordionItem item={client}/>
-            </>
-          ))}
-
+            
+          <AccordionItem item={{name:"Banking", imgPaths: bankingImgPaths}}/>
+          <AccordionItem item={{name:"Companies", imgPaths: companiesImgPaths}}/>
+          <AccordionItem item={{name:"Institutions", imgPaths: institutionImgPaths}}/>
+            
         </Accordion>                  
         </div>
       </div>
