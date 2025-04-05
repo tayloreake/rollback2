@@ -242,11 +242,10 @@ const Quote = () => {
     <div className='w-full h-full flex flex-col items-center justify-center'>
       <PageTitle title={"Quote"} />
       <div className='w-full h-full flex flex-col items-center justify-center max-w-[1440px]'>
-        <div className='py-12  flex flex-col px-4'>
-          <h1 className='mb-4 md:mb-12 text-xl'>Feel Free To Ask</h1>
+        <div className='py-12 max-w-[840px] flex flex-col px-4 mx-auto'>
+          <h1 className='mb-4 md:mb-7 text-xl font-bold'>Feel Free To Ask</h1>
           <p>
-            We are here to assist you with any inquiries you may have regarding
-            Taylor Movers and the services we provide. Please feel free to
+            Please feel free to
             contact us by filling out the form below, and we will respond to
             your message as promptly as possible.
           </p>
@@ -365,7 +364,6 @@ const Quote = () => {
                     More than 6br{" "}
                   </option>
                   <option onClick={() => setBedrooms("studio")}> Studio </option>
-                  <option onClick={() => setBedrooms("Office")}> Studio </option>
 
                 </select>
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>

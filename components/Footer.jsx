@@ -145,7 +145,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="w-full flex items-center justify-center py-3 text-sm border-t border-slate-600 opacity-60 hover:opacity-full">
-          © All Rights Reserved. Taylor Movers 2023
+        © {new Date().getFullYear()} Taylor Movers. All rights reserved.
       </div>
     </div>
   )

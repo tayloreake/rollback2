@@ -41,7 +41,6 @@ const Blog = ({ blogs, tags, categories }) => {
                         })
                         return found
                       })
-
                       setStateBlogs(newBlogs)
                     }}
                     className=' mr-6 hover:antialiased cursor-pointer w-fit'>
