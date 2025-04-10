@@ -70,7 +70,8 @@ const Featured = ({ content, urlFor }) => {
                   className="bg-[rgba(0,0,0,0.3)] text-center top-0 bottom-auto">
                     <div className="text-4xl font-bold py-3"><span className="text-red-500 italic">Warehouse</span> Moving</div>
                     <div className="italic text-2xl mt-1">
-                      Imagine The best warehouse storage
+                      Often a business move requires a bit of extra storage during times of&nbsp;transition.&nbsp;Looking for extra storage for business files, 
+                      office furniture,&nbsp;or the&nbsp;boss’s fancy flip flop collection? You’re in luck!
                     </div>
                 </Carousel.Caption>
             </Carousel.Item>
