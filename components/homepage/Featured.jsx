@@ -20,9 +20,11 @@ const Featured = ({ content, urlFor }) => {
                 />
                 <Carousel.Caption 
                   className="bg-[rgba(0,0,0,0.3)] text-center top-0 bottom-auto">
-                    <div className="text-4xl font-bold py-3">Corporate <span className="text-red-500 italic">Moving</span></div>
+                    <div className="text-4xl font-bold py-3">Moving <span className="text-red-500 italic">Resources</span></div>
                     <div className="italic text-2xl mt-1">
-                      Experience the greatness in Moving with the Best Movers in the country
+                          Even for professionals like us, moving can be a daunting task.
+                          With that in mind, we’ve pulled together some resources that can come in handy,
+                          whether you are moving with us or not.
                     </div>
                 </Carousel.Caption>
             </Carousel.Item>
@@ -38,7 +40,8 @@ const Featured = ({ content, urlFor }) => {
                   className="bg-[rgba(0,0,0,0.3)] text-center top-0 bottom-auto">
                     <div className="text-4xl font-bold py-3"><span className="text-red-500 italic">Corporate</span> Moving</div>
                     <div className="italic text-2xl mt-1">
-                      Best Corporate Moving to the best of the adhreence to international standards
+                          New to an area? Do you need Area Tours, Information Packets, School/ Community Information, Home Finding/Home Purchasing Information &amp;
+                          Assistance, Home Rental Solutions, Mortgage Services or Temporary Housing?
                     </div>
                 </Carousel.Caption>
             </Carousel.Item>
@@ -52,9 +55,9 @@ const Featured = ({ content, urlFor }) => {
                 />
                 <Carousel.Caption 
                   className="bg-[rgba(0,0,0,0.3)] text-center top-0 bottom-auto">
-                    <div className="text-4xl font-bold py-3"><span className="text-red-500 italic">House</span> Moving</div>
+                    <div className="text-4xl font-bold py-3"><span className="text-red-500 italic">Household</span> Moving</div>
                     <div className="italic text-2xl mt-1">
-                      Conveniently move your house to the best considerations of Pricing and honor
+                          Our Packing Options and additional household moving services let you do as much as you like or as little as you like when it comes to your big move.
                     </div>
                 </Carousel.Caption>
             </Carousel.Item>
@@ -68,7 +71,7 @@ const Featured = ({ content, urlFor }) => {
                 />
                 <Carousel.Caption 
                   className="bg-[rgba(0,0,0,0.3)] text-center top-0 bottom-auto">
-                    <div className="text-4xl font-bold py-3"><span className="text-red-500 italic">Warehouse</span> Moving</div>
+                    <div className="text-4xl font-bold py-3"><span className="text-red-500 italic">Warehousing</span> & Storage</div>
                     <div className="italic text-2xl mt-1">
                       Often a business move requires a bit of extra storage during times of&nbsp;transition.&nbsp;Looking for extra storage for business files, 
                       office furniture,&nbsp;or the&nbsp;boss’s fancy flip flop collection? You’re in luck!
