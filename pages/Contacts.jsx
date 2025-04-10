@@ -95,12 +95,10 @@ const Contacts = () => {
       <PageTitle title={"Contact Us"} />
       <div className='w-full h-full flex flex-col items-center justify-center max-w-[1440px]'>
         <div className='py-12  flex flex-col px-4'>
-          <h1 className='mb-4 md:mb-12 text-xl'>Feel Free To Contact Us</h1>
+                  <h1 className='mb-4 md:mb-12 text-xl'>WE WOULD LOVE TO HEAR FROM YOU</h1>
           <p>
-            We are here to assist you with any inquiries you may have regarding
-            Taylor Movers and the services we provide. Please feel free to
-            contact us by filling out the form below, and we will respond to
-            your message as promptly as possible.
+                      WE ARE HERE TO ANSWER ANY QUESTIONS YOU MAY HAVE ABOUT TAYLOR MOVERS AND THE SERVICES WE OFFER.
+                      REACH OUT TO US BY FILLING THE BELOW FORM AND WE WILL RESPOND AS SOON AS WE CAN.
           </p>
           <div className='my-4 py-4 flex flex-col md:flex-row justify-between'>
             <div className='flex flex-col'>
