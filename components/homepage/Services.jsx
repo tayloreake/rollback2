@@ -22,7 +22,7 @@ const Services = ({ content, urlFor }) => {
       <div className='max-w-[1720px] flex flex-col md:flex-row items-center w-full justify-center md:justify-evenly px-4'>
         <div className='flex flex-col items-start justify-center'>
           <h2 className='mb-2 text-xl font-semibold max-w-[70%]'>
-            {/* TAYLOR MOVERS IS A PREMIER <br /> MOVING COMPANY IN KENYA */}
+            {/* TAYLOR MOVERS IS  PREMIER <br /> MOVING COMPANY IN KENYA */}
             {content.aboutTitle}
           </h2>
           <hr className='w-[100px] border-[#DB421B] border my-3' />
