@@ -91,7 +91,7 @@ const Clients = ({ content, urlFor }) => {
         <Accordion
           className="accordion"
           id="clients-accordion"
-          defaultActiveKey={"clients-banking"}
+          defaultActiveKey={"banking"}
           allowMultipleExpanded={false}
           uuid={63213}
         >

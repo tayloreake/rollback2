@@ -41,7 +41,7 @@ const Navbar = () => {
             <div className='md:hidden py-2 my-2 px-2  md:px-8  flex-row justify-center items-center'>
                 <div className='w-full flex flex-row items-center justify-between'>
                     <Link href='/'>
-                        <Image src='/assets/General/logo.svg' width={105} height={48}  alt='Taylor Movers Logo' />
+                        <Image src='/assets/General/logo.png' width={105} height={48}  alt='Taylor Movers Logo' />
                     </Link>
                     <AiOutlineMenu size={30} className='ml-4' onClick={() => setOpen(true)}/>
                 </div>
@@ -51,7 +51,7 @@ const Navbar = () => {
             <div className='hidden md:flex w-full py-2 my-2 px-2  md:px-8  flex-row justify-center items-center'>
                 <div className='max-w-[1720px] w-full flex flex-row justify-between'>
                     <Link href='/'>
-                        <Image src='/assets/General/logo.svg' width={205} height={48}  alt='Taylor Movers Logo' />
+                        <Image src='/assets/General/logo.png' width={205} height={48}  alt='Taylor Movers Logo' />
                     </Link>
                     <div className='flex flex-row items-center text-sm'>
                         <Link href='/'>
@@ -109,7 +109,7 @@ const Navbar = () => {
                 <div className='flex flex-col w-full h-full '>
                     <div className='flex w-full items-start justify-between'>
                         <Link href='/'>
-                            <Image src='/assets/General/logo.svg' alt='/' width='150' height='1' />
+                            <Image src='/assets/General/logo.png' alt='/' width='150' height='1' />
                         </Link>
                         <div onClick={() => setOpen(false)} className='rounded-full  p-1 cursor-pointer hover:animate-pulse'>
                             <AiOutlineCloseCircle size={20} />
