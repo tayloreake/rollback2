@@ -53,6 +53,8 @@ const Clients = ({ content, urlFor }) => {
   const companiesImgPaths = companiesImages.keys().map(companiesImages);
   const institutionImages = require.context(`../../public/assets/Clients/govtoil`, false, /\.(png|jpe?g|svg)$/);
   const institutionImgPaths = institutionImages.keys().map(institutionImages);
+  const internationalImages = require.context(`../../public/assets/Clients/govtoil`, false, /\.(png|jpe?g|svg)$/);
+  const internationalImgPaths = institutionImages.keys().map(institutionImages);
   
   
   const AccordionItem = ({item}) => {
@@ -99,6 +101,7 @@ const Clients = ({ content, urlFor }) => {
           <AccordionItem item={{name:"Banking", imgPaths: bankingImgPaths}}/>
           <AccordionItem item={{name:"Companies", imgPaths: companiesImgPaths}}/>
           <AccordionItem item={{name:"Institutions", imgPaths: institutionImgPaths}}/>
+          <AccordionItem item={{name:"International", imgPaths: internationalImgPaths}}/>
             
         </Accordion>                  
         </div>

@@ -50,9 +50,29 @@ export default async function handler(req, res) {
     if (!isHuman) {
       return res.status(400).json({ message: 'reCAPTCHA verification failed' });
     }
-
+    const formatMessageContent = () => {
+      const message = `
+        New Move Request:
+        Name: ${name}
+        Email: ${email}
+        review: ${review}
+        Move Date: ${moveDate}
+        sentiment: ${sentiment}
+      `;
+      return message;
+    }
     const result = await createReview(sentiment, review, name, email);
-    
+    const emailResponse = await fetch("/api/sendEmail", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        to: email,
+        message: {messageContent},
+        recaptchaToken: emailToken
+      }),
+    });
     return res.status(200).json({ 
       success: true, 
       message: 'Review submitted successfully',
