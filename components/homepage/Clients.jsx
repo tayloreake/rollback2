@@ -66,7 +66,7 @@ const Clients = ({ content, urlFor }) => {
         <Accordion.Body>
           {item.imgPaths.map((src, i) => (
             <Image 
-              key={`${item.name}-${i}`}
+              key={`${item.name}`}
               alt={`img-${i}`}
               src={src}
               width={200}
@@ -91,7 +91,7 @@ const Clients = ({ content, urlFor }) => {
         <Accordion
           className="accordion"
           id="clients-accordion"
-          defaultActiveKey={"banking"}
+          defaultActiveKey={"Banking"}
           allowMultipleExpanded={false}
           uuid={63213}
         >

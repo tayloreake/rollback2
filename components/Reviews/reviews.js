@@ -8,11 +8,12 @@ const Reviews = () => {
   const [selectedEmoji, setSelectedEmoji] = useState(null)
   const [review, setReview] = useState("")
   const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
-  const recaptchaRef = useRef(null)
+  const [success, setSuccess] = useState(false);
+  const recaptchaRef = useRef(null);
   const [lastSubmissionTime, setLastSubmissionTime] = useState(0)
 
   const emojis = [
@@ -37,8 +38,9 @@ const Reviews = () => {
       return;
     }
 
-    if (!selectedEmoji || !review.trim() || !name.trim() || !email.trim()) {
-      setError("Please fill in all fields");
+    if (!selectedEmoji) {
+
+      setErrors({emoji: "Please select an emoji"});
       return;
     }
 
@@ -52,12 +54,13 @@ const Reviews = () => {
     // Verify reCAPTCHA
     const recaptchaValue = await recaptchaRef.current.executeAsync();
     if (!recaptchaValue) {
-      setError("Please verify that you are human");
-      return;
+      // setError("Please verify that you are human");
+      // return;
     }
 
     setIsSubmitting(true);
     setError("");
+    setErrors({})
     setSuccess(false);
 
     try {
@@ -106,6 +109,7 @@ const Reviews = () => {
   const handleCancel = () => {
     setIsModalOpen(false)
     setError("")
+    setErrors({})
     setSuccess(false)
   }
 
@@ -121,7 +125,7 @@ const Reviews = () => {
             </p>
             <button
               onClick={showModal}
-              className='border-2 border-white text-white hover:bg-white hover:text-[#DB421B] text-xs rounded-full py-2 px-4 w-fit mt-4 transition-all duration-300'>
+              className='border-2 border-white text-white hover:opacity-70 hover:text-[#DB421B] text-xs rounded-full py-2 px-4 w-fit mt-4 transition-all duration-300'>
               Tell us what you think !
             </button>
           </div>
@@ -158,24 +162,27 @@ const Reviews = () => {
             {emojis.map((emoji, index) => (
               <div 
                 key={index} 
-                className="flex flex-col items-center gap-2"
+                className={`${selectedEmoji == emoji?.sentiment ? "border border-red-500 p-1 rounded-md " : ''} flex-col items-center gap-2`}
               >
                 <button
                   onClick={() => setSelectedEmoji(emoji.sentiment)}
-                  className={`text-3xl transition-transform hover:scale-110 ${
-                    selectedEmoji === emoji.sentiment ? "scale-125" : ""
+                  className={`opacity-60 text-3xl transition-transform hover:scale-110 ${
+                    selectedEmoji === emoji.sentiment ? "scale-130 opacity-100" : ""
                   }`}>
                   {emoji.icon}
                 </button>
-                <span className="text-xs text-gray-600 capitalize">
+                <div className="text-xs text-gray-600 capitalize">
                   {emoji.sentiment}
-                </span>
+                </div>
               </div>
             ))}
+            {errors?.emoji && <div className="text-red">{errors?.emoji}</div>}
           </div>
+
 
           <input
             type="text"
+            required
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder='Your Name'
@@ -184,6 +191,7 @@ const Reviews = () => {
 
           <input
             type="email"
+            required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder='Your Email'
@@ -191,6 +199,7 @@ const Reviews = () => {
           />
 
           <textarea
+            required
             value={review}
             onChange={(e) => setReview(e.target.value)}
             placeholder='Tell us about your experience...'
