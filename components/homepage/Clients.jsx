@@ -47,11 +47,11 @@ const Clients = ({ content, urlFor }) => {
     
   }
 
-  const bankingImages = require.context(`../../public/assets/clients/banking`, false, /\.(png|jpe?g|svg)$/);
+  const bankingImages = require.context(`../../public/assets/Clients/banking`, false, /\.(png|jpe?g|svg)$/);
   const bankingImgPaths = bankingImages.keys().map(bankingImages);
-  const companiesImages = require.context(`../../public/assets/clients/companies`, false, /\.(png|jpe?g|svg)$/);
+  const companiesImages = require.context(`../../public/assets/Clients/companies`, false, /\.(png|jpe?g|svg)$/);
   const companiesImgPaths = companiesImages.keys().map(companiesImages);
-  const institutionImages = require.context(`../../public/assets/clients/govtoil`, false, /\.(png|jpe?g|svg)$/);
+  const institutionImages = require.context(`../../public/assets/Clients/govtoil`, false, /\.(png|jpe?g|svg)$/);
   const institutionImgPaths = institutionImages.keys().map(institutionImages);
   
   
