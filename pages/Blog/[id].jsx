@@ -7,7 +7,6 @@ import PortableText from "@sanity/block-content-to-react"
 import PageTitle from "../../components/PageTitle"
 
 const Blog = ({ blog }) => {
-  console.log(blog)
   const builder = imageUrlBuilder(client)
 
   function urlFor(source) {

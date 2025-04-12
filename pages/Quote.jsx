@@ -260,6 +260,7 @@ const Quote = () => {
                 <input
                   type='text'
                   value={fname}
+                  required
                   onChange={(e) => setFname(e.target.value)}
                   className='px-4 py-2 w-full rounded-xl'
                 />
@@ -277,6 +278,7 @@ const Quote = () => {
                 <input
                   type='text'
                   value={number}
+                  required
                   onChange={(e) => setNumber(e.target.value)}
                   className='px-4 py-2 w-full rounded-xl'
                   placeholder="0700000000"
@@ -363,7 +365,7 @@ const Quote = () => {
                     {" "}
                     More than 6br{" "}
                   </option>
-                  <option onClick={() => setBedrooms("studio")}> Studio </option>
+                  <option onClick={() => setBedrooms("studio")}> Studio Apartment</option>
 
                 </select>
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>

@@ -84,6 +84,11 @@ const Navbar = () => {
                                 <p>Gallery</p>
                             </div>
                         </Link>
+                        <Link href='/Feedback'>
+                            <div className='mr-6'>
+                                <p>Feedback</p>
+                            </div>
+                        </Link>
                         <Link href='/Quote'>
                             <div className='mr-6 cursor-pointer px-4 flex flex-row items-center justify-center py-2 border border-[#DB421B] rounded-full shadow-sm shadow-[#DB421B] animate-pulse'>
                                 <p className='text-[#DB421B]'>Request a quote</p>
