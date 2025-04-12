@@ -7,6 +7,27 @@ import { getAboutPageData } from "../sanity/sanity-utils"
 import imageUrlBuilder from "@sanity/image-url"
 import client from "../sanity/config/client-config"
 
+
+
+const OurTalentedPeople = () => {
+  talenteds = [
+    {
+      name: "",
+      image: "",
+      desc: "",
+    }
+  ]
+
+  return (
+    <section>
+      <h1>Our Talented People</h1>
+      <div>
+
+      </div>
+    </section>
+  )
+}
+
 const About = ({ aboutPage }) => {
   const [data, setData] = useState(aboutPage[0])
   const builder = imageUrlBuilder(client)
@@ -77,6 +98,7 @@ const About = ({ aboutPage }) => {
           </div>
         </div>
       </div>
+      <OurTalentedPeople />
       <Clients content={data} urlFor={urlFor} />
     </div>
   )

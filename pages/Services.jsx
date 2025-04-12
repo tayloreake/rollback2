@@ -21,7 +21,10 @@ const Services = ({ content }) => {
   const [type, setType] = useState("Household Moving")
   const [subType, setSubType] = useState("Premoving")
 
-  
+  useEffect(() => {
+    setType("Household Moving");
+    setSubType("Premoving")
+  },[])
 
   // console.log(service, subservice)
 
@@ -111,7 +114,7 @@ const Services = ({ content }) => {
                 className='h-[419px] object-cover max-w-[200px] md:max-w-[419px]'
               />
               <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
-                <h3 className='text-white text-center'>Warehouse Moving</h3>
+                <h3 className='text-white text-center'>Warehouse Storage</h3>
               </div>
             </div>
           </div>
@@ -146,23 +149,23 @@ const Services = ({ content }) => {
               </p>
 
               <div className='flex flex-col md:flex-row mt-6 w-full'>
-                <div className='flex flex-row md:flex-col md:max-w-fit md:pr-6 md:min-w-fit w-full overflow-x-auto pb-6 md:mr-6 border-b md:border-b-0 md:border-r border-gray-200'>
+                <div className='md:flex-col md:max-w-fit md:pr-6 md:min-w-fit w-full overflow-x-auto pb-6 md:mr-6 border-b md:border-b-0 md:border-r border-gray-200'>
                   <div
                     onClick={() => setSubType("Premoving")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap font-bold underline'>Pre Moving Survey </p>
+                    <p className='whitespace-nowrap font-bold'>Pre Moving Survey </p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                   <div
                     onClick={() => setSubType("Quotation")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'>Quotation</p>
+                    <p className='whitespace-nowrap font-bold'>Quotation</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                   <div
                     onClick={() => setSubType("Other Services")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'>Other Services</p>
+                    <p className='whitespace-nowrap font-bold'>Other Services</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                 </div>
@@ -291,7 +294,7 @@ const Services = ({ content }) => {
               {/* <h4 className='mb-2 text-[#DB421B] text-lg'>International Moves</h4> */}
 
               <div className='flex flex-col md:flex-row mt-6 w-full'>
-                <div className='flex flex-row md:flex-col md:pr-6 max-w-fit min-w-fit w-full overflow-x-auto pb-6 md:mr-6 border-b md:border-b-0 md:border-r border-gray-200'>
+                <div className='flex-row md:flex-col md:pr-6 max-w-fit min-w-fit w-full overflow-x-auto pb-6 md:mr-6 border-b md:border-b-0 md:border-r border-gray-200'>
                   <div
                     onClick={() => setSubType("Office Move")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
@@ -301,7 +304,7 @@ const Services = ({ content }) => {
                   <div
                     onClick={() => setSubType("Service List")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'> Service List</p>
+                    <p className='whitespace-nowrap font-bold '> Service List</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                 </div>
@@ -394,17 +397,17 @@ const Services = ({ content }) => {
               {/* <h4 className='mb-2 text-[#DB421B] text-lg'>International Moves</h4> */}
 
               <div className='flex flex-col md:flex-row mt-6 w-full'>
-                <div className='flex flex-row md:flex-col md:pr-6 max-w-fit  w-full overflow-x-auto pb-6 md:mr-6 border-b md:border-b-0 md:border-r border-gray-200'>
+                <div className='flex-row md:flex-col md:pr-6 max-w-fit  w-full overflow-x-auto pb-6 md:mr-6 border-b md:border-b-0 md:border-r border-gray-200'>
                   <div
                     onClick={() => setSubType("Coporate Relocations")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap font-bold underline'>Coporate Relocations</p>
+                    <p className='whitespace-nowrap font-bold underline'>Corporate Relocations</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                   <div
                     onClick={() => setSubType("Coporate Service List")}
                     className=' mr-6 md:mr-0 md:my-4 cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap'> Service List</p>
+                    <p className='whitespace-nowrap font-bold underline'> Service List</p>
                     <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
                   </div>
                 </div>

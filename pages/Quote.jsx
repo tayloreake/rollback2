@@ -95,7 +95,7 @@ const Quote = () => {
         body: JSON.stringify({
           to: email,
           message: messageContent,
-          recaptchaToken: emailToken
+          recaptchaToken: "emailToken"
         }),
       });
       

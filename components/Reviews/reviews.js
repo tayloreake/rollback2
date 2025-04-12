@@ -84,6 +84,31 @@ const Reviews = () => {
         throw new Error(data.message || 'Something went wrong');
       }
 
+
+      // send mail
+      const formatMessageContent = () => {
+            const message = `
+              New Review:
+              Name: ${name}
+              Email: ${email}
+              review: ${review}
+              sentiment: ${selectedEmoji}
+            `;
+            return message;
+          }
+      const messageContent = formatMessageContent();
+      const emailResponse = await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "sales@taylorea.com",
+          message: {messageContent},
+          recaptchaToken: "recaptchaToken"
+        }),
+      });
+      console.log("THE MAIL SENDING OUTCOME  ::: ", emailResponse);
       setSuccess(true);
       setLastSubmissionTime(now);
       
@@ -112,6 +137,8 @@ const Reviews = () => {
     setErrors({})
     setSuccess(false)
   }
+
+  
 
   return (
     <div className='h-[50vh] flex items-center justify-center '>
@@ -176,8 +203,9 @@ const Reviews = () => {
                 </div>
               </div>
             ))}
-            {errors?.emoji && <div className="text-red">{errors?.emoji}</div>}
+            
           </div>
+          {errors?.emoji && <div className="text-red-500">{errors?.emoji}</div>}
 
 
           <input

@@ -47,20 +47,22 @@ const Clients = ({ content, urlFor }) => {
     
   }
 
-  const bankingImages = require.context(`../../public/assets/Clients/banking`, false, /\.(png|jpe?g|svg)$/);
+  const bankingImages = require.context(`../../public/assets/Clients/bank-oil`, false, /\.(png|jpe?g|svg)$/);
   const bankingImgPaths = bankingImages.keys().map(bankingImages);
   const companiesImages = require.context(`../../public/assets/Clients/companies`, false, /\.(png|jpe?g|svg)$/);
   const companiesImgPaths = companiesImages.keys().map(companiesImages);
-  const institutionImages = require.context(`../../public/assets/Clients/govtoil`, false, /\.(png|jpe?g|svg)$/);
+  const institutionImages = require.context(`../../public/assets/Clients/institutions`, false, /\.(png|jpe?g|svg)$/);
   const institutionImgPaths = institutionImages.keys().map(institutionImages);
-  const internationalImages = require.context(`../../public/assets/Clients/govtoil`, false, /\.(png|jpe?g|svg)$/);
-  const internationalImgPaths = institutionImages.keys().map(institutionImages);
+  const internationalImages = require.context(`../../public/assets/Clients/international`, false, /\.(png|jpe?g|svg)$/);
+  const internationalImgPaths = internationalImages.keys().map(internationalImages);
+  const governmentImages = require.context(`../../public/assets/Clients/government`, false, /\.(png|jpe?g|svg)$/);
+  const governmentImgPaths = governmentImages?.keys()?.map(governmentImages);
   
   
   const AccordionItem = ({item}) => {
 
     return (
-      <Accordion.Item eventKey={"clients-" + item.name}>
+      <Accordion.Item eventKey={item.name}>
         <Accordion.Header className="font-bold !capitalize">
             {item.name}
         </Accordion.Header>
@@ -93,15 +95,16 @@ const Clients = ({ content, urlFor }) => {
         <Accordion
           className="accordion"
           id="clients-accordion"
-          defaultActiveKey={"Banking"}
+          defaultActiveKey={"Banking and Oil"}
           allowMultipleExpanded={false}
           uuid={63213}
         >
             
-          <AccordionItem item={{name:"Banking", imgPaths: bankingImgPaths}}/>
+          <AccordionItem item={{name:"Banking and Oil", imgPaths: bankingImgPaths}}/>
           <AccordionItem item={{name:"Companies", imgPaths: companiesImgPaths}}/>
           <AccordionItem item={{name:"Institutions", imgPaths: institutionImgPaths}}/>
           <AccordionItem item={{name:"International", imgPaths: internationalImgPaths}}/>
+          <AccordionItem item={{name:"International", imgPaths: governmentImgPaths}}/>
             
         </Accordion>                  
         </div>
