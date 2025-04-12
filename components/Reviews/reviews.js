@@ -104,11 +104,10 @@ const Reviews = () => {
         },
         body: JSON.stringify({
           to: "sales@taylorea.com",
-          message: {messageContent},
+          message: messageContent,
           recaptchaToken: "recaptchaToken"
         }),
       });
-      console.log("THE MAIL SENDING OUTCOME  ::: ", emailResponse);
       setSuccess(true);
       setLastSubmissionTime(now);
       

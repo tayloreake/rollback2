@@ -58,7 +58,6 @@ const Clients = ({ content, urlFor }) => {
   const governmentImages = require.context(`../../public/assets/Clients/government`, false, /\.(png|jpe?g|svg)$/);
   const governmentImgPaths = governmentImages?.keys()?.map(governmentImages);
   
-  
   const AccordionItem = ({item}) => {
 
     return (
@@ -76,7 +75,7 @@ const Clients = ({ content, urlFor }) => {
               width={200}
               height={100}
               className="inline-block mb-3 client-logo"
-              style={{width:"200px", marginRight:"7px"}}
+              style={{width:"200px", marginRight:"12px"}}
               />
           ))}
         </Accordion.Body>
