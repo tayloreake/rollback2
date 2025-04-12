@@ -27,9 +27,14 @@ const Footer = () => {
             services and logistics services efficiently.
           </p>
           <div className='hidden md:flex flex-wrap justify-between w-full max-w-[249px]'>
-            <Link href='https://web.facebook.com/taylormoversea'>
+          <Link href='https://web.facebook.com/taylormoversea'>
               <div className='p-2 w-[44px] h-[44px] border border-[#DB421B] rounded-2xl flex items-center justify-center'>
                 <BsFacebook size={20} className='text-gray-400' />
+              </div>
+            </Link>
+            <Link href='https://web.instagram.com/taylormoversea'>
+              <div className='p-2 w-[44px] h-[44px] border border-[#DB421B] rounded-2xl flex items-center justify-center'>
+                <BsInstagram size={20} className='text-gray-400' />
               </div>
             </Link>
             <a href='https://twitter.com/taylormoverske' target="_blank">

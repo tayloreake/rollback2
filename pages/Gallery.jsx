@@ -43,17 +43,20 @@ const Gallery = () => {
                     ))}                
                 </Tab>
                 <Tab eventKey="images" title="Images">
-                {imagePaths.map((src, i) => (
-                        <Image 
-                        key={`${"gallery-images-"}-${i}`}
-                        alt={`img-${i}`}
-                        src={src}
-                        width={200}
-                        height={100}
-                        className="inline-block mb-3 client-logo"
-                        style={{width:"200px", marginRight:"7px"}}
-                        />
-                    ))}
+
+                  <div className="md:columns-6 gap-1">
+                      {imagePaths.map((src, i) => (
+                          <Image 
+                          key={`${"gallery-images-"}-${i}`}
+                          alt={`img-${i}`}
+                          src={src}
+                          width={200}
+                          height={100}
+                          className="break-inside-avoid inline-block mb-2 client-logo"
+                          style={{width:"200px", marginRight:"7px"}}
+                          />
+                      ))}
+                  </div>
                 </Tab>
                 
             </Tabs>
