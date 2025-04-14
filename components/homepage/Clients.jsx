@@ -103,7 +103,7 @@ const Clients = ({ content, urlFor }) => {
           <AccordionItem item={{name:"Companies", imgPaths: companiesImgPaths}}/>
           <AccordionItem item={{name:"Institutions", imgPaths: institutionImgPaths}}/>
           <AccordionItem item={{name:"International", imgPaths: internationalImgPaths}}/>
-          <AccordionItem item={{name:"International", imgPaths: governmentImgPaths}}/>
+          <AccordionItem item={{name:"Government", imgPaths: governmentImgPaths}}/>
             
         </Accordion>                  
         </div>
