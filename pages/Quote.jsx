@@ -37,7 +37,8 @@ const Quote = () => {
   };
 
   const handleSendMessage = async () => {
-    const messageContent = formatMessageContent()
+    const tayloreaMessageContent = formatMessageContent('taylorea');
+    const userMessageContent = formatMessageContent('user');
 
 
     try {
@@ -66,7 +67,7 @@ const Quote = () => {
         },
         body: JSON.stringify({
           to: ["+254721410517"],
-          message: messageContent,
+          message: tayloreaMessageContent,
           recaptchaToken: smsToken
         }),
       });
@@ -87,6 +88,7 @@ const Quote = () => {
         throw new Error('Failed to verify reCAPTCHA for email');
       }
 
+
       const emailResponse = await fetch("/api/sendEmail", {
         method: "POST",
         headers: {
@@ -94,12 +96,24 @@ const Quote = () => {
         },
         body: JSON.stringify({
           to: email,
-          message: messageContent,
+          message: userMessageContent,
+          recaptchaToken: "emailToken"
+        }),
+      });
+
+      const salesMailResponse = await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          to: "sales@taylorea.com",
+          message: tayloreaMessageContent,
           recaptchaToken: "emailToken"
         }),
       });
       
-      if (!emailResponse.ok) {
+      if (!emailResponse.ok || !salesMailResponse.ok) {
         const errorData = await emailResponse.json();
         throw new Error(errorData.message || 'Failed to send email');
       }
@@ -138,9 +152,10 @@ const Quote = () => {
     }
   }
 
-  const formatMessageContent = () => {
+  const formatMessageContent = (to) => {
     const message = `
       New Move Request:
+      ${to == 'user' ? 'dear ' + fname + '\n' + 'This is a confirmation email that you have made a new move request with the following details:' : ''}
       Name: ${fname}
       Email: ${email}
       Phone Number: ${number}

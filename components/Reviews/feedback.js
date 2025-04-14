@@ -2,6 +2,7 @@ import { Modal, notification } from "antd";
 import Image from "next/image";
 import React, { useState, useRef } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
+import Feedback from "../../pages/Feedback";
 
 const ratingQuestions = [
     { text: "How would you rate the booking process?" },
@@ -15,7 +16,7 @@ const ratingQuestions = [
     { text: "Overall, how was your experience?" },
 ];
 
-const Reviews = () => {
+const Feedback = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -250,4 +251,4 @@ const Reviews = () => {
     );
 };
 
-export default Reviews;
+export default Feedback;
