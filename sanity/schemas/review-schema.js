@@ -16,6 +16,36 @@ export default {
       validation: Rule => Rule.required().email(),
     },
     {
+      name: "finalized",
+      title: "Finalized",
+      type: "string",
+      validation: Rule => Rule.required(),
+    },
+    {
+      name: "booking",
+      title: "Booking",
+      type: "number",
+      validation: Rule => Rule.required(),
+    },
+    {
+      name: "communication",
+      title: "Communication",
+      type: "number",
+      validation: Rule => Rule.required(),
+    },
+    {
+      name: "punctuality",
+      title: "Punctuality",
+      type: "number",
+      validation: Rule => Rule.required(),
+    },
+    {
+      name: "professionalism",
+      title: "Professionalism",
+      type: "number",
+      validation: Rule => Rule.required(),
+    },
+    {
       name: "sentiment",
       title: "Sentiment",
       type: "string",

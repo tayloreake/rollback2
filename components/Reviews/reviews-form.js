@@ -2,6 +2,14 @@ import Image from "next/image"
 import React, { useState, useRef } from "react"
 import ReCAPTCHA from "react-google-recaptcha"
 
+
+const ratingQuestions = [
+    { text: "How would you rate the booking process?", name: "booking" },
+    { text: "How would you rate the communication?", name:"communication" },
+    { text: "How would you rate the punctuality?", name:"punctuality" },
+    { text: "How would you rate the professionalism?", name:"professionalism" }
+];
+
 const ReviewForm = ({setIsModalOpen}) => {
 
     const [selectedEmoji, setSelectedEmoji] = useState(null)
@@ -12,7 +20,10 @@ const ReviewForm = ({setIsModalOpen}) => {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState("")
     const [success, setSuccess] = useState(false);
+    const [ratings, setRatings] = useState(Array(4).fill(1));
+    const [finalized, setFinalized] = useState(null);
     const recaptchaRef = useRef(null);
+    
     const [lastSubmissionTime, setLastSubmissionTime] = useState(0)
   
     const emojis = [
@@ -23,6 +34,11 @@ const ReviewForm = ({setIsModalOpen}) => {
       { icon: "😄", sentiment: "very happy" },
     ]
   
+    const handleRatingChange = (index, value) => {
+      const newRatings = [...ratings];
+      newRatings[index] = value;
+      setRatings(newRatings);
+  };
 
     const handleOk = async () => {
         // Check for rapid submissions (1 minute cooldown)
@@ -66,6 +82,11 @@ const ReviewForm = ({setIsModalOpen}) => {
             body: JSON.stringify({
               name,
               email,
+              finalized: finalized,
+              booking: ratings[0],
+              communication: ratings[1],
+              punctuality: ratings[2],
+              professionalism: ratings[3],
               sentiment: selectedEmoji,
               review: review.trim(),
               recaptchaToken: recaptchaValue,
@@ -85,8 +106,13 @@ const ReviewForm = ({setIsModalOpen}) => {
                   New Review:
                   Name: ${name}
                   Email: ${email}
-                  review: ${review}
                   sentiment: ${selectedEmoji}
+                  Finalized Moving: ${finalized}
+                  Booking: ${ratings[0]}/5,
+                  Communication: ${ratings[1]}/5,
+                  Punctuality: ${ratings[2]}/5,
+                  Professionalism: ${ratings[3]}/5,
+                  Review: ${review}
                 `;
                 return message;
               }
@@ -178,6 +204,54 @@ const ReviewForm = ({setIsModalOpen}) => {
             className='w-full p-3 border rounded-lg mb-6 focus:outline-none focus:ring-2 focus:ring-[#DB421B]'
           />
 
+
+          <div className="mb-6">
+            <p className="mb-2 font-medium">Was the Moving finalized?</p>
+            <div className="flex gap-6">
+                <label className="flex items-center gap-2">
+                    <input
+                        type="radio"
+                        name="finalized"
+                        value="Yes"
+                        onChange={() => setFinalized("Yes")}
+                    />
+                    Yes
+                </label>
+                <label className="flex items-center gap-2">
+                    <input
+                        type="radio"
+                        name="finalized"
+                        value="No"
+                        onChange={() => setFinalized("No")}
+                    />
+                    No
+                </label>
+            </div>
+            </div>
+            
+
+            {/* Satisfaction Ratings */}
+            {ratingQuestions.map((question, index) => (
+                <div key={index} className="mb-6">
+                    <p className="mb-2 font-medium">{question.text}</p>
+                    <div className="flex gap-4">
+                        {[1, 2, 3, 4, 5].map((num) => (
+                            <label key={num} className="flex items-center gap-1">
+                                <input
+                                    type="radio"
+                                    name={`rating-${index}`}
+                                    value={num}
+                                    onChange={() => handleRatingChange(index, num)}
+                                />
+                                {num}
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            ))}
+          <div>
+
+          </div>
           <textarea
             required
             value={review}
