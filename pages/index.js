@@ -32,7 +32,7 @@ export default function Home({ landingPage }) {
       <Cta content={data} />
       <Clients content={data} urlFor={urlFor} />
       {/* <Testimonials /> */}
-      <Reviews />
+      {/* <Reviews /> */}
     </div>
   )
 }

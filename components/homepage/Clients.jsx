@@ -2,6 +2,7 @@ import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { BiChevronRight } from "react-icons/bi"
 import Accordion from 'react-bootstrap/Accordion';
+import Reviews from "../Reviews/reviews";
 
 const Clients = ({ content, urlFor }) => {
   const [info, setInfo] = useState([])
@@ -84,28 +85,44 @@ const Clients = ({ content, urlFor }) => {
   }
   return (
     <div className='w-full h-full py-4 px-4 md:px-8 flex items-center justify-center'>
-      <div className='flex flex-col max-w-[1440px] w-full'>
-        <h2 className='text-xl font-semibold'>{content.clientsTitle}</h2>
+      <div className='container'>
         <hr className='border border-[#DB421B] w-[50px] my-3' />
 
-        <p className='max-w-[1400px]'>{content.clientsDescription}</p>
+        {/* <p className='max-w-[1400px]'>{content.clientsDescription}</p> */}
 
-        <div className='flex flex-col mt-12'>
-        <Accordion
-          className="accordion"
-          id="clients-accordion"
-          defaultActiveKey={"Banking and Oil"}
-          allowMultipleExpanded={false}
-          uuid={63213}
-        >
-            
-          <AccordionItem item={{name:"Banking and Oil", imgPaths: bankingImgPaths}}/>
-          <AccordionItem item={{name:"Companies", imgPaths: companiesImgPaths}}/>
-          <AccordionItem item={{name:"Institutions", imgPaths: institutionImgPaths}}/>
-          <AccordionItem item={{name:"International", imgPaths: internationalImgPaths}}/>
-          <AccordionItem item={{name:"Government", imgPaths: governmentImgPaths}}/>
-            
-        </Accordion>                  
+        
+        
+        <div className='row'>
+          <div className="col-md-6 md:pr-5">
+            <h1 className="my-3 text-3xl font-bold">What Our Customers Say</h1>
+
+            <div className="my-2">
+              We have a diversified portfolio of moving services in Kenya that include residential moving, corporate moving, office moving and industrial moving services. Whether you're moving within Nairobi, moving anywhere in Kenya or international moving, Taylor Movers Kenya has a solution tailor made for you.
+            </div>
+
+            <div className="mt-5">
+              <Reviews />
+            </div>
+          </div>
+
+          <div className="col-md-6">
+
+            <h1 className="text-2xl my-3 font-bold">Our Clients</h1>
+            <Accordion
+              className="accordion"
+              id="clients-accordion"
+              defaultActiveKey={"Banking and Oil"}
+              allowMultipleExpanded={false}
+              uuid={63213}
+            >
+              <AccordionItem item={{name:"Banking and Oil", imgPaths: bankingImgPaths}}/>
+              <AccordionItem item={{name:"Companies", imgPaths: companiesImgPaths}}/>
+              <AccordionItem item={{name:"Institutions", imgPaths: institutionImgPaths}}/>
+              <AccordionItem item={{name:"International", imgPaths: internationalImgPaths}}/>
+              <AccordionItem item={{name:"Government", imgPaths: governmentImgPaths}}/>
+            </Accordion>  
+          </div>
+                        
         </div>
       </div>
     </div>

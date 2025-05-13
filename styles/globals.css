@@ -52,3 +52,14 @@ body {
 .accordion-header .accordion-button {
   text-transform: capitalize !important;
 }
+
+.client-logo {
+  border: 1px solid #dddddd;
+  padding: 4px 10px;
+  border-radius: 4px;
+  height: 100px;
+}
+
+.container {
+  max-width: 1200px;
+}

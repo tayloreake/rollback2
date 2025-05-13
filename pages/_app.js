@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Layout from "../components/Layout"
 import "../styles/globals.css"
 import { ToastContainer } from "react-toastify"
+
 import "react-toastify/dist/ReactToastify.css"
 import TawkTo from "next-tawkto"
 import { useEffect } from "react"

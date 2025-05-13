@@ -52,7 +52,7 @@ const Gallery = () => {
                           src={src}
                           width={200}
                           height={100}
-                          className="break-inside-avoid inline-block mb-2 client-logo"
+                          className="break-inside-avoid inline-block mb-2"
                           style={{width:"200px", marginRight:"7px"}}
                           />
                       ))}
