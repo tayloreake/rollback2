@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react"
 import { BiChevronRight } from "react-icons/bi"
 import Accordion from 'react-bootstrap/Accordion';
 import Reviews from "../Reviews/reviews";
+import { isMobile } from "react-device-detect";
+import { Tab, Tabs } from "react-bootstrap";
 
 const Clients = ({ content, urlFor }) => {
   const [info, setInfo] = useState([])
@@ -66,21 +68,82 @@ const Clients = ({ content, urlFor }) => {
         <Accordion.Header className="font-bold !capitalize">
             {item.name}
         </Accordion.Header>
-
         <Accordion.Body>
           {item.imgPaths.map((src, i) => (
             <Image 
               key={`${item.name}`}
               alt={`img-${i}`}
               src={src}
-              width={200}
+              width={100}
               height={100}
               className="inline-block mb-3 client-logo"
-              style={{width:"200px", marginRight:"12px"}}
+              style={{width:"100px", marginRight:"12px"}}
               />
           ))}
         </Accordion.Body>
       </Accordion.Item>
+    )
+  }
+
+
+  const ClientTabs = () => {
+
+    const tabsList = [
+      {
+        title: "banking and oil",
+        eventKey: 'banking',
+        imgPaths: bankingImgPaths,
+      },
+      {
+        title: "Companies",
+        eventKey: 'companies',
+        imgPaths: companiesImgPaths,
+      },
+      {
+        title: "institutions",
+        eventKey: 'institutions',
+        imgPaths: institutionImgPaths,
+      },
+      {
+        title: "International",
+        eventKey: 'international',
+        imgPaths: internationalImgPaths,
+      },
+      {
+        title: "government",
+        eventKey: 'government',
+        imgPaths: governmentImgPaths,
+      }
+    ]
+
+    return (
+      <div className="">
+      <Tabs defaultActiveKey={"banking"} id="scrollable-tabs" className="plain-tabs flex-nowrap">
+        {/* Make the tabs dynamic */}
+
+        {
+          tabsList?.map((item, idx) => (
+            <Tab 
+              eventKey={item?.eventKey}
+              title={item?.title}
+              className="p-3 max-h-[300px] overflow-auto"
+              >
+                {item.imgPaths.map((src, i) => (
+                  <Image 
+                    key={`${item.name}`}
+                    alt={`img-${i}`}
+                    src={src}
+                    width={100}
+                    height={200}
+                    className="inline-block mb-3 client-logo"
+                    style={{width:"200px", marginRight:"12px"}}
+                    />
+                ))}
+            </Tab>
+          ))
+        }
+    </Tabs>
+    </div>
     )
   }
   return (
@@ -106,9 +169,11 @@ const Clients = ({ content, urlFor }) => {
           </div>
 
           <div className="col-md-6">
+            <h1 className="text-2xl my-4 font-bold">Our Clients</h1>
 
-            <h1 className="text-2xl my-3 font-bold">Our Clients</h1>
-            <Accordion
+            {isMobile 
+              ?
+              <Accordion
               className="accordion"
               id="clients-accordion"
               defaultActiveKey={"Banking and Oil"}
@@ -120,7 +185,12 @@ const Clients = ({ content, urlFor }) => {
               <AccordionItem item={{name:"Institutions", imgPaths: institutionImgPaths}}/>
               <AccordionItem item={{name:"International", imgPaths: internationalImgPaths}}/>
               <AccordionItem item={{name:"Government", imgPaths: governmentImgPaths}}/>
-            </Accordion>  
+            </Accordion>
+            :
+            
+              <ClientTabs />
+            }
+            
           </div>
                         
         </div>

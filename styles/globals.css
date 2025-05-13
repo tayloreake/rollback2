@@ -55,11 +55,37 @@ body {
 
 .client-logo {
   border: 1px solid #dddddd;
-  padding: 4px 10px;
+  padding: 4px 8px;
   border-radius: 4px;
-  height: 100px;
+  height: 80px;
 }
 
 .container {
   max-width: 1200px;
+}
+
+#clients-accordion .accordion-body {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.nav-tabs {
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.nav-tabs .nav-link {
+  color: #666 !important;
+  background-color: var(--bs-nav-tabs-link-active-bg);
+  border-color: transparent !important;
+  clear: both;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-left: 0px !important;
+  padding-right: 8px;
+}
+.nav-tabs .nav-link.active {
+  border-bottom: 2px solid !important;
+
 }
