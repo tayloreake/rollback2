@@ -24,18 +24,18 @@ const Navbar = () => {
 
   return (
     <div className='w-full h-full'>
-        <div className='w-full h-full'>
-            <div className='bg-[#DB421B]  w-full h-full flex flex-row items-center justify-center md:px-8'>
+        <div className='h-full container'>
+            <div className='bg-[#]  w-full h-full flex flex-row items-center justify-center md:px-8'>
                 <div className='max-w-[1720px] flex flex-row items-end justify-end w-full px-2'>
-                    <Link href='https://wa.me/254721410517 ' passHref 
-                        className='flex flex-row items-center text-white mr-6  bg-[#182C4D] px-2 py-2'>
+                    <Link href=' ' passHref 
+                        className='flex flex-row items-center mr-6 px-2 py-2'>
                             <BsFillTelephoneFill className='mr-1'/> | <BsWhatsapp className='mr-2 ml-1' />
                             +254 721410517
                     </Link>
-                    <div className='flex flex-row items-center text-white py-2'>
+                    {/* <div className='flex flex-row items-center text-white py-2'>
                         <MdEmail className='mr-2'/>
                         <p className='font-bold text-sm'>sales@taylorea.com</p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <div className='md:hidden py-2 my-2 px-2  md:px-8  flex-row justify-center items-center'>
@@ -49,11 +49,11 @@ const Navbar = () => {
 
         
             <div className='hidden md:flex w-full py-2 my-2 px-2  md:px-8  flex-row justify-center items-center'>
-                <div className='max-w-[1720px] w-full flex flex-row justify-between'>
+                <div className='w-full flex flex-row justify-between'>
                     <Link href='/'>
                         <Image src='/assets/General/logo.png' width={205} height={48}  alt='Taylor Movers Logo' />
                     </Link>
-                    <div className='flex flex-row items-center text-sm'>
+                    <div className='mb-2 left-slanted-box !pl-[32px] text-white font-[500] bg-[#FF5000] px-3 flex flex-row items-center text-sm'>
                         <Link href='/'>
                             <div className='mr-6'>
                                 <p>Home</p>
@@ -89,24 +89,18 @@ const Navbar = () => {
                                 <p>Feedback</p>
                             </div>
                         </Link>
+                    </div>
+
+                    <div className='mb-2 right-slanted-box flex items-center px-4 py-2 bg-[#FF5000]'>
                         <Link href='/Quote'>
-                            <div className='mr-6 cursor-pointer px-4 flex flex-row items-center justify-center py-2 border border-[#DB421B] rounded-full shadow-sm shadow-[#DB421B] animate-pulse'>
-                                <p className='text-[#DB421B]'>Request a quote</p>
-                                <BsClipboard className='text-[#DB421B] ml-2'/>
+                            <div className='cursor-pointer text-white'>
+                                <p className=''>Request a quote</p>
                             </div>
                         </Link>
-
                     </div>
+                    
                 </div>
             </div>
-            
-            {/* <Link href='https://wa.me/254721410517 ' passHref>
-                <div className='bg-[#182C4D] cursor-pointer w-full h-full max-h-[37px] py-2 flex flex-row items-center justify-center md:px-8'>
-                    <div className='max-w-[1720px] flex flex-row items-center justify-center w-full py-2'>
-                        <p className='font-bold text-sm text-white'>Click here to chat with us now</p>
-                    </div>
-                </div>
-            </Link> */}
         </div>
 
         <div>

@@ -89,3 +89,11 @@ body {
   border-bottom: 2px solid !important;
 
 }
+
+.right-slanted-box {
+  clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+}
+
+.left-slanted-box {
+  clip-path: polygon(5% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
