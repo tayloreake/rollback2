@@ -40,7 +40,7 @@ const About = ({ aboutPage }) => {
     <div className='w-full h-full'>
       {getPageMetadata("about")}
 
-      <Jumbotron image={'about.png'}/>
+      <Jumbotron image={'about.png'} text={""} />
       
       <div className="row mx-0 items-center">
         <div className="col-md-6 ">

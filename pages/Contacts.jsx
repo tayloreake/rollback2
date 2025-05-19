@@ -4,9 +4,13 @@ import Featured from "../components/Contacts/Featured"
 import Testimonials from "../components/homepage/Testimonials"
 import { toast } from "react-toastify"
 import PageTitle from "../components/PageTitle"
+import Jumbotron from "../components/jumbotron"
 
 const Contacts = () => {
-  const [fname, setFname] = useState("")
+  
+
+  const ContactForm = () => {
+const [fname, setFname] = useState("")
   const [lname, setLname] = useState("")
   const [email, setEmail] = useState("")
   const [number, setNumber] = useState("")
@@ -89,130 +93,128 @@ const Contacts = () => {
       toast.error("Phone number does not match the required format +254...")
     }
   }
-
-  return (
-    <div className='w-full h-full flex flex-col items-center justify-center'>
-      <PageTitle title={"Contact Us"} />
-      <div className='w-full h-full flex flex-col items-center justify-center max-w-[1440px]'>
-        <div className='py-12  flex flex-col px-4'>
-                  <h1 className='mb-4 md:mb-12 text-xl'>WE WOULD LOVE TO HEAR FROM YOU</h1>
-          <p>
-                      WE ARE HERE TO ANSWER ANY QUESTIONS YOU MAY HAVE ABOUT TAYLOR MOVERS AND THE SERVICES WE OFFER.
-                      REACH OUT TO US BY FILLING THE BELOW FORM AND WE WILL RESPOND AS SOON AS WE CAN.
-          </p>
-          <div className='my-4 py-4 flex flex-col md:flex-row justify-between'>
-            <div className='flex flex-col'>
-              <h3 className='mb-4 text-lg text-gray-500'>
-                Main Office Contact Details
-              </h3>
-              <p className='mb-2 text-[#DB421B]'>Nairobi Office: </p>
-              <p className='mb-4 text-sm'>
-                Nazarene Complex Suite 1, Central Church of The Nazarene
-                <br />
-                Ngong Road,
-                <br />
-                Nairobi, Kenya
-                <br />
-                Tel: 0721410517
-                <br />
-                Email: info@taylorea.com
-              </p>
-              <p className='mb-2 text-[#DB421B]'>Mombasa Office: </p>
-              <p className='mb-2 text-sm'>
-                Moi Avenue,
-                <br />
-                Ivory Building, 2nd Floor
-                <br />
-                Mombasa Kenya.
-                <br />
-                Tel: 0758590998
-                <br />
-                Email: msacc@taylorea.com
-              </p>
-            </div>
-            <Image
-              src='/assets/Contacts/map2.png'
-              alt='map'
-              width={669}
-              height={368}
-              className=' w-full md:max-w-[669px]  my-4'
+    return (
+      <form
+        onSubmit={(e) => handleSubmit(e)}
+        className='flex-col'>
+        <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
+          <div className='rounded-xl relative w-full mb-4 md:mr-2'>
+            <label className='font-[600] text-sm text-gray-600 mb-1'>
+              First Name
+            </label>
+            <input
+              type='text'
+              value={fname}
+              required
+              placeholder="First Name"
+              onChange={(e) => setFname(e.target.value)}
+              className='px-2 w-full py-2 rounded-xl'
             />
+            
+          </div>
+          <div className='relative w-full mb-4 md:mr-2'>
+            <label className='font-[600] text-sm text-gray-600 mb-1'>
+              Last Name
+            </label>
+            <input
+              type='text'
+              value={lname}
+              placeholder="Last Name"
+              onChange={(e) => setLname(e.target.value)}
+              className='px-2 w-full py-2 rounded-xl'
+            />
+            
           </div>
         </div>
-        <div className='flwe flex-col w-full px-4 mb-4'>
-          <h3 className='text-lg mb-4'>Contact Us</h3>
-          <form
-            onSubmit={(e) => handleSubmit(e)}
-            className='w-full flex flex-col'>
-            <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
-              <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-                <input
-                  type='text'
-                  value={fname}
-                  onChange={(e) => setFname(e.target.value)}
-                  className='px-4 w-full py-2 rounded-xl'
-                />
-                <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                  First Name
-                </label>
-              </div>
-              <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-                <input
-                  type='text'
-                  value={lname}
-                  onChange={(e) => setLname(e.target.value)}
-                  className='px-4 w-full py-2 rounded-xl'
-                />
-                <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                  Last Name
-                </label>
-              </div>
-            </div>
-            <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
-              <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-                <input
-                  type='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className='px-4 w-full py-2 rounded-xl'
-                />
-                <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                  Email
-                </label>
-              </div>
-              <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-                <input
-                  type='text'
-                  value={number}
-                  onChange={(e) => setNumber(e.target.value)}
-                  className='px-4 w-full py-2 rounded-xl'
-                />
-                <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                  Phone Number
-                </label>
-              </div>
-            </div>
-
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              cols='30'
-              rows='10'
-              className='p-3 my-4 border border-grey-500 rounded-xl w-full max-w-[351px] md:max-w-[800px]'
+        <div className='relative w-full mb-4 md:mr-2'>
+            <label className='font-[600] text-sm text-gray-600 mb-1'>
+              Email
+            </label>
+            <input
+              type='email'
+              value={email}
+              placeholder="example@email.com"
+              onChange={(e) => setEmail(e.target.value)}
+              className='px-2 w-full py-2 rounded-xl'
             />
+            
+          </div>
+          <div className='relative w-full mb-4 md:mr-2'>
+            <label className='font-[600] text-sm text-gray-600 mb-1'>
+              Mobile Phone
+            </label>
+            <input
+              type='text'
+              value={number}
+              required
+              placeholder="0712345678"
+              onChange={(e) => setNumber(e.target.value)}
+              className='px-2 w-full py-2 rounded-xl'
+            />
+            
+          </div>
 
-            <button
-              type='submit'
-              className='px-4 py-2 bg-[#E25B3B] text-white max-w-[130px]'>
-              Submit
-            </button>
-          </form>
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          cols='30'
+          rows='10'
+          placeholder="Message"
+          className='p-3 my-2 border border-grey-500 rounded-xl w-full max-w-[351px] md:max-w-[800px]'
+        />
+
+        <button
+          type='submit'
+          className='font-bold px-4 py-2 mb-2 bg-[#F05423] text-white w-full rounded-xl'>
+          Send Message
+        </button>
+      </form>
+    )
+  }
+
+  const ContactAddress = () => {
+
+    return (
+      <div className="bg-[#F05423] text-white rounded-md h-full px-8 py-8">
+        <h1 className="text-black font-bold my-3">Mombasa Office</h1>
+        <div className="mb-5">
+          Moi Avenue,<br />Ivory Building, 2nd Floor<br/>Mombasa Kenya.<br/>Tel: 0758590998<br/>Email: msacc@taylorea.com
+        </div>
+        <h1 className="text-black font-bold my-3">Nairobi Office</h1>
+        <div className="">
+          Nazarene Complex Suite 1,<br/>Central Church of The Nazarene<br/>Ngong Road,<br/>Nairobi, Kenya<br/>Tel: 0721410517<br/>Email: info@taylorea.com
         </div>
       </div>
-      <div className='mt-8 w-full'>
-        <Testimonials />
+    )
+  }
+
+  return (
+    <>
+      <Jumbotron image={"contacts.png"} text={"We would love to hear from you"}/>
+
+      <div className='container pt-6'>
+        <p className="text-xl py-4 !pt-8">
+          We are here to answer any questions you may have about Taylor Movers and the services we offer. Reach out to us by filling the below form and we will respond as soon as we can.
+        </p>
       </div>
-    </div>
+
+      <div className="container">
+        <div className="row bg-[#EDEDED] py-4 px-3 my-4">
+          <div className="col-md-6">
+            <div className="">
+              <p className="my-3">
+                Feel free to contact us and we will get Back to you as soon as we can. 
+              </p>
+              <ContactForm />
+            </div>
+          </div>
+
+          <div className="col-md-6">
+            <ContactAddress />
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
 

@@ -27,11 +27,11 @@ const Navbar = () => {
         <div className='h-full container'>
             <div className='bg-[#]  w-full h-full flex flex-row items-center justify-center md:px-8'>
                 <div className='max-w-[1720px] flex flex-row items-end justify-end w-full px-2'>
-                    <Link href=' ' passHref 
+                    <a href='tel:+254721410517' 
                         className='flex flex-row items-center mr-6 px-2 py-2'>
-                            <BsFillTelephoneFill className='mr-1'/> | <BsWhatsapp className='mr-2 ml-1' />
-                            +254 721410517
-                    </Link>
+                            <BsFillTelephoneFill className='mr-1'/>
+                            +254 721410517 
+                    </a>
                     {/* <div className='flex flex-row items-center text-white py-2'>
                         <MdEmail className='mr-2'/>
                         <p className='font-bold text-sm'>sales@taylorea.com</p>

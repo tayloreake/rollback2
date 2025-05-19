@@ -5,7 +5,20 @@ import { getServicesPageData } from "../sanity/sanity-utils"
 import { useRouter } from "next/router"
 import PageTitle from "../components/PageTitle"
 import Script from 'next/script';
+import Jumbotron from "../components/jumbotron"
+import { isMobile } from "react-device-detect"
+import Slider from "react-slick"
 
+
+const settings = {
+  dots: true,
+  infinite: true,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  autoplay: true,
+  autoplaySpeed: 3000,
+};
 const Services = ({ content }) => {
   const router = useRouter();
   const videoRef = useRef(null);
@@ -28,6 +41,54 @@ const Services = ({ content }) => {
 
   // console.log(service, subservice)
 
+  const services = [
+
+    {
+      name: "Household Moving",
+      image: "household.jpg",
+      titlePos: "bottom"
+    },
+
+    {
+      name: "Office Moving",
+      image: "officehold.jpg",
+      titlePos: "top"
+    },
+    {
+      name: "Corporate Moving",
+      image: "corporatehold.jpg",
+      titlePos: "bottom"
+    },
+    {
+      name: "Warehousing",
+      image: "warehousehold.jpg",
+      titlePos: "top"
+    },
+
+  ]
+
+  const ServiceItem = ({item}) => {
+
+    return (
+      <div
+        onClick={() => setType(item?.name)}
+        className='px-0 bg-black relative h-full hover:animate-pulse cursor-pointer'>
+        <Image
+          src={`/assets/services/${item?.image}`}
+          alt=""
+          width={420}
+          height={420}
+          // fill
+          // style={{width:"300px", height:"400px", objectFit:"cover"}}
+          className=''
+        />
+        <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
+          <h3 className='text-white text-center'>{item?.name}</h3>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
       {generateServicesPageMetadata([
@@ -36,90 +97,41 @@ const Services = ({ content }) => {
         "corporate",
         "warehousingAndStorage",
       ])}
-      <div className='w-full h-full flex flex-col items-center justify-center'>
-        <PageTitle title={"Our Services"} />
-        <div className='max-w-[1440px] w-full h-full flex flex-col items-start justify-start py-8 my-4 px-4 md:px-8'>
-          <div className='flex flex-col mb-6'>
-            {/* <h2 className='text-xl mb-2 font-semibold'>Our Services</h2> */}
-            <p>
-              We specialize in local and international relocations. Taylor
-              Movers is a privately held firm committed to excellence through
-              providing relocations, transportation, warehousing, expatriate
-              mobility services and logistics services efficiently.
-            </p>
+
+      <Jumbotron image={"services.png"} text={"What we do"}/>
+
+      <div className="container my-4">
+          <h1 className="text-3xl font-[500] text-[#ff5000] py-2 !mt-12">We specialize in</h1>
+          <div className="py-3">
+            <p>local and international relocation. Taylor Movers is a privately held firm committed to excellence through providing relocation, transportation, warehousing, expatriate mobility services and logistics services efficiently.</p>
           </div>
-          <div className='flex flex-row items-center w-full h-full overflow-x-auto pb-4 mb-12'>
-            <div
-              onClick={() => setType("Household Moving")}
-              className='bg-black relative h-full hover:animate-pulse cursor-pointer'>
-              <Image
-                src='/assets/services/house.jpg'
-                alt='Household Moving'
-                width={419}
-                height={419}
-                className='max-h-[419px] object-cover max-w-[200px] md:max-w-[419px]'
-              />
-              <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
-                <h3 className='text-white text-center'>Household Moving</h3>
-              </div>
-            </div>
-            <div
-              onClick={() => setType("Office Moving")}
-              className='bg-black relative h-full hover:animate-pulse cursor-pointer'>
-              <video 
-                // ref={"videoRef"}
-                width="320"
-                height="240" 
-                controls
-                autoPlay muted loop
-                playsInline
-                className="max-w-[419px] w-[419px] h-[419px]"
-                >
-                <source 
-                  src="/assets/services/office.mp4" type="video/mp4"/>
-                <source src="/assets/services/office.mov" type="video/mov"/>
+      </div>
+      <div className='container'>
+          
 
-                
-                Your browser does not support the video tag.
-              </video>
-              
-              {/* <iframe src="https://www.youtube.com/embed/19g66ezsKAg" allowFullScreen /> */}
+          <div className='row items-center w-full h-full overflow-x-auto pb-4 mb-12'>
+          {!isMobile 
+              ?
+            services?.map((item, idx) => (
+              <div className="col-md-3 px-0"><ServiceItem item={item} /></div>
+            ))
+            
+            :
+          <Slider {...settings}>
+                {services?.map((service, idx) => (
+                    <div className="col-12">
+                        <ServiceItem item={service} />
+                    </div>
 
-              <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
-                <h3 className='text-white text-center'>Office Moving</h3>
-              </div>
-            </div>
-            <div
-              onClick={() => setType("Corporate Moving")}
-              className='bg-black relative h-full hover:animate-pulse cursor-pointer'>
-              <Image
-                src='/assets/services/corporate.jpg'
-                alt='Corporate Moving'
-                width={419}
-                height={419}
-                className='max-h-[419px] object-cover max-w-[200px] md:max-w-[419px]'
-              />
-              <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
-                <h3 className='text-white text-center'>Corporate Moving</h3>
-              </div>
-            </div>
-            <div
-              onClick={() => setType("Warehouse Moving")}
-              className='bg-black relative h-full hover:animate-pulse cursor-pointer'>
-              <Image
-                src='/assets/services/warehouse.jpg'
-                alt='Warehouse Moving'
-                width={419}
-                height={419}
-                className='h-[419px] object-cover max-w-[200px] md:max-w-[419px]'
-              />
-              <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
-                <h3 className='text-white text-center'>Warehouse Storage</h3>
-              </div>
-            </div>
+                ))}
+            </Slider>
+          
+          }
           </div>
-
-          {type === "Household Moving" ? (
+          
+          {
+          
+          type === "Household Moving" ? (
             <div className='flex flex-col items-start justify-start w-full'>
               <h3 className='font-bold mb-4 text-xl'>Household Moving</h3>
               <h4 className='mb-2 text-[#DB421B] text-lg'>Local Moves</h4>
@@ -556,7 +568,6 @@ const Services = ({ content }) => {
             </div>
           ) : null}
         </div>
-      </div>
     </>
   )
 }
