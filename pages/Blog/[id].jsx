@@ -5,6 +5,7 @@ import client from "../../sanity/config/client-config"
 import imageUrlBuilder from "@sanity/image-url"
 import PortableText from "@sanity/block-content-to-react"
 import PageTitle from "../../components/PageTitle"
+import Image from "next/image"
 
 const Blog = ({ blog }) => {
   const builder = imageUrlBuilder(client)
@@ -13,11 +14,17 @@ const Blog = ({ blog }) => {
     return builder.image(source)
   }
   return (
-    <div className='w-full h-full flex flex-col items-center justify-center'>
-      <PageTitle title={blog.blogTitle} image={urlFor(blog.blogImage).url()} />
-      <div className='max-w-[1440px] w-full h-full flex flex-col items-start justify-start py-8 my-4 px-4 md:px-8'>
+    <div className='w-full h-full flex flex-col items-center justify-center container'>
+      <div className=''>
         <div className='flex flex-col mb-6'>
-          <h2 className='text-2xl mb-4'>{blog.blogTitle}</h2>
+          <h2 className='text-3xl text-[#FF5000] my-4 !mt-9 font-bold'>{blog.blogTitle}</h2>
+          <Image
+          src={urlFor(blog.blogImage).url()}
+          alt='background'
+          width={350}
+          height={350}
+          className='mb-6 md:mb-0 cursor-pointer w-full max-h-[500px] my-4'
+        />
           <PortableText blocks={blog.blogText} />
         </div>
       </div>
