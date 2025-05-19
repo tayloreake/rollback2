@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import PageTitle from "../components/PageTitle"
 import Image from "next/image"
 import getPageMetadata from "../SEO/seo";
@@ -6,60 +6,94 @@ import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 
 const Gallery = () => {
+    const [categories, setCategories] = useState([]);
+    const [activeCategory, setActiveCategory] = useState({});
+    const [fetchedImages, setFetchedImages] = useState([])
+
+    const getCategories = () => {
+
+      // apiCategories
+      setCategories(
+        [
+          {
+            id:1,
+            name:'General Moving'
+          },
+          {
+            id:2,
+            name:"House Moving"
+          },
+          {
+            id:3,
+            name:"Office Moving"
+          },
+          {
+            id: 4,
+            name:"videos"
+          }
+        ]
+      )
+    }
+    useEffect(() => {
+      if(categories?.length > 0) {
+        setActiveCategory(categories[0])
+      }
+    }, [categories]);
+
     const images = require.context(`../public/assets/gallery/images`, false, /\.(png|jpe?g|svg)$/);
     const imagePaths = images.keys().map(images);
     const videos = require.context(`../public/assets/gallery/videos`, false, /\.(png|jpe?g|svg)$/);
     const videoPaths = videos.keys().map(videos);
-  return (
-    <div className='w-full h-full'>
 
-      <PageTitle title="Gallery" />
+    const getCategoryContent = (category) => {
+
+      // ApI get category content
+      // for now` we do just the direct images
+    }
+
     
-        <section className="max-w-[1140px] mx-auto my-5">
-            <Tabs
-                defaultActiveKey="images"
-                id="uncontrolled-tab-example"
-                className="mb-3"
-                >
-                <Tab eventKey="videos" title="Videos">
-                {videoPaths.map((src, i) => (
+    useEffect(() => {
 
-                    <video 
-                    key={`${"gallery-videos-"}-${i}`}
-                    width="320"
-                    height="240" 
-                    controls
-                    muted loop
-                    playsInline
-                    className="inline-block max-w-[419px] w-[419px] h-[419px]"
-                    >
-                    <source 
-                        src={src} type="video/mp4"/>
-                    <source src={src} type="video/mov"/>
+      getCategoryContent(activeCategory);
+
+    },[activeCategory]);
+
+    useEffect(() => {
+      getCategories();
+    }, [])
 
 
-                    Your browser does not support the video tag.
-                    </video>
-                    ))}                
-                </Tab>
-                <Tab eventKey="images" title="Images">
-
-                  <div className="md:columns-6 gap-1">
-                      {imagePaths.map((src, i) => (
-                          <Image 
-                          key={`${"gallery-images-"}-${i}`}
-                          alt={`img-${i}`}
-                          src={src}
-                          width={200}
-                          height={100}
-                          className="break-inside-avoid inline-block mb-2"
-                          style={{width:"200px", marginRight:"7px"}}
-                          />
-                      ))}
-                  </div>
-                </Tab>
+    
+  return (
+    <div className='w-full h-full bg-[#EDEDED] pt-8 pb-6'>
+        <section className="container">
+          <h1 className="text-[#F05423] text-3xl font-[600] text-center">We would love to hear from you</h1>
+        </section>
+        <section className="container">
+          <div className="my-4">
+            {categories?.map((category, idx) => (
+              <button 
+                onClick={() => setActiveCategory(category)}
+                className={`hover:bg-[#FF5000] text-white mr-3 btn rounded-3xl px-5 py-2 ${category == activeCategory ? "bg-[#FF5000]" : "bg-[#6D6E71]"}`}>
+                  {category?.name}
+              </button>
+            ))}
+          </div>
+          <div className="md:columns-6 gap-1">
+              {/* Do Active category instead */}
+              {imagePaths.map((src, i) => (
+                  <Image 
+                  key={`${"gallery-images-"}-${i}`}
+                  alt={`img-${i}`}
+                  src={src}
+                  width={200}
+                  height={100}
+                  className="break-inside-avoid inline-block mb-2"
+                  style={{width:"200px", marginRight:"12px"}}
+                  />
+              ))}
+          </div>
                 
-            </Tabs>
         </section>
 
     </div>
