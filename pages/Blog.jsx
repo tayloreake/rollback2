@@ -10,6 +10,13 @@ import {
 import getPageMetadata from "../SEO/seo"
 import PageTitle from "../components/PageTitle"
 
+
+const categories = [
+  "General moving",
+  "Document Storage",
+  "House Moving",
+  "Office Moving",
+];
 const Blog = ({ blogs, tags, categories }) => {
   // console.log({
   //   blogs,
@@ -23,13 +30,14 @@ const Blog = ({ blogs, tags, categories }) => {
   return (
     <>
       {getPageMetadata("ourBlog")}
-      <div className='w-full h-full flex flex-col items-center justify-center'>
-        <PageTitle title={"Our Blog"} />
-        <div className='max-w-[1440px] w-full h-full flex flex-col items-start justify-start py-8  px-4 md:px-8'>
+
+      <div className='container my-4'>
 
           <div className='flex flex-col  mt-6 w-full'>
-            <h3 className='text-[#DB421B] mb-2 text-lg'>Categories</h3>
-            <div className='flex flex-row pr-6   w-full overflow-x-auto pb-6 mr-6 '>
+            <h1 className='text-[#F05423] text-center mb-2 text-3xl font-[600] my-5'>Conversation Categories</h1>
+            <h3 className="font-[600] text-2xl text-center text-black my-3">Latest Story From Our Blog</h3>
+
+            <div className='flex items-justify justify-center pr-6   w-full overflow-x-auto pb-6 mr-6 '>
               {categories?.length > 0 &&
                 categories?.map((category) => (
                   <div
@@ -44,41 +52,21 @@ const Blog = ({ blogs, tags, categories }) => {
                       setStateBlogs(newBlogs)
                     }}
                     className=' mr-6 hover:antialiased cursor-pointer w-fit'>
-                    <p className='whitespace-nowrap capitalize'>{category.category}</p>
-                    <hr className='border border-[#DB421B] w-[50px] hover:w-[80px] duration-150' />
+                    <button className='bg-[#F05423] rounded-full font-[500] btn text-white whitespace-nowrap capitalize'>{category.category}</button>
                   </div>
                 ))}
             </div>
-            <h3 className='text-[#DB421B] mb-2 mt-3'>Search By Tag</h3>
-            <div className='flex flex-row pr-6   w-full overflow-x-auto pb-6 mr-6 '>
-              {tags?.length > 0 &&
-                tags?.map((tag) => (
-                  <button
-                    key={tag._id}
-                    onClick={async () => {
-                      const newBlogs = blogs.filter((blg) => {
-                        const found = blg.blogTags.some((tg) => {
-                          return tg._ref === tag._id
-                        })
-                        return found
-                      })
+            
 
-                      setStateBlogs(newBlogs)
-                    }}
-                    className='text-sm bg-[#DB421B]/60 rounded-full mr-6 hover:antialiased cursor-pointer w-fit py-2 px-2 flex items-center justify-center text-white'>
-                    <p className='whitespace-nowrap'>{tag.tag}</p>
-                  </button>
-                ))}
-            </div>
-
-            <div className='flex flex-col w-full'>
+            <div className='row'>
               {stateBlogs?.length > 0 &&
                 stateBlogs?.map((blog) => (
-                  <BlogCard key={blog.slug.current} blog={blog} />
+                  <div className="col-md-4">
+                    <BlogCard key={blog.slug.current} blog={blog} />
+                  </div>
                 ))}
             </div>
           </div>
-        </div>
       </div>
     </>
   )
