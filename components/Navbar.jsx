@@ -1,11 +1,13 @@
+'use client'; // Required for interactivity in app directory
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useState, useEffect,useRef } from 'react'
 import {BsBookHalf, BsClipboard, BsFillTelephoneFill, BsPeopleFill, BsTruck, BsWhatsapp} from 'react-icons/bs'
 import {MdEmail, MdShareLocation} from 'react-icons/md'
 import Link from 'next/link'
 import { AiOutlineClose, AiOutlineCloseCircle, AiOutlineMenu} from 'react-icons/ai'
 import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa'
 import { Drawer } from 'antd';
+import QuoteForm from './Quote/Form'
 
 const Navbar = () => {
     const [open, setOpen] = useState(false)
@@ -21,9 +23,45 @@ const Navbar = () => {
       setPlacement(e.target.value);
     };
 
+    const ShowQuote = () => {
+        const [open, setOpen] = useState(false);
+        const menuRef = useRef(null);
+
+
+        useEffect(() => {
+            const handler = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) {
+                setOpen(false);
+            }
+            };
+            document.addEventListener('mousedown', handler);
+            return () => document.removeEventListener('mousedown', handler);
+        }, []);
+
+        return (
+            <div 
+                className='relative inline-block mb-2 '>
+                <div 
+                    onClick={() => setOpen(!open)}
+                    className=''>
+                    <div className='right-slanted-box f items-center px-4 py-2 bg-[#FF5000] cursor-pointer text-white'>
+                        <p className=''>Request a quote</p>
+                    </div>
+                </div>
+
+                {open && (
+                    <div 
+                        className="absolute right-0 mt-2 bg-white rounded-md shadow-lg z-20">
+                            <QuoteForm />
+                    </div>
+                )}
+            </div>
+            
+        )
+    }
 
   return (
-    <div className='w-full h-full'>
+    <div className='w-full h-full z-50'>
         <div className='h-full container'>
             <div className='bg-[#]  w-full h-full flex flex-row items-center justify-center md:px-8'>
                 <div className='max-w-[1720px] flex flex-row items-end justify-end w-full px-2'>
@@ -90,14 +128,9 @@ const Navbar = () => {
                             </div>
                         </Link>
                     </div>
+                    
+                    <ShowQuote />
 
-                    <div className='mb-2 right-slanted-box flex items-center px-4 py-2 bg-[#FF5000]'>
-                        <Link href='/Quote'>
-                            <div className='cursor-pointer text-white'>
-                                <p className=''>Request a quote</p>
-                            </div>
-                        </Link>
-                    </div>
                     
                 </div>
             </div>

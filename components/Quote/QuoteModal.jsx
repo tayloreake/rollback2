@@ -1,6 +1,7 @@
 import { Modal } from "antd"
 import Image from "next/image"
 import React, { useState, useRef } from "react"
+import QuoteForm from "./Form"
 // import ReCAPTCHA from "react-google-recaptcha"
 // import ReviewsForm from "./reviews-form"
 
@@ -18,8 +19,8 @@ const QuoteModal = ({isModalOpen}) => {
         title={null}
         open={isModalOpen}
         footer={null}
-        width={500}>
-        <div className="text-4xl">Some class is here</div>
+        width={380}>
+        <QuoteForm />
       </Modal>
   )
 }
