@@ -60,8 +60,8 @@ const Blog = ({ blogs, tags, categories }) => {
 
             <div className='row'>
               {stateBlogs?.length > 0 &&
-                stateBlogs?.map((blog) => (
-                  <div className="col-md-4">
+                stateBlogs?.map((blog, idx) => (
+                  <div key={`blog-${idx}`} className="col-md-4">
                     <BlogCard key={blog.slug.current} blog={blog} />
                   </div>
                 ))}

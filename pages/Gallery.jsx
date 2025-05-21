@@ -73,6 +73,7 @@ const Gallery = () => {
           <div className="my-4">
             {categories?.map((category, idx) => (
               <button 
+                 key={`category-${idx}`} 
                 onClick={() => setActiveCategory(category)}
                 className={`hover:bg-[#FF5000] text-white mr-3 btn rounded-3xl px-5 py-2 ${category == activeCategory ? "bg-[#FF5000]" : "bg-[#6D6E71]"}`}>
                   {category?.name}

@@ -85,7 +85,7 @@ const HomeServices = () => {
             {!isMobile 
               ?
                 services?.map((service, idx) => (
-                    <div className="col-md-6">
+                    <div key={`service-card-${idx}`} className="col-md-6">
                         <ServiceCard service={service} />
                     </div>
 
@@ -93,7 +93,7 @@ const HomeServices = () => {
             :
             <Slider {...settings}>
                 {services?.map((service, idx) => (
-                    <div className="col-12">
+                    <div key={`service-${idx}`} className="col-12">
                         <ServiceCard service={service} />
                     </div>
 

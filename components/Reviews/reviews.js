@@ -53,7 +53,7 @@ const Reviews = () => {
       
       <Slider {...settings}>
         {reviews.map((review,) => (
-          <div>
+          <div  key={`review-${idx}`} >
           <div className="flex">
             <div className="flex-col mr-3">
               <Image 

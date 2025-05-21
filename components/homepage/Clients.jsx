@@ -124,6 +124,7 @@ const Clients = ({ content, urlFor }) => {
         {
           tabsList?.map((item, idx) => (
             <Tab 
+              key={`item-${idx}`} 
               eventKey={item?.eventKey}
               title={item?.title}
               className="p-3 max-h-[300px] overflow-auto"
@@ -160,7 +161,7 @@ const Clients = ({ content, urlFor }) => {
             <h1 className="my-3 text-3xl font-bold">What Our Customers Say</h1>
 
             <div className="my-2">
-              We have a diversified portfolio of moving services in Kenya that include residential moving, corporate moving, office moving and industrial moving services. Whether you're moving within Nairobi, moving anywhere in Kenya or international moving, Taylor Movers Kenya has a solution tailor made for you.
+              We have a diversified portfolio of moving services in Kenya that include residential moving, corporate moving, office moving and industrial moving services. Whether you&apos;re moving within Nairobi, moving anywhere in Kenya or international moving, Taylor Movers Kenya has a solution tailor made for you.
             </div>
 
             <div className="mt-5">

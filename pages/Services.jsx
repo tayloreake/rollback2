@@ -113,13 +113,13 @@ const Services = ({ content }) => {
           {!isMobile 
               ?
             services?.map((item, idx) => (
-              <div className="col-md-3 px-0"><ServiceItem item={item} /></div>
+              <div  key={`service-list-${idx}`}  className="col-md-3 px-0"><ServiceItem item={item} /></div>
             ))
             
             :
           <Slider {...settings}>
                 {services?.map((service, idx) => (
-                    <div className="col-12">
+                    <div  key={`service-${idx}`}  className="col-12">
                         <ServiceItem item={service} />
                     </div>
 
