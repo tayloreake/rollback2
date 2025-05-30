@@ -36,20 +36,6 @@ const Clients = ({ content, urlFor }) => {
   }
   const clients = ["banking", 'companies', 'institutions'];
 
-  // not working... sort out
-  const getImagePaths = (name) => {
-    console.log("THE NAME IS :::: ", name);
-    try{
-      const importedImages = require.context(`../../public/assets/clients/banking`, false, /\.(png|jpe?g|svg)$/);
-      const imgPaths = importedImages.keys().map(importedImages);
-      return imgPaths;
-    } catch(err) {
-      console.log("THE ERR   ", err)
-      return [];
-    }
-    
-  }
-
   const bankingImages = require.context(`../../public/assets/Clients/bank-oil`, false, /\.(png|jpe?g|svg)$/);
   const bankingImgPaths = bankingImages.keys().map(bankingImages);
   const companiesImages = require.context(`../../public/assets/Clients/companies`, false, /\.(png|jpe?g|svg)$/);
@@ -60,25 +46,25 @@ const Clients = ({ content, urlFor }) => {
   const internationalImgPaths = internationalImages.keys().map(internationalImages);
   const governmentImages = require.context(`../../public/assets/Clients/government`, false, /\.(png|jpe?g|svg)$/);
   const governmentImgPaths = governmentImages?.keys()?.map(governmentImages);
-  
-  const AccordionItem = ({item}) => {
+
+  const AccordionItem = ({ item }) => {
 
     return (
       <Accordion.Item eventKey={item.name}>
         <Accordion.Header className="font-bold !capitalize">
-            {item.name}
+          {item.name}
         </Accordion.Header>
         <Accordion.Body>
           {item.imgPaths.map((src, i) => (
-            <Image 
+            <Image
               key={`${item.name}`}
               alt={`img-${i}`}
               src={src}
               width={100}
               height={100}
               className="inline-block mb-3 client-logo"
-              style={{width:"100px", marginRight:"12px"}}
-              />
+              style={{ width: "100px", marginRight: "12px" }}
+            />
           ))}
         </Accordion.Body>
       </Accordion.Item>
@@ -118,33 +104,33 @@ const Clients = ({ content, urlFor }) => {
 
     return (
       <div className="">
-      <Tabs defaultActiveKey={"banking"} id="scrollable-tabs" className="plain-tabs flex-nowrap">
-        {/* Make the tabs dynamic */}
+        <Tabs defaultActiveKey={"banking"} id="scrollable-tabs" className="plain-tabs flex-nowrap">
+          {/* Make the tabs dynamic */}
 
-        {
-          tabsList?.map((item, idx) => (
-            <Tab 
-              key={`item-${idx}`} 
-              eventKey={item?.eventKey}
-              title={item?.title}
-              className="p-3 max-h-[300px] overflow-auto"
+          {
+            tabsList?.map((item, idx) => (
+              <Tab
+                key={`item-${idx}`}
+                eventKey={item?.eventKey}
+                title={item?.title}
+                className="p-3 max-h-[300px] overflow-auto"
               >
                 {item.imgPaths.map((src, i) => (
-                  <Image 
+                  <Image
                     key={`${item.name}`}
                     alt={`img-${i}`}
                     src={src}
                     width={100}
                     height={200}
                     className="inline-block mb-3 client-logo"
-                    style={{width:"200px", marginRight:"12px"}}
-                    />
+                    style={{ width: "200px", marginRight: "12px" }}
+                  />
                 ))}
-            </Tab>
-          ))
-        }
-    </Tabs>
-    </div>
+              </Tab>
+            ))
+          }
+        </Tabs>
+      </div>
     )
   }
   return (
@@ -154,8 +140,8 @@ const Clients = ({ content, urlFor }) => {
 
         {/* <p className='max-w-[1400px]'>{content.clientsDescription}</p> */}
 
-        
-        
+
+
         <div className='row'>
           <div className="col-md-6 md:pr-5">
             <h1 className="my-3 text-3xl font-bold">What Our Customers Say</h1>
@@ -172,28 +158,28 @@ const Clients = ({ content, urlFor }) => {
           <div className="col-md-6">
             <h1 className="text-2xl my-4 font-bold">Our Clients</h1>
 
-            {isMobile 
+            {isMobile
               ?
               <Accordion
-              className="accordion"
-              id="clients-accordion"
-              defaultActiveKey={"Banking and Oil"}
-              allowMultipleExpanded={false}
-              uuid={63213}
-            >
-              <AccordionItem item={{name:"Banking and Oil", imgPaths: bankingImgPaths}}/>
-              <AccordionItem item={{name:"Companies", imgPaths: companiesImgPaths}}/>
-              <AccordionItem item={{name:"Institutions", imgPaths: institutionImgPaths}}/>
-              <AccordionItem item={{name:"International", imgPaths: internationalImgPaths}}/>
-              <AccordionItem item={{name:"Government", imgPaths: governmentImgPaths}}/>
-            </Accordion>
-            :
-            
+                className="accordion"
+                id="clients-accordion"
+                defaultActiveKey={"Banking and Oil"}
+                allowMultipleExpanded={false}
+                uuid={63213}
+              >
+                <AccordionItem item={{ name: "Banking and Oil", imgPaths: bankingImgPaths }} />
+                <AccordionItem item={{ name: "Companies", imgPaths: companiesImgPaths }} />
+                <AccordionItem item={{ name: "Institutions", imgPaths: institutionImgPaths }} />
+                <AccordionItem item={{ name: "International", imgPaths: internationalImgPaths }} />
+                <AccordionItem item={{ name: "Government", imgPaths: governmentImgPaths }} />
+              </Accordion>
+              :
+
               <ClientTabs />
             }
-            
+
           </div>
-                        
+
         </div>
       </div>
     </div>

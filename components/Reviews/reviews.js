@@ -32,7 +32,7 @@ const Reviews = () => {
       rating: 3
     }
   ]
-  
+
   const showModal = () => {
     setIsModalOpen(true);
   }
@@ -46,43 +46,43 @@ const Reviews = () => {
     autoplaySpeed: 3000,
   };
 
-  
+
 
   return (
     <div className='bg-[#0000000D] rounded-2xl px-3 py-4'>
-      
+
       <Slider {...settings}>
-        {reviews.map((review,) => (
-          <div  key={`review-${idx}`} >
-          <div className="flex">
-            <div className="flex-col mr-3">
-              <Image 
-                width={0}
-                height={0}
-                sizes="auto"
-                style={{width:"200px", height:"150px"}}
-                className=" mr-3 rounded-lg"
-                src={`/assets/Reviews/${review?.image}`} alt='' />
-            </div>
-            <div className="flex-col">
-              <h3 className="font-[600]">{review.author}</h3>
-              <div className="my-3 text-sm text-[#586863]">{review.title}</div>
-              <div className="my-3">
-                {[...Array(review?.rating)].map((_, i) => (
-                  <FaStar className="inline-block text-[#F05423]" key={i} />
-                ))}
-                {[...Array(5 - review?.rating)].map((_, i) => (
-                  <FaRegStar className="inline-block text-[#F05423]" key={i} />
-                ))}
+        {reviews.map((review, idx) => (
+          <div key={`review-${idx}`} >
+            <div className="flex">
+              <div className="flex-col mr-3">
+                <Image
+                  width={0}
+                  height={0}
+                  sizes="auto"
+                  style={{ width: "200px", height: "150px" }}
+                  className=" mr-3 rounded-lg"
+                  src={`/assets/Reviews/${review?.image}`} alt='' />
               </div>
-              <p>{review.text}</p>
+              <div className="flex-col">
+                <h3 className="font-[600]">{review.author}</h3>
+                <div className="my-3 text-sm text-[#586863]">{review.title}</div>
+                <div className="my-3">
+                  {[...Array(review?.rating)].map((_, i) => (
+                    <FaStar className="inline-block text-[#F05423]" key={i} />
+                  ))}
+                  {[...Array(5 - review?.rating)].map((_, i) => (
+                    <FaRegStar className="inline-block text-[#F05423]" key={i} />
+                  ))}
+                </div>
+                <p>{review.text}</p>
+              </div>
+
             </div>
-            
-          </div>
           </div>
         ))}
-    </Slider>
-      
+      </Slider>
+
     </div>
   )
 }

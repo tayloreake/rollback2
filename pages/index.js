@@ -5,6 +5,7 @@ import getPageMetadata from "../SEO/seo"
 import dynamic from "next/dynamic"
 import About from "../components/homepage/About"
 import HomeServices from "../components/homepage/HomeServices"
+import HeroSection from "../components/homepage/hero-section"
 
 const Featured = dynamic(() => import("../components/homepage/Featured"))
 const Services = dynamic(() => import("../components/homepage/Services"))
@@ -23,12 +24,12 @@ export default function Home({ landingPage }) {
   function urlFor(source) {
     return builder.image(source)
   }
-  console.log(landingPage)
   return (
     <div className=''>
       {getPageMetadata("home")}
 
-      <Featured content={data} urlFor={urlFor} />
+      <HeroSection />
+      {/* <Featured content={data} urlFor={urlFor} /> */}
       {/* <Services content={data} urlFor={urlFor} /> */}
       {/* <Mirage content={data} urlFor={urlFor} /> */}
       {/* <Cta content={data} /> */}
