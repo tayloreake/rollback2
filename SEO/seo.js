@@ -10,7 +10,7 @@ const getPageMetadata = (pageName) => {
 
   return (
     <Head>
-      <title>{capitalizedPageName == "Home" && "Taylor Movers" ||  capitalizedPageName== "About" && "About Taylor Movers" || capitalizedPageName== "OurBlog" && "Taylor Movers Handy Blog"} Page</title>
+      <title>{capitalizedPageName == "Home" && "Taylor Movers" || capitalizedPageName == "About" && "About Taylor Movers" || capitalizedPageName == "OurBlog" && "Taylor Movers Handy Blog"} Page</title>
       <meta name='keywords' content={pageKeywords.join(", ")} />
       <meta name='description' content={pageDescription} />
     </Head>
@@ -25,7 +25,7 @@ export const generateServicesPageMetadata = (serviceKeys) => {
 
   return (
     <Head>
-      <title>{title== "Home" && "Taylor Movers" || title== "About" && "About Taylor Movers" || title == "ourBlog" && "Taylor Movers Handy Blog"}</title>
+      <title>{title == "Home" && "Taylor Movers" || title == "About" && "About Taylor Movers" || title == "ourBlog" && "Taylor Movers Handy Blog"}</title>
       <meta name='keywords' content={kw.join(", ")} />
       <meta name='description' content={pageDescription} />
       {/* Add more meta tags as needed */}

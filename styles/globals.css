@@ -106,3 +106,31 @@ body {
   }
 
 }
+
+.service-navigator .nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+  color: white;
+  background-color: #FF5000;
+}
+
+.service-navigator .nav-link {
+  font-weight: bold;
+  color: #666666;
+}
+
+blockquote,
+dl,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+hr,
+figure,
+p,
+pre {
+  margin: 0;
+  margin-bottom: 16px;
+}

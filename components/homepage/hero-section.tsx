@@ -19,7 +19,7 @@ const HeroSection: React.FC = () => {
                     </h1>
                     <div className="h-0.5 w-24 bg-orange-500 mb-6" />
 
-                    <p className="text-white md:!text-gray-700 mb-8 max-w-md">
+                    <p className="text-white md:!text-gray-700 mb-8 max-w-md md:block hidden">
                         We support businesses through periods of expansion, succession, and all other important transitions.
                     </p>
 
@@ -29,7 +29,7 @@ const HeroSection: React.FC = () => {
                                 <div className="">
                                     <Image src={service.icon} alt={service.title} width={40} height={40} />
                                 </div>
-                                <span className="mt-2 text-sm font-medium">{service.title}</span>
+                                <span className="text-white md:!text-gray-700 mt-2 text-sm font-medium">{service.title}</span>
                             </div>
                         ))}
                     </div>
