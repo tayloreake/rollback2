@@ -33,40 +33,40 @@ const Blog = ({ blogs, tags, categories }) => {
 
       <div className='container my-4'>
 
-          <div className='flex flex-col  mt-6 w-full'>
-            <h1 className='text-[#F05423] text-center mb-2 text-3xl font-[600] my-5'>Conversation Categories</h1>
-            <h3 className="font-[600] text-2xl text-center text-black my-3">Latest Story From Our Blog</h3>
+        <div className='flex flex-col  mt-6 w-full'>
+          <h1 className='hidden md:block text-[#F05423] text-center mb-2 text-3xl font-[600] my-5'>Conversation Categories</h1>
+          <h3 className="font-[600] text-2xl text-center text-black my-3">Latest Story From Our Blog</h3>
 
-            <div className='flex items-justify justify-center pr-6   w-full overflow-x-auto pb-6 mr-6 '>
-              {categories?.length > 0 &&
-                categories?.map((category) => (
-                  <div
-                    key={category._id}
-                    onClick={async () => {
-                      const newBlogs = blogs.filter((blg) => {
-                        const found = blg.blogCategories.some((ctgry) => {
-                          return ctgry._ref === category._id
-                        })
-                        return found
+          <div className='hidden md:flex items-justify justify-center pr-6   w-full overflow-x-auto pb-6 mr-6 '>
+            {categories?.length > 0 &&
+              categories?.map((category) => (
+                <div
+                  key={category._id}
+                  onClick={async () => {
+                    const newBlogs = blogs.filter((blg) => {
+                      const found = blg.blogCategories.some((ctgry) => {
+                        return ctgry._ref === category._id
                       })
-                      setStateBlogs(newBlogs)
-                    }}
-                    className=' mr-6 hover:antialiased cursor-pointer w-fit'>
-                    <button className='bg-[#F05423] rounded-full font-[500] btn text-white whitespace-nowrap capitalize'>{category.category}</button>
-                  </div>
-                ))}
-            </div>
-            
-
-            <div className='row'>
-              {stateBlogs?.length > 0 &&
-                stateBlogs?.map((blog, idx) => (
-                  <div key={`blog-${idx}`} className="col-md-4">
-                    <BlogCard key={blog.slug.current} blog={blog} />
-                  </div>
-                ))}
-            </div>
+                      return found
+                    })
+                    setStateBlogs(newBlogs)
+                  }}
+                  className=' mr-6 hover:antialiased cursor-pointer w-fit'>
+                  <button className='bg-[#F05423] rounded-full font-[500] btn text-white whitespace-nowrap capitalize'>{category.category}</button>
+                </div>
+              ))}
           </div>
+
+
+          <div className='row'>
+            {stateBlogs?.length > 0 &&
+              stateBlogs?.map((blog, idx) => (
+                <div key={`blog-${idx}`} className="col-md-4">
+                  <BlogCard key={blog.slug.current} blog={blog} />
+                </div>
+              ))}
+          </div>
+        </div>
       </div>
     </>
   )
