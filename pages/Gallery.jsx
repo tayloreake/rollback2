@@ -4,13 +4,12 @@ import Image from "next/image"
 import getPageMetadata from "../SEO/seo";
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-// import { isMobile } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 
 const Gallery = () => {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState({});
   const [fetchedImages, setFetchedImages] = useState([]);
-  const [isMobile, setIsMobile] = useState(true);
 
   const getCategories = () => {
 
