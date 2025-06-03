@@ -123,11 +123,11 @@ const Navbar = () => {
                                     Gallery
                                 </div>
                             </Link>
-                            <Link href='/Feedback'>
+                            {/* <Link href='/Feedback'>
                                 <div className='mr-6'>
                                     Feedback
                                 </div>
-                            </Link>
+                            </Link> */}
                         </div>
 
                         <ShowQuote />
