@@ -7,66 +7,66 @@ import PageTitle from "../components/PageTitle"
 import Jumbotron from "../components/jumbotron"
 
 const Contacts = () => {
-  
+
 
   const ContactForm = () => {
-const [fname, setFname] = useState("")
-  const [lname, setLname] = useState("")
-  const [email, setEmail] = useState("")
-  const [number, setNumber] = useState("")
-  const [message, setMessage] = useState("")
+    const [fname, setFname] = useState("")
+    const [lname, setLname] = useState("")
+    const [email, setEmail] = useState("")
+    const [number, setNumber] = useState("")
+    const [message, setMessage] = useState("")
 
-  const isValidPhoneNumber = (phoneNumber) => {
-    return /0\d{9}$/.test(phoneNumber)
-  }
-
-  const handleSendSMS = async () => {
-    const messageContent = formatMessageContent()
-
-    try {
-      const options = {
-        to: [`+254721410517`],
-        message: messageContent,
-      }
-
-      const emailOptions = {
-        to: email,
-        message: messageContent,
-      }
-      const smsResponse = await fetch("/api/sendSms", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(options),
-      })
-      if (!smsResponse.ok) {
-        const errorData = await smsResponse.json();
-        toast.error(errorData.error || errorData.message || 'Failed to send SMS')
-        throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
-      }
-      const emailResponse = await fetch("/api/sendEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(emailOptions),
-      })
-      const smsData = await smsResponse.json()
-      const emailData = await emailResponse.json()
-
-      // toast.success("Request submitted")
-      setFname("")
-      setLname("")
-      setEmail("")
-      setMessage("")
-      setNumber("")
-    } catch (error) {
-      console.error("Error sending SMS/email:", error)
+    const isValidPhoneNumber = (phoneNumber) => {
+      return /0\d{9}$/.test(phoneNumber)
     }
-  }
-  const formatMessageContent = () => {
-    const msg = `
+
+    const handleSendSMS = async () => {
+      const messageContent = formatMessageContent()
+
+      try {
+        const options = {
+          to: [`+254721410517`],
+          message: messageContent,
+        }
+
+        const emailOptions = {
+          to: email,
+          message: messageContent,
+        }
+        const smsResponse = await fetch("/api/sendSms", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(options),
+        })
+        if (!smsResponse.ok) {
+          const errorData = await smsResponse.json();
+          toast.error(errorData.error || errorData.message || 'Failed to send SMS')
+          throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
+        }
+        const emailResponse = await fetch("/api/sendEmail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(emailOptions),
+        })
+        const smsData = await smsResponse.json()
+        const emailData = await emailResponse.json()
+
+        // toast.success("Request submitted")
+        setFname("")
+        setLname("")
+        setEmail("")
+        setMessage("")
+        setNumber("")
+      } catch (error) {
+        console.error("Error sending SMS/email:", error)
+      }
+    }
+    const formatMessageContent = () => {
+      const msg = `
           Someone is trying to reach to you through the website contact page:
           Name: ${fname}
           Name: ${lname}
@@ -75,24 +75,24 @@ const [fname, setFname] = useState("")
           Message: ${message}
         `
 
-    return msg
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-
-    if (!fname || !lname || !email || !number || !message)
-      return toast.error("Please fill in all fields correctly")
-    if (isValidPhoneNumber(number)) {
-      // Phone number is valid, proceed with form submission
-      handleSendSMS()
-      // Add your form submission logic here
-      toast.success("Your message has been sent")
-    } else {
-      // Phone number does not match the required format, show error message
-      toast.error("Phone number does not match the required format +254...")
+      return msg
     }
-  }
+
+    const handleSubmit = (e) => {
+      e.preventDefault()
+
+      if (!fname || !lname || !email || !number || !message)
+        return toast.error("Please fill in all fields correctly")
+      if (isValidPhoneNumber(number)) {
+        // Phone number is valid, proceed with form submission
+        handleSendSMS()
+        // Add your form submission logic here
+        toast.success("Your message has been sent")
+      } else {
+        // Phone number does not match the required format, show error message
+        toast.error("Phone number does not match the required format +254...")
+      }
+    }
     return (
       <form
         onSubmit={(e) => handleSubmit(e)}
@@ -110,7 +110,7 @@ const [fname, setFname] = useState("")
               onChange={(e) => setFname(e.target.value)}
               className='px-2 w-full py-2 rounded-xl'
             />
-            
+
           </div>
           <div className='relative w-full mb-4 md:mr-2'>
             <label className='font-[600] text-sm text-gray-600 mb-1'>
@@ -123,36 +123,36 @@ const [fname, setFname] = useState("")
               onChange={(e) => setLname(e.target.value)}
               className='px-2 w-full py-2 rounded-xl'
             />
-            
+
           </div>
         </div>
         <div className='relative w-full mb-4 md:mr-2'>
-            <label className='font-[600] text-sm text-gray-600 mb-1'>
-              Email
-            </label>
-            <input
-              type='email'
-              value={email}
-              placeholder="example@email.com"
-              onChange={(e) => setEmail(e.target.value)}
-              className='px-2 w-full py-2 rounded-xl'
-            />
-            
-          </div>
-          <div className='relative w-full mb-4 md:mr-2'>
-            <label className='font-[600] text-sm text-gray-600 mb-1'>
-              Mobile Phone
-            </label>
-            <input
-              type='text'
-              value={number}
-              required
-              placeholder="0712345678"
-              onChange={(e) => setNumber(e.target.value)}
-              className='px-2 w-full py-2 rounded-xl'
-            />
-            
-          </div>
+          <label className='font-[600] text-sm text-gray-600 mb-1'>
+            Email
+          </label>
+          <input
+            type='email'
+            value={email}
+            placeholder="example@email.com"
+            onChange={(e) => setEmail(e.target.value)}
+            className='px-2 w-full py-2 rounded-xl'
+          />
+
+        </div>
+        <div className='relative w-full mb-4 md:mr-2'>
+          <label className='font-[600] text-sm text-gray-600 mb-1'>
+            Mobile Phone
+          </label>
+          <input
+            type='text'
+            value={number}
+            required
+            placeholder="0712345678"
+            onChange={(e) => setNumber(e.target.value)}
+            className='px-2 w-full py-2 rounded-xl'
+          />
+
+        </div>
 
         <textarea
           value={message}
@@ -175,14 +175,14 @@ const [fname, setFname] = useState("")
   const ContactAddress = () => {
 
     return (
-      <div className="bg-[#F05423] text-white rounded-md h-full px-8 py-8">
+      <div className="bg-[#F05423] text-white rounded-md h-full px-3 py-8">
         <h1 className="text-black font-bold my-3">Mombasa Office</h1>
         <div className="mb-5">
-          Moi Avenue,<br />Ivory Building, 2nd Floor<br/>Mombasa Kenya.<br/>Tel: 0758590998<br/>Email: msacc@taylorea.com
+          Moi Avenue,<br />Ivory Building, 2nd Floor<br />Mombasa Kenya.<br />Tel: 0758590998<br />Email: msacc@taylorea.com
         </div>
         <h1 className="text-black font-bold my-3">Nairobi Office</h1>
         <div className="">
-          Nazarene Complex Suite 1,<br/>Central Church of The Nazarene<br/>Ngong Road,<br/>Nairobi, Kenya<br/>Tel: 0721410517<br/>Email: info@taylorea.com
+          Nazarene Complex Suite 1,<br />Central Church of The Nazarene<br />Ngong Road,<br />Nairobi, Kenya<br />Tel: 0721410517<br />Email: info@taylorea.com
         </div>
       </div>
     )
@@ -190,7 +190,7 @@ const [fname, setFname] = useState("")
 
   return (
     <>
-      <Jumbotron image={"contacts.png"} text={"We would love to hear from you"}/>
+      <Jumbotron image={"contacts.png"} text={"We would love to hear from you"} />
 
       <div className='container pt-6'>
         <p className="text-xl py-4 !pt-8">
@@ -199,11 +199,11 @@ const [fname, setFname] = useState("")
       </div>
 
       <div className="container">
-        <div className="row bg-[#EDEDED] py-4 px-3 my-4">
+        <div className="row bg-[#EDEDED] py-4 my-4">
           <div className="col-md-6">
             <div className="">
               <p className="my-3">
-                Feel free to contact us and we will get Back to you as soon as we can. 
+                Feel free to contact us and we will get Back to you as soon as we can.
               </p>
               <ContactForm />
             </div>
