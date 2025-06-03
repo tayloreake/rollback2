@@ -9,7 +9,7 @@ import Jumbotron from "../components/jumbotron"
 import { isMobile } from "react-device-detect"
 import Slider from "react-slick"
 import { set } from "sanity"
-import { Tab, Nav, Row, Col } from 'react-bootstrap';
+import { Tab, Nav, Row, Col, Accordion } from 'react-bootstrap';
 
 
 
@@ -102,7 +102,7 @@ const Services = ({ content }) => {
     return (
       <div
         onClick={() => setType(item?.name)}
-        className='px-0 bg-black relative h-full hover:animate-pulse cursor-pointer'>
+        className='px-0 bg-black  h-full hover:animate-pulse cursor-pointer'>
         <Image
           src={`/assets/services/${item?.image}`}
           alt=""
@@ -283,7 +283,7 @@ const Services = ({ content }) => {
             :
             <Slider {...settings}>
               {services?.map((service, idx) => (
-                <div key={`service-${idx}`}
+                <div key={`services-${idx}`}
                   onClick={() => setActiveTab(service)}
                   className="col-12">
                   <ServiceItem item={service} />

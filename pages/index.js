@@ -29,7 +29,7 @@ export default function Home({ landingPage }) {
       {getPageMetadata("home")}
 
       <HeroSection />
-      {/* <Featured content={data} urlFor={urlFor} /> */}
+      <Featured content={data} urlFor={urlFor} />
       {/* <Services content={data} urlFor={urlFor} /> */}
       {/* <Mirage content={data} urlFor={urlFor} /> */}
       {/* <Cta content={data} /> */}
