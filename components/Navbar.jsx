@@ -44,8 +44,8 @@ const Navbar = () => {
                 <div
                     onClick={() => setOpen(!open)}
                     className=''>
-                    <div className='right-slanted-box f items-center px-4 py-2 bg-[#FF5000] cursor-pointer text-white'>
-                        <span className=''>Request a quote</span>
+                    <div className='right-slanted-box items-center px-2 md:px-4 py-2 bg-[#FF5000] cursor-pointer text-white'>
+                        <span className='font-semibold md:text-sm text-xs'>Request a quote</span>
                     </div>
                 </div>
 
@@ -64,10 +64,10 @@ const Navbar = () => {
         <div className='w-full h-full z-50'>
             <div className='h-full container'>
                 <div className='bg-[#]  w-full h-full flex flex-row items-center justify-center md:px-8'>
-                    <div className='max-w-[1720px] flex flex-row items-end justify-end w-full px-2'>
+                    <div className=' flex items-end justify-end w-full'>
                         <a href='tel:+254721410517'
-                            className='flex flex-row items-center mr-6 px-2 py-2'>
-                            <BsFillTelephoneFill className='mr-1' />
+                            className='flex flex-row justify-end font-bold text-[#FF5000] py-2'>
+                            <span className='text-gray-800 mr-2'>Call: </span>
                             +254 721410517
                         </a>
                         {/* <div className='flex flex-row items-center text-white py-2'>
@@ -76,12 +76,13 @@ const Navbar = () => {
                     </div> */}
                     </div>
                 </div>
-                <div className='md:hidden py-2 my-2 px-2  md:px-8  flex-row justify-center items-center'>
+                <div className='md:hidden py-2 my-2  md:px-4  flex-row justify-center items-center'>
                     <div className='w-full flex flex-row items-center justify-between'>
                         <Link href='/'>
-                            <Image src='/assets/General/logo.png' width={105} height={48} alt='Taylor Movers Logo' />
+                            <Image className='object-contain' src='/assets/General/logo.png' width={120} height={1} alt='Taylor Movers Logo' />
                         </Link>
-                        <AiOutlineMenu size={30} className='ml-4' onClick={() => setOpen(true)} />
+                        <AiOutlineMenu size={40} className='mx-2' onClick={() => setOpen(true)} />
+                        <ShowQuote />
                     </div>
                 </div>
 
@@ -141,7 +142,7 @@ const Navbar = () => {
                     <div className='flex flex-col w-full h-full '>
                         <div className='flex w-full items-start justify-between'>
                             <Link href='/'>
-                                <Image src='/assets/General/logo.png' alt='/' width='150' height='1' />
+                                <Image src='/assets/General/logo.png' alt='/' width='200' height='1' />
                             </Link>
                             <div onClick={() => setOpen(false)} className='rounded-full  p-1 cursor-pointer hover:animate-pulse'>
                                 <AiOutlineCloseCircle size={20} />
@@ -150,45 +151,35 @@ const Navbar = () => {
 
                         <hr className='my-4 border-3 rounded-full' />
 
-                        <div className='py-4 flex flex-col my-4'>
+                        <div className=' flex flex-col font-bold'>
+                            <Link href='/' onClick={() => setOpen(false)}>
+                                <div className='flex flex-row px-4 items-center py-2'>
+                                    Home
+                                </div>
+                            </Link>
                             <Link href='/About' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 items-center shadow-sm border-slate-300 rounded-lg py-4'>
-                                    <BsTruck size={20} className='text-slate-600 mr-2' />
-                                    <p className='text-lg'>
-                                        About us
-                                    </p>
+                                <div className='flex flex-row px-4 items-center py-2'>
+                                    About us
                                 </div>
                             </Link>
                             <Link href='/Services?service=Household Moving&&subservice=Premoving' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 my-2 items-center shadow-sm border-slate-300 rounded-lg py-4'>
-                                    <BsBookHalf size={20} className='text-slate-600 mr-2' />
-                                    <p className='text-lg'>
-                                        Services
-                                    </p>
+                                <div className='flex flex-row px-4 items-center py-2'>
+                                    Services
                                 </div>
                             </Link>
                             <Link href='/Blog' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 my-2 items-center shadow-sm border-slate-300 rounded-lg py-4'>
-                                    <BsPeopleFill size={20} className='text-slate-600 mr-2' />
-                                    <p className='text-lg'>
-                                        Blog
-                                    </p>
+                                <div className='flex flex-row px-4 items-center py-2'>
+                                    Blog
                                 </div>
                             </Link>
                             <Link href='/Contacts' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 my-2 items-center shadow-sm border-slate-300 rounded-lg py-4'>
-                                    <MdShareLocation size={20} className='text-slate-600 mr-2' />
-                                    <p className='text-lg'>
-                                        Contact Us
-                                    </p>
+                                <div className='flex flex-row px-4 items-center py-2'>
+                                    Contact Us
                                 </div>
                             </Link>
-                            <Link href='/Quote' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 my-2 items-center shadow-sm shadow-[#ffefec] rounded-md py-4 animate-pulse '>
-                                    <BsClipboard size={20} className='text-[#DB421B] mr-2' />
-                                    <p className='text-lg text-[#DB421B]'>
-                                        Request A Quote
-                                    </p>
+                            <Link href='/Gallery' onClick={() => setOpen(false)}>
+                                <div className='flex flex-row px-4 items-center py-2'>
+                                    Gallery
                                 </div>
                             </Link>
                         </div>

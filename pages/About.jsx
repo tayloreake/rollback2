@@ -41,12 +41,12 @@ const About = ({ aboutPage }) => {
       {getPageMetadata("about")}
 
       <Jumbotron image={'about.png'} text={""} />
-      
-      <div className="row mx-0 items-center">
+
+      <div className="row mx-0 items-top">
         <div className="col-md-6 ">
-          <div className="mx-[160px] py-8">
+          <div className="md:mx-[160px] mx-2 py-8 md:text-left text-center">
             <h1 className="my-6 text-3xl font-[600] text-[#FF5000]">
-              The premier <br/>Moving <br/>Company
+              The premier <br />Moving <br />Company
             </h1>
             <div className="my-3 leading-[1.5]">
               <p>Our key focus and goal is to understand our clients experience from their point of view. We see this as our central focus that drives every aspect of how we conduct our business and relate to our customers. We guarantee professional moving services in Kenya. Whether moving within Nairobi or around the globe, Taylor movers Kenya will have a custom tailored moving solution for you.</p>
@@ -55,21 +55,21 @@ const About = ({ aboutPage }) => {
         </div>
 
         <div className="col-md-6">
-            <div className="bg-[#F0EFEF] px-[160px] py-8">
+          <div className="bg-[#F0EFEF] mx-2 px-2 md:px-[160px] py-8 md:text-left text-center">
             <h1 className="text-[#ff5000] py-3 font-bold text-2xl">Our Vision</h1>
             <div className="py-6">
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium, eget laoreet enim tempor. Etiam erat ex, lacinia nec mattis quis, efficitur et magna. Nam auctor odio vitae nulla scelerisque, vel porttitor eros sodales. Aenean scelerisque felis id est facilisis ornare. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. </p>
-                </div>
-            </div>
-            <div className="bg-[#ff5000] px-[160px] py-12">
-                <h1 className="text-[#070707] py-3 font-bold text-2xl">Our Mission</h1>
-                <div className="py-2 text-white">
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium, eget laoreet enim tempor. Etiam erat ex, lacinia nec mattis quis, efficitur et magna. Nam auctor odio vitae nulla scelerisque, vel porttitor eros sodales. Aenean scelerisque felis id est facilisis ornare. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. </p>
-                </div>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium, eget laoreet enim tempor. Etiam erat ex, lacinia nec mattis quis, efficitur et magna. Nam auctor odio vitae nulla scelerisque, vel porttitor eros sodales. Aenean scelerisque felis id est facilisis ornare. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. </p>
             </div>
           </div>
+          <div className="bg-[#ff5000] mx-2 px-2 md:px-[160px] py-12 md:text-left text-center">
+            <h1 className="text-[#070707] py-3 font-bold text-2xl">Our Mission</h1>
+            <div className="py-2 text-white">
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium, eget laoreet enim tempor. Etiam erat ex, lacinia nec mattis quis, efficitur et magna. Nam auctor odio vitae nulla scelerisque, vel porttitor eros sodales. Aenean scelerisque felis id est facilisis ornare. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. </p>
+            </div>
+          </div>
+        </div>
       </div>
-      
+
       <Clients content={data} urlFor={urlFor} />
     </div>
   )

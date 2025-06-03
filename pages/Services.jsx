@@ -85,8 +85,8 @@ const Services = ({ content }) => {
       international: "<p>Moving overseas can be both intimidating and exciting. There is the prospect of seeing new places, becoming acquainted with people from different cultures, and learning customs different from those of your origin country. Nevertheless, particularly for the person who has lived abroad before, there are understandable anxieties, especially about the safe handling of one's household possessions.</p>",
     },
     {
-      name: "Corporate Moving",
-      image: "corporatehold.jpg",
+      name: "Warehousing & Storage",
+      image: "warehousehold.jpg",
       icon: '/icons/corporate.png',
       titlePos: "bottom",
       presurvey: "<p>We will schedule an appointment at a time convenient to you. Our relocation assessment consultant will then conduct a pre-move survey on your premises. Our survey begins with a walk through of the premises. A room by room evaluation of the items that you need relocated to the destination premises. This will allow our consultant to assess each article in every room that will be shipped out.</p> <p>During the survey, it will be helpful if you could identify and point out the household items that you would like to be sent via air, sea or stored in our warehouse. Our well trained and experienced consultants are ready to assist you should there be any concerns involving any step of the move. Their advice should ensure a satisfactory outcome to completion of the move. We request our clients to schedule approximately thirty minutes for the survey.</p>",
@@ -122,13 +122,13 @@ const Services = ({ content }) => {
   const LocalInternational = () => {
     return (
       <div className="row">
-        <div className="col-md-6 bg-[#EDEDED] p-4">
+        <div className="col-md-6 bg-[#EDEDED] p-8">
           <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">Local <br /> Moves</h1>
           <div className="my-3">
             <div dangerouslySetInnerHTML={{ __html: activeTab?.local }} />
           </div>
         </div>
-        <div className="col-md-6 bg-[#E1DEDE] p-4">
+        <div className="col-md-6 bg-[#E1DEDE] p-8">
           <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">International <br /> Moves</h1>
           <div className="my-3">
             <div dangerouslySetInnerHTML={{ __html: activeTab?.international }} />
@@ -165,9 +165,46 @@ const Services = ({ content }) => {
   const MobileActiveItem = () => {
 
     return (
-      <div className="">
-
-      </div>
+      <Accordion
+        className="accordion"
+        id="mobile-services-accordion"
+        defaultActiveKey={'name'}
+        allowMultipleExpanded={false}
+        uuid={63213}
+      >
+        <Accordion.Item eventKey={"name"}>
+          <Accordion.Header className="font-bold !capitalize">
+            {activeTab?.name}
+          </Accordion.Header>
+          <Accordion.Body>
+            <LocalInternational />
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey={"presurvey"}>
+          <Accordion.Header className="font-bold !capitalize">
+            Pre-survey
+          </Accordion.Header>
+          <Accordion.Body>
+            <PresurveyContent />
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey={"quotation"}>
+          <Accordion.Header className="font-bold !capitalize">
+            Quotation
+          </Accordion.Header>
+          <Accordion.Body>
+            <QuotationContent />
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey={"others"}>
+          <Accordion.Header className="font-bold !capitalize">
+            Other Services
+          </Accordion.Header>
+          <Accordion.Body>
+            <OthersContent />
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
     )
   }
 
@@ -176,7 +213,7 @@ const Services = ({ content }) => {
     return (
       <Tab.Container id="left-tabs-example" activeKey={key} onSelect={(k) => setKey(k)}>
         <Row>
-          <Col sm={3}>
+          <Col sm={3} className="pr-4">
             <Nav variant="pills" className="flex-column">
               <Nav.Item>
                 <Nav.Link eventKey="name">{activeTab?.name}</Nav.Link>
@@ -258,7 +295,7 @@ const Services = ({ content }) => {
           }
         </div>
 
-        <div className='border-[3px] border-[#FF5000] mb-8 p-4 rounded-sm'>
+        <div className='border-[3px] border-[#FF5000] mb-8 md:p-12 p-6 rounded-sm'>
           <div className="text-3xl text-[#FF5000] font-bold py-2 flex items-center justify-center my-2">
             <div className="mr-3">
               {activeTab?.icon && <Image src={`${activeTab?.icon}`} alt="" width={50} height={50} />}

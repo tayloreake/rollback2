@@ -55,13 +55,14 @@ const Reviews = () => {
         {reviews.map((review, idx) => (
           <div key={`review-${idx}`} >
             <div className="flex">
-              <div className="flex-col mr-3">
+              <div className="flex-col mr-3 w-[300px]">
                 <Image
                   width={0}
                   height={0}
                   sizes="auto"
-                  style={{ width: "200px", height: "150px" }}
-                  className=" mr-3 rounded-lg"
+                  // style={{ width: "200px", height: "150px" }}
+                  className=" mr-3 rounded-lg w-[150px] h-[100px] object-cover"
+                  loading="lazy"
                   src={`/assets/Reviews/${review?.image}`} alt='' />
               </div>
               <div className="flex-col">

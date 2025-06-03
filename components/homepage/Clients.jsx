@@ -134,7 +134,7 @@ const Clients = ({ content, urlFor }) => {
     )
   }
   return (
-    <div className='w-full h-full py-4 px-4 md:px-8 flex items-center justify-center'>
+    <div className='w-full h-full py-4 px-2 md:px-8 flex items-center justify-center'>
       <div className='container'>
         <hr className='border border-[#DB421B] w-[50px] my-3' />
 

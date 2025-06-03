@@ -38,7 +38,7 @@ const HeroSection: React.FC = () => {
 
                 <div className="mt-12 lg:mt-0 lg:w-1/2 relative">
 
-                    <button className="absolute bottom-[20%] left-1/2 transform -translate-x-1/2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-full transition">
+                    <button className="absolute bottom-[40px] md:bottom-[20%] left-1/2 transform -translate-x-1/2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-full transition">
                         REQUEST QUOTE
                     </button>
                 </div>
