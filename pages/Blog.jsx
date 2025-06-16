@@ -62,7 +62,7 @@ const Blog = ({ blogs, tags, categories }) => {
             {stateBlogs?.length > 0 &&
               stateBlogs?.map((blog, idx) => (
                 <div key={`blog-${idx}`} className="col-md-4">
-                  <BlogCard key={blog.slug.current} blog={blog} />
+                  <BlogCard key={blog.slug} blog={blog} />
                 </div>
               ))}
           </div>

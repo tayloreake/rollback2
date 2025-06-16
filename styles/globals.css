@@ -88,8 +88,7 @@ body {
 }
 
 .nav-tabs .nav-link.active {
-  border-bottom: 2px solid !important;
-
+  border-bottom: 5px solid #F05423 !important;
 }
 
 .right-slanted-box {
@@ -133,4 +132,8 @@ p,
 pre {
   margin: 0;
   margin-bottom: 16px;
+}
+
+.plain-tabs .nav-link {
+  text-transform: capitalize !important;
 }

@@ -1,37 +1,29 @@
 import { Modal } from "antd"
 import Image from "next/image"
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import imageUrlBuilder from "@sanity/image-url"
+import client from "../../sanity/config/client-config"
+import { getClientReviews } from "../../sanity/sanity-utils";
 import { FaRegStar, FaStar } from "react-icons/fa";
 
 const Reviews = () => {
+  const [reviews, setReviews] = useState();
 
-  // Get this from Sanity
-  const reviews = [
-    {
-      image: "review1.png",
-      author: "Esther Njeri",
-      title: "Copywriter on  Silot",
-      text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium.",
-      rating: 5
-    },
-    {
-      image: "review1.png",
-      author: "Esther Njeri",
-      title: "Copywriter on  Silot",
-      text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium.",
-      rating: 4
-    },
-    {
-      image: "review1.png",
-      author: "Esther Njeri",
-      title: "Copywriter on  Silot",
-      text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium.",
-      rating: 3
-    }
-  ]
+  useEffect(() => {
+    const storedReviews = JSON.parse(window.localStorage.getItem("clientReviews"));
+    setReviews(storedReviews);
+  }, [])
+
+
+  const builder = imageUrlBuilder(client)
+
+  function urlFor(source) {
+    return builder.image(source)
+  }
+  useEffect(() => { console.log("Reviews data", reviews) }, [reviews])
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -52,7 +44,7 @@ const Reviews = () => {
     <div className='bg-[#0000000D] rounded-2xl px-3 py-4'>
 
       <Slider {...settings}>
-        {reviews.map((review, idx) => (
+        {reviews?.map((review, idx) => (
           <div key={`review-${idx}`} >
             <div className="flex">
               <div className="flex-col mr-3 w-[300px]">
@@ -61,12 +53,12 @@ const Reviews = () => {
                   height={0}
                   sizes="auto"
                   // style={{ width: "200px", height: "150px" }}
-                  className=" mr-3 rounded-lg w-[150px] h-[100px] object-cover"
+                  className=" mr-3 rounded-lg !w-[150px] !h-[100px] object-cover"
                   loading="lazy"
-                  src={`/assets/Reviews/${review?.image}`} alt='' />
+                  src={urlFor(review?.logo).url()} />
               </div>
               <div className="flex-col">
-                <h3 className="font-[600]">{review.author}</h3>
+                <h3 className="font-[600] capitalize">{review.name}</h3>
                 <div className="my-3 text-sm text-[#586863]">{review.title}</div>
                 <div className="my-3">
                   {[...Array(review?.rating)].map((_, i) => (
@@ -76,7 +68,7 @@ const Reviews = () => {
                     <FaRegStar className="inline-block text-[#F05423]" key={i} />
                   ))}
                 </div>
-                <p>{review.text}</p>
+                <p>{review.review}</p>
               </div>
 
             </div>

@@ -1,29 +1,59 @@
-import Image from "next/image"
-import React, { useEffect, useState } from "react"
-import { BiChevronRight } from "react-icons/bi"
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import { BiChevronRight } from "react-icons/bi";
 import Accordion from 'react-bootstrap/Accordion';
 import Reviews from "../Reviews/reviews";
 import { isMobile } from "react-device-detect";
 import { Tab, Tabs } from "react-bootstrap";
+import imageUrlBuilder from "@sanity/image-url";
+import client from "../../sanity/config/client-config"
 
-const Clients = ({ content, urlFor }) => {
+
+const Clients = ({ content }) => {
   const [info, setInfo] = useState([])
+  const [clientCategories, setClientCategories] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [activeKey, setActiveKey] = useState("banking")
+
+  useEffect(() => { }, [clients])
+
+
   useEffect(() => {
-    setInfo(
-      content.clientsAccordions.map((item, index) => {
-        const { _key, clientsAccordionTitle, clientsAccordionImages } = item
-        const imagesArray = clientsAccordionImages.map((image) =>
-          urlFor(image).url()
-        )
-        return {
-          id: _key,
-          title: clientsAccordionTitle,
-          images: imagesArray,
-          open: index === 0,
-        }
-      })
-    )
-  }, [urlFor])
+    const storedcategories = JSON.parse(window.localStorage.getItem("clientCategories"));
+    const storedClients = JSON.parse(window.localStorage.getItem("clients"));
+    setClientCategories(storedcategories);
+
+    setClients(storedClients?.filter(item => item?.logoCategories[0]?.key === "banking"));
+
+
+  }, []);
+
+  useEffect(() => {
+    const storedClients = JSON.parse(window.localStorage.getItem("clients"));
+    setClients(storedClients?.filter(item => item?.logoCategories[0]?.key === activeKey));
+
+  }, [activeKey])
+  const builder = imageUrlBuilder(client)
+
+  function urlFor(source) {
+    return builder.image(source)
+  }
+  // useEffect(() => {
+  //   setInfo(
+  //     content.clientsAccordions.map((item, index) => {
+  //       const { _key, clientsAccordionTitle, clientsAccordionImages } = item
+  //       const imagesArray = clientsAccordionImages.map((image) =>
+  //         urlFor(image).url()
+  //       )
+  //       return {
+  //         id: _key,
+  //         title: clientsAccordionTitle,
+  //         images: imagesArray,
+  //         open: index === 0,
+  //       }
+  //     })
+  //   )
+  // }, [urlFor])
 
   const handleClick = (id) => {
     const newInfo = info.map((item) => {
@@ -34,28 +64,17 @@ const Clients = ({ content, urlFor }) => {
     })
     setInfo(newInfo)
   }
-  const clients = ["banking", 'companies', 'institutions'];
 
-  const bankingImages = require.context(`../../public/assets/Clients/bank-oil`, false, /\.(png|jpe?g|svg)$/);
-  const bankingImgPaths = bankingImages.keys().map(bankingImages);
-  const companiesImages = require.context(`../../public/assets/Clients/companies`, false, /\.(png|jpe?g|svg)$/);
-  const companiesImgPaths = companiesImages.keys().map(companiesImages);
-  const institutionImages = require.context(`../../public/assets/Clients/institutions`, false, /\.(png|jpe?g|svg)$/);
-  const institutionImgPaths = institutionImages.keys().map(institutionImages);
-  const internationalImages = require.context(`../../public/assets/Clients/international`, false, /\.(png|jpe?g|svg)$/);
-  const internationalImgPaths = internationalImages.keys().map(internationalImages);
-  const governmentImages = require.context(`../../public/assets/Clients/government`, false, /\.(png|jpe?g|svg)$/);
-  const governmentImgPaths = governmentImages?.keys()?.map(governmentImages);
 
   const AccordionItem = ({ item }) => {
 
     return (
-      <Accordion.Item eventKey={item.name}>
+      <Accordion.Item eventKey={item.key}>
         <Accordion.Header className="font-bold !capitalize">
-          {item.name}
+          {item.category}
         </Accordion.Header>
         <Accordion.Body>
-          {item.imgPaths.map((src, i) => (
+          {clients.map((src, i) => (
             <Image
               key={`${item.name}`}
               alt={`img-${i}`}
@@ -74,61 +93,47 @@ const Clients = ({ content, urlFor }) => {
 
   const ClientTabs = () => {
 
-    const tabsList = [
-      {
-        title: "banking and oil",
-        eventKey: 'banking',
-        imgPaths: bankingImgPaths,
-      },
-      {
-        title: "Companies",
-        eventKey: 'companies',
-        imgPaths: companiesImgPaths,
-      },
-      {
-        title: "institutions",
-        eventKey: 'institutions',
-        imgPaths: institutionImgPaths,
-      },
-      {
-        title: "International",
-        eventKey: 'international',
-        imgPaths: internationalImgPaths,
-      },
-      {
-        title: "government",
-        eventKey: 'government',
-        imgPaths: governmentImgPaths,
-      }
-    ]
-
     return (
       <div className="">
-        <Tabs defaultActiveKey={"banking"} id="scrollable-tabs" className="plain-tabs flex-nowrap">
+        <Tabs
+          defaultActiveKey={"banking"}
+          id="scrollable-tabs"
+          onSelect={(k) => setActiveKey(k)}
+          className="capitalize plain-tabs flex-nowrap">
           {/* Make the tabs dynamic */}
 
           {
-            tabsList?.map((item, idx) => (
+            clientCategories?.map((item, idx) => (
               <Tab
                 key={`item-${idx}`}
-                eventKey={item?.eventKey}
-                title={item?.title}
-                className="p-3 max-h-[300px] overflow-auto"
+                onSelect={() => setActiveKey(item?.key)}
+                eventKey={item?.key}
+                title={item?.category}
+                className="p-3 max-h-[300px] overflow-auto !capitalize"
               >
-                {item.imgPaths.map((src, i) => (
+                {clients?.map((src, i) => (
+
                   <Image
                     key={`${item.name}`}
                     alt={`img-${i}`}
-                    src={src}
+                    src={urlFor(src?.clientLogo).url()}
                     width={100}
                     height={200}
                     className="inline-block mb-3 client-logo"
                     style={{ width: "200px", marginRight: "12px" }}
                   />
                 ))}
+
+                {clients?.length < 1 &&
+                  <div
+                    className="bg-gray-200 text-gray-700 rounded-md text-center border-dashed p-2 ">
+                    You'll be a unique client
+                  </div>
+                }
               </Tab>
             ))
           }
+
         </Tabs>
       </div>
     )
@@ -163,15 +168,13 @@ const Clients = ({ content, urlFor }) => {
               <Accordion
                 className="accordion"
                 id="clients-accordion"
-                defaultActiveKey={"Banking and Oil"}
+                defaultActiveKey={"banking"}
                 allowMultipleExpanded={false}
                 uuid={63213}
               >
-                <AccordionItem item={{ name: "Banking and Oil", imgPaths: bankingImgPaths }} />
-                <AccordionItem item={{ name: "Companies", imgPaths: companiesImgPaths }} />
-                <AccordionItem item={{ name: "Institutions", imgPaths: institutionImgPaths }} />
-                <AccordionItem item={{ name: "International", imgPaths: internationalImgPaths }} />
-                <AccordionItem item={{ name: "Government", imgPaths: governmentImgPaths }} />
+                {clientCategories?.map((category, idx) => (
+                  <AccordionItem item={category} />
+                ))}
               </Accordion>
               :
 
@@ -185,5 +188,4 @@ const Clients = ({ content, urlFor }) => {
     </div>
   )
 }
-
-export default Clients
+export default Clients;

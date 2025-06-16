@@ -1,12 +1,15 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
+import { GetStaticProps } from 'next';
 import PageTitle from "../components/PageTitle"
 import Clients from "../components/homepage/Clients"
 import Image from "next/image"
 import getPageMetadata from "../SEO/seo"
-import { getAboutPageData } from "../sanity/sanity-utils"
+import { getAboutData } from "../sanity/sanity-utils"
 import imageUrlBuilder from "@sanity/image-url"
 import client from "../sanity/config/client-config"
 import Jumbotron from "../components/jumbotron"
+import PortableText from "@sanity/block-content-to-react"
+
 
 
 
@@ -36,6 +39,7 @@ const About = ({ aboutPage }) => {
   function urlFor(source) {
     return builder.image(source)
   }
+
   return (
     <div className='w-full h-full'>
       {getPageMetadata("about")}
@@ -49,7 +53,7 @@ const About = ({ aboutPage }) => {
               The premier <br />Moving <br />Company
             </h1>
             <div className="my-3 leading-[1.5]">
-              <p>Our key focus and goal is to understand our clients experience from their point of view. We see this as our central focus that drives every aspect of how we conduct our business and relate to our customers. We guarantee professional moving services in Kenya. Whether moving within Nairobi or around the globe, Taylor movers Kenya will have a custom tailored moving solution for you.</p>
+              <div dangerouslySetInnerHTML={{ __html: data?.about_us }} />
             </div>
           </div>
         </div>
@@ -58,13 +62,14 @@ const About = ({ aboutPage }) => {
           <div className="bg-[#F0EFEF] mx-2 px-2 md:px-[160px] py-8 md:text-left text-center">
             <h1 className="text-[#ff5000] py-3 font-bold text-2xl">Our Vision</h1>
             <div className="py-6">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium, eget laoreet enim tempor. Etiam erat ex, lacinia nec mattis quis, efficitur et magna. Nam auctor odio vitae nulla scelerisque, vel porttitor eros sodales. Aenean scelerisque felis id est facilisis ornare. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. </p>
+              <div dangerouslySetInnerHTML={{ __html: data?.vision }} />
+
             </div>
           </div>
           <div className="bg-[#ff5000] mx-2 px-2 md:px-[160px] py-12 md:text-left text-center">
             <h1 className="text-[#070707] py-3 font-bold text-2xl">Our Mission</h1>
             <div className="py-2 text-white">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium, eget laoreet enim tempor. Etiam erat ex, lacinia nec mattis quis, efficitur et magna. Nam auctor odio vitae nulla scelerisque, vel porttitor eros sodales. Aenean scelerisque felis id est facilisis ornare. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. </p>
+              <div dangerouslySetInnerHTML={{ __html: data?.mission }} />
             </div>
           </div>
         </div>
@@ -76,17 +81,15 @@ const About = ({ aboutPage }) => {
 }
 
 export default About
-
-export async function getServerSideProps({ req, res }) {
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=10, stale-while-revalidate=59"
-  )
-  const aboutPage = await getAboutPageData()
+export async function getStaticProps() {
+  const aboutPage = await getAboutData()
 
   return {
     props: {
-      aboutPage,
+      aboutPage
     },
+    revalidate: 60, // Revalidate every 60 seconds
   }
 }
+
+

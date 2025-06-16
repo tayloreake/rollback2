@@ -48,6 +48,40 @@ export async function getCategories() {
       }`
   )
 }
+
+export async function getClientCategories() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "clientcategory"]{
+        ...,
+      }`
+  )
+}
+export async function getClientLogos() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "clientlogo"]{
+        ...,
+        logoCategories[]->{
+          category,
+          key
+        }
+      }`
+  )
+}
+export async function getClientReviews() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "newreview"]{
+        ...,
+        
+      }`
+  )
+}
+export async function getAboutData() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "about"]{
+        ...,
+      }`
+  )
+}
 export async function getTags() {
   return createClient(clientConfig).fetch(
     groq`*[_type == "tags"]{
@@ -86,7 +120,7 @@ export async function createQuote(
 
 export async function createReview(sentiment, review, name, email) {
   const client = createClient(clientConfig)
-  
+
   return client.create({
     _type: "review",
     name,
