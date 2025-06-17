@@ -117,7 +117,7 @@ const Clients = ({ content }) => {
                   <Image
                     key={`${item.name}`}
                     alt={`img-${i}`}
-                    src={urlFor(src?.clientLogo).url()}
+                    src={urlFor(src?.clientLogo)?.url() || '/assets/Clients/default.png'}
                     width={100}
                     height={200}
                     className="inline-block mb-3 client-logo"
