@@ -11,28 +11,7 @@ import client from "../../sanity/config/client-config"
 
 const Clients = ({ content }) => {
   const [info, setInfo] = useState([])
-  const [clientCategories, setClientCategories] = useState([]);
-  const [clients, setClients] = useState([]);
-  const [activeKey, setActiveKey] = useState("banking")
 
-  useEffect(() => { }, [clients])
-
-
-  useEffect(() => {
-    const storedcategories = JSON.parse(window.localStorage.getItem("clientCategories"));
-    const storedClients = JSON.parse(window.localStorage.getItem("clients"));
-    setClientCategories(storedcategories);
-
-    setClients(storedClients?.filter(item => item?.logoCategories[0]?.key === "banking"));
-
-
-  }, []);
-
-  useEffect(() => {
-    const storedClients = JSON.parse(window.localStorage.getItem("clients"));
-    setClients(storedClients?.filter(item => item?.logoCategories[0]?.key === activeKey));
-
-  }, [activeKey])
   const builder = imageUrlBuilder(client)
 
   function urlFor(source) {
@@ -92,6 +71,28 @@ const Clients = ({ content }) => {
 
 
   const ClientTabs = () => {
+    const [clientCategories, setClientCategories] = useState([]);
+    const [clients, setClients] = useState([]);
+    const [activeKey, setActiveKey] = useState("banking")
+
+    useEffect(() => { }, [clients])
+
+
+    useEffect(() => {
+      const storedcategories = JSON.parse(window.localStorage.getItem("clientCategories"));
+      const storedClients = JSON.parse(window.localStorage.getItem("clients"));
+      setClientCategories(storedcategories);
+
+      setClients(storedClients?.filter(item => item?.logoCategories[0]?.key === "banking"));
+
+
+    }, []);
+
+    useEffect(() => {
+      const storedClients = JSON.parse(window.localStorage.getItem("clients"));
+      setClients(storedClients?.filter(item => item?.logoCategories[0]?.key === activeKey));
+
+    }, [activeKey])
 
     return (
       <div className="">

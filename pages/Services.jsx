@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { generateServicesPageMetadata } from "../SEO/seo"
-import { getServicesPageData } from "../sanity/sanity-utils"
+import { getServicesData, getServicesPageData } from "../sanity/sanity-utils"
 import { useRouter } from "next/router"
 import PageTitle from "../components/PageTitle"
 import Script from 'next/script';
@@ -10,7 +10,9 @@ import { isMobile } from "react-device-detect"
 import Slider from "react-slick"
 import { set } from "sanity"
 import { Tab, Nav, Row, Col, Accordion } from 'react-bootstrap';
-
+import imageUrlBuilder from "@sanity/image-url"
+import client from "../sanity/config/client-config"
+import { PortableText } from '@portabletext/react';
 
 
 
@@ -23,10 +25,16 @@ const settings = {
   autoplay: true,
   autoplaySpeed: 3000,
 };
-const Services = ({ content }) => {
+const Services = ({ content, servicesData }) => {
   const router = useRouter();
   const videoRef = useRef(null);
+  const [services, setServices] = useState(servicesData)
 
+
+  const builder = imageUrlBuilder(client)
+  function urlFor(source) {
+    return builder.image(source)
+  }
 
   useEffect(() => {
     const { service, subservice } = router.query;
@@ -46,73 +54,24 @@ const Services = ({ content }) => {
     setActiveTab(services[0])
   }, [])
 
-  // console.log(service, subservice)
 
-  const services = [
-
-    {
-      name: "Household Moving",
-      image: "household.jpg",
-      titlePos: "bottom",
-      icon: '/icons/household.png',
-      presurvey: "<p>We will schedule an appointment at a time convenient to you. Our relocation assessment consultant will then conduct a pre-move survey on your premises. Our survey begins with a walk through of the premises. A room by room evaluation of the items that you need relocated to the destination premises. This will allow our consultant to assess each article in every room that will be shipped out.</p> <p>During the survey, it will be helpful if you could identify and point out the household items that you would like to be sent via air, sea or stored in our warehouse. Our well trained and experienced consultants are ready to assist you should there be any concerns involving any step of the move. Their advice should ensure a satisfactory outcome to completion of the move. We request our clients to schedule approximately thirty minutes for the survey.</p>",
-      quotation: "<p>An estimated quotation will then be sent to you based on the preliminary survey. This will include a description of the services we will provide on move day. Also included will be the time frame in which we expect to complete the scheduled relocation.</p> <p>Be sure to include any additional services you might need during your move: pre-packing boxes, crating, arrange for cars and boats to be transported, storage facilities during the move and much more.</p>",
-      others: "<p>Rates - Cost competitiveness is an important factor for our clients. All our actions put the clients' value for their money first.</p> <p>First Rate equipment and Packing Materials Reliability is a basic requirement by our clients and we believe in consistent service delivery.To meet this goal we have implemented best of class practices thorough out the company to ensure the highest maintenance standards are observed.</p> <p> Communication - Keeping track of clients' shipment through-out the transportation process is a basic requirement and be competitive advantage for our clients. All the vehicles in the fleet are fitted with tracking equipment and a 2 way Radio Communication to ensure constant contact between headquarters, fleet management and truck drivers.</p> <p> Insurance - Our clients entrust Taylor Movers Ltd with the responsibility of transporting their valuable cargo.We have gone to great lengths to assure our clients that their cargo is protected, but unfortunate incidents do occur.To mitigate any losses to the client, all our shipments are insured with general cartage comprehensive cover.</p>",
-      local: "<p>As a full service moving and storage company, we pride ourselves on servicing our customers with local and long distant moves. Our residential moves start with a free in home estimate by a professional move consultant. We offer movers and a full packing service as well as antique care and special heavy services.</p>",
-      international: "<p>Moving overseas can be both intimidating and exciting. There is the prospect of seeing new places, becoming acquainted with people from different cultures, and learning customs different from those of your origin country. Nevertheless, particularly for the person who has lived abroad before, there are understandable anxieties, especially about the safe handling of one's household possessions.</p>",
-    },
-
-    {
-      name: "Office Moving",
-      image: "officehold.jpg",
-      titlePos: "top",
-      icon: '/icons/office.png',
-      presurvey: "<p>We will schedule an appointment at a time convenient to you. Our relocation assessment consultant will then conduct a pre-move survey on your premises. Our survey begins with a walk through of the premises. A room by room evaluation of the items that you need relocated to the destination premises. This will allow our consultant to assess each article in every room that will be shipped out.</p> <p>During the survey, it will be helpful if you could identify and point out the household items that you would like to be sent via air, sea or stored in our warehouse. Our well trained and experienced consultants are ready to assist you should there be any concerns involving any step of the move. Their advice should ensure a satisfactory outcome to completion of the move. We request our clients to schedule approximately thirty minutes for the survey.</p>",
-      quotation: "<p>An estimated quotation will then be sent to you based on the preliminary survey. This will include a description of the services we will provide on move day. Also included will be the time frame in which we expect to complete the scheduled relocation.</p> <p>Be sure to include any additional services you might need during your move: pre-packing boxes, crating, arrange for cars and boats to be transported, storage facilities during the move and much more.</p>",
-      others: "<p>Rates - Cost competitiveness is an important factor for our clients. All our actions put the clients' value for their money first.</p> <p>First Rate equipment and Packing Materials Reliability is a basic requirement by our clients and we believe in consistent service delivery.To meet this goal we have implemented best of class practices thorough out the company to ensure the highest maintenance standards are observed.</p> <p> Communication - Keeping track of clients' shipment through-out the transportation process is a basic requirement and be competitive advantage for our clients. All the vehicles in the fleet are fitted with tracking equipment and a 2 way Radio Communication to ensure constant contact between headquarters, fleet management and truck drivers.</p> <p> Insurance - Our clients entrust Taylor Movers Ltd with the responsibility of transporting their valuable cargo.We have gone to great lengths to assure our clients that their cargo is protected, but unfortunate incidents do occur.To mitigate any losses to the client, all our shipments are insured with general cartage comprehensive cover.</p>",
-      local: "<p>As a full service moving and storage company, we pride ourselves on servicing our customers with local and long distant moves. Our residential moves start with a free in home estimate by a professional move consultant. We offer movers and a full packing service as well as antique care and special heavy services.</p>",
-      international: "<p>Moving overseas can be both intimidating and exciting. There is the prospect of seeing new places, becoming acquainted with people from different cultures, and learning customs different from those of your origin country. Nevertheless, particularly for the person who has lived abroad before, there are understandable anxieties, especially about the safe handling of one's household possessions.</p>",
-    },
-    {
-      name: "Corporate Moving",
-      image: "corporatehold.jpg",
-      icon: '/icons/corporate.png',
-      titlePos: "bottom",
-      presurvey: "<p>We will schedule an appointment at a time convenient to you. Our relocation assessment consultant will then conduct a pre-move survey on your premises. Our survey begins with a walk through of the premises. A room by room evaluation of the items that you need relocated to the destination premises. This will allow our consultant to assess each article in every room that will be shipped out.</p> <p>During the survey, it will be helpful if you could identify and point out the household items that you would like to be sent via air, sea or stored in our warehouse. Our well trained and experienced consultants are ready to assist you should there be any concerns involving any step of the move. Their advice should ensure a satisfactory outcome to completion of the move. We request our clients to schedule approximately thirty minutes for the survey.</p>",
-      quotation: "<p>An estimated quotation will then be sent to you based on the preliminary survey. This will include a description of the services we will provide on move day. Also included will be the time frame in which we expect to complete the scheduled relocation.</p> <p>Be sure to include any additional services you might need during your move: pre-packing boxes, crating, arrange for cars and boats to be transported, storage facilities during the move and much more.</p>",
-      others: "<p>Rates - Cost competitiveness is an important factor for our clients. All our actions put the clients' value for their money first.</p> <p>First Rate equipment and Packing Materials Reliability is a basic requirement by our clients and we believe in consistent service delivery.To meet this goal we have implemented best of class practices thorough out the company to ensure the highest maintenance standards are observed.</p> <p> Communication - Keeping track of clients' shipment through-out the transportation process is a basic requirement and be competitive advantage for our clients. All the vehicles in the fleet are fitted with tracking equipment and a 2 way Radio Communication to ensure constant contact between headquarters, fleet management and truck drivers.</p> <p> Insurance - Our clients entrust Taylor Movers Ltd with the responsibility of transporting their valuable cargo.We have gone to great lengths to assure our clients that their cargo is protected, but unfortunate incidents do occur.To mitigate any losses to the client, all our shipments are insured with general cartage comprehensive cover.</p>",
-      local: "<p>As a full service moving and storage company, we pride ourselves on servicing our customers with local and long distant moves. Our residential moves start with a free in home estimate by a professional move consultant. We offer movers and a full packing service as well as antique care and special heavy services.</p>",
-      international: "<p>Moving overseas can be both intimidating and exciting. There is the prospect of seeing new places, becoming acquainted with people from different cultures, and learning customs different from those of your origin country. Nevertheless, particularly for the person who has lived abroad before, there are understandable anxieties, especially about the safe handling of one's household possessions.</p>",
-    },
-    {
-      name: "Warehousing & Storage",
-      image: "warehousehold.jpg",
-      icon: '/icons/corporate.png',
-      titlePos: "bottom",
-      presurvey: "<p>We will schedule an appointment at a time convenient to you. Our relocation assessment consultant will then conduct a pre-move survey on your premises. Our survey begins with a walk through of the premises. A room by room evaluation of the items that you need relocated to the destination premises. This will allow our consultant to assess each article in every room that will be shipped out.</p> <p>During the survey, it will be helpful if you could identify and point out the household items that you would like to be sent via air, sea or stored in our warehouse. Our well trained and experienced consultants are ready to assist you should there be any concerns involving any step of the move. Their advice should ensure a satisfactory outcome to completion of the move. We request our clients to schedule approximately thirty minutes for the survey.</p>",
-      others: "<p>Rates - Cost competitiveness is an important factor for our clients. All our actions put the clients' value for their money first.</p> <p>First Rate equipment and Packing Materials Reliability is a basic requirement by our clients and we believe in consistent service delivery.To meet this goal we have implemented best of class practices thorough out the company to ensure the highest maintenance standards are observed.</p> <p> Communication - Keeping track of clients' shipment through-out the transportation process is a basic requirement and be competitive advantage for our clients. All the vehicles in the fleet are fitted with tracking equipment and a 2 way Radio Communication to ensure constant contact between headquarters, fleet management and truck drivers.</p> <p> Insurance - Our clients entrust Taylor Movers Ltd with the responsibility of transporting their valuable cargo.We have gone to great lengths to assure our clients that their cargo is protected, but unfortunate incidents do occur.To mitigate any losses to the client, all our shipments are insured with general cartage comprehensive cover.</p>",
-      local: "<p>As a full service moving and storage company, we pride ourselves on servicing our customers with local and long distant moves. Our residential moves start with a free in home estimate by a professional move consultant. We offer movers and a full packing service as well as antique care and special heavy services.</p>",
-      international: "<p>Moving overseas can be both intimidating and exciting. There is the prospect of seeing new places, becoming acquainted with people from different cultures, and learning customs different from those of your origin country. Nevertheless, particularly for the person who has lived abroad before, there are understandable anxieties, especially about the safe handling of one's household possessions.</p>",
-    },
-
-  ]
 
   const ServiceItem = ({ item }) => {
 
     return (
       <div
         onClick={() => setType(item?.name)}
-        className='px-0 bg-black  h-full hover:animate-pulse cursor-pointer'>
+        className='max-w-[300px] px-0 bg-black  h-full hover:animate-pulse cursor-pointer relative'>
         <Image
-          src={`/assets/services/${item?.image}`}
+          src={urlFor(item?.image).url()}
           alt=""
           width={420}
           height={420}
           // fill
-          // style={{width:"300px", height:"400px", objectFit:"cover"}}
+          // style={{ width: "300px", height: "400px", objectFit: "cover" }}
           className=''
         />
-        <div className='absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full bottom-0 py-4'>
+        <div className={`absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full ${item?.titlePos}-0 py-4`}>
           <h3 className='text-white text-center'>{item?.name}</h3>
         </div>
       </div>
@@ -125,13 +84,13 @@ const Services = ({ content }) => {
         <div className="col-md-6 bg-[#EDEDED] p-8">
           <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">Local <br /> Moves</h1>
           <div className="my-3">
-            <div dangerouslySetInnerHTML={{ __html: activeTab?.local }} />
+            <PortableText value={activeTab?.local} />
           </div>
         </div>
         <div className="col-md-6 bg-[#E1DEDE] p-8">
           <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">International <br /> Moves</h1>
           <div className="my-3">
-            <div dangerouslySetInnerHTML={{ __html: activeTab?.international }} />
+            <PortableText value={activeTab?.international} />
           </div>
         </div>
 
@@ -142,7 +101,7 @@ const Services = ({ content }) => {
   const PresurveyContent = () => {
     return (
       <div className="my-3">
-        <div dangerouslySetInnerHTML={{ __html: activeTab?.presurvey }} />
+        <PortableText value={activeTab?.presurvey} />
       </div>
     )
   }
@@ -150,14 +109,14 @@ const Services = ({ content }) => {
   const QuotationContent = () => {
     return (
       <div className="my-3">
-        <div dangerouslySetInnerHTML={{ __html: activeTab?.quotation }} />
+        <PortableText value={activeTab?.quotation} />
       </div>
     )
   }
   const OthersContent = () => {
     return (
       <div className="my-3">
-        <div dangerouslySetInnerHTML={{ __html: activeTab?.others }} />
+        <PortableText value={activeTab?.others} />
       </div>
     )
   }
@@ -323,10 +282,12 @@ export async function getServerSideProps({ req, res }) {
     "public, s-maxage=10, stale-while-revalidate=59"
   )
   const content = await getServicesPageData()
+  const servicesData = await getServicesData();
 
   return {
     props: {
       content,
+      servicesData
     },
   }
 }

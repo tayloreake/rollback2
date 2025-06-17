@@ -12,6 +12,7 @@ import review from "./sanity/schemas/review-schema"
 import clientreview from "./sanity/schemas/new-review-schema"
 import clientlogo from "./sanity/schemas/client-logos-schema"
 import clientcategory from "./sanity/schemas/client-categories-schema"
+import service from "./sanity/schemas/services-schema"
 
 const config = defineConfig({
   projectId: "bsg3746e",
@@ -21,7 +22,7 @@ const config = defineConfig({
   basePath: "/admin",
   plugins: [deskTool()],
   schema: {
-    types: [landingPage, aboutPage, servicespage, category, tag, blog, quote, review, clientcategory, clientlogo, clientreview, about],
+    types: [service, landingPage, aboutPage, servicespage, category, tag, blog, quote, review, clientcategory, clientlogo, clientreview, about],
   },
 })
 

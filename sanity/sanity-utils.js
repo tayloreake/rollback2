@@ -75,6 +75,14 @@ export async function getClientReviews() {
       }`
   )
 }
+export async function getServicesData() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "service" && !(_id in path('drafts.**'))]{
+        ...,
+        
+      }`
+  )
+}
 export async function getAboutData() {
   return createClient(clientConfig).fetch(
     groq`*[_type == "about"]{
