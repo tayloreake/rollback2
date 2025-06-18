@@ -19,7 +19,7 @@ const Blog = ({ blog }) => {
   // //   return builder.image(source)
   // // }
   return (
-    <div className='w-full h-full flex flex-col items-center justify-center container'>
+    <div className='blog w-full h-full flex flex-col items-center justify-center container'>
       <div className=''>
         <div className='flex flex-col mb-6'>
           <h2 className='text-3xl text-[#FF5000] my-4 !mt-9 font-bold'>{blog.blogTitle}</h2>
