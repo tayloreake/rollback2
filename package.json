@@ -14,7 +14,7 @@
     "@next/env": "^15.2.2",
     "@portabletext/react": "^3.0.4",
     "@sanity/block-content-to-react": "^3.0.0",
-    "@sanity/image-url": "^1.0.2",
+    "@sanity/image-url": "^1.1.0",
     "africastalking": "^0.6.7",
     "antd": "^5.8.2",
     "axios": "^1.4.0",

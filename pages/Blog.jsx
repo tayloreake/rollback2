@@ -52,7 +52,7 @@ const Blog = ({ blogs, tags, categories }) => {
                     setStateBlogs(newBlogs)
                   }}
                   className=' mr-6 hover:antialiased cursor-pointer w-fit'>
-                  <button className='bg-[#F05423] rounded-full font-[500] btn text-white whitespace-nowrap capitalize'>{category.category}</button>
+                  <button className='!bg-[#F05423] rounded-full font-[500] btn text-white whitespace-nowrap capitalize'>{category.category}</button>
                 </div>
               ))}
           </div>

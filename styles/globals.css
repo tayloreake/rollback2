@@ -91,6 +91,14 @@ body {
   border-bottom: 5px solid #F05423 !important;
 }
 
+a {
+  color: #F05423;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 .right-slanted-box {
   clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
 }

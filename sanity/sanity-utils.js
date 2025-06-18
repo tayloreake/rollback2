@@ -28,6 +28,17 @@ export async function getBlogs() {
   return createClient(clientConfig).fetch(
     groq`*[_type == "blogs"]{
         ...,
+        title,
+        content[]{
+          ...,
+          _type == "image" => {
+            ...,
+            asset->{
+              _id,
+              url
+            }
+          }
+        }
       }`
   )
 }
