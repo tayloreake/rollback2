@@ -246,16 +246,15 @@ const QuoteForm = () => {
 
       await handleSendMessage();
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Failed to submit form. Please try again.");
     }
   }
 
   return (
     <div className='md:w-[320px]'>
-      <div className='py-12 flex flex-col px-4 mx-auto'>
-        <h1 className="font-bold text-2xl text-gray-600">Request a Quote</h1>
-        <h1 className='mb-4 md:mb-7 text- '>Feel Free To Ask</h1>
+      <div className='py-4 flex flex-col px-4 mx-auto mb-4 bg-[#DB421B]'>
+        <h1 className="font-bold text-2xl text-white">Request a Quote</h1>
+        <h1 className='mb-2 text-white '>Feel Free To Ask</h1>
 
       </div>
       <div className='flwe flex-col w-full px-4 mb-4'>
@@ -269,11 +268,12 @@ const QuoteForm = () => {
                 type='text'
                 value={fname}
                 required
+                placeholder="John Doe"
                 onChange={(e) => setFname(e.target.value)}
                 className='border border-slate-300 px-2 py-1 w-full rounded-xl'
               />
               <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                First Name
+                Full Name
               </label>
             </div>
             <div className=' relative w-full max-w-[351px] mb-4 md:mr-2'>
@@ -288,7 +288,7 @@ const QuoteForm = () => {
                 value={number}
                 required
                 onChange={(e) => setNumber(e.target.value)}
-                className='border border-slate-300 rounded-xl py-1 px-2 w-full rounded-xl'
+                className='border border-slate-300 rounded-xl py-2 px-2 w-full rounded-xl'
                 placeholder="0700000000"
               />
               <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
@@ -301,6 +301,7 @@ const QuoteForm = () => {
               <input
                 type='email'
                 value={email}
+                placeholder="john@gmail.com"
                 onChange={(e) => setEmail(e.target.value)}
                 className='px-4 py-2 w-full rounded-xl'
               />
@@ -315,6 +316,7 @@ const QuoteForm = () => {
               <input
                 type='text'
                 value={destination}
+                placeholder="Mathare"
                 onChange={(e) => setDestination(e.target.value)}
                 className='px-4 py-2 w-full rounded-xl'
               />
@@ -326,6 +328,7 @@ const QuoteForm = () => {
               <input
                 type='text'
                 value={location}
+                placeholder=""
                 onChange={(e) => setLocation(e.target.value)}
                 className='px-4 py-2 w-full rounded-xl'
               />
@@ -335,7 +338,7 @@ const QuoteForm = () => {
             </div>
 
           </div>
-          <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
+          <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
             <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
               <select
                 onChange={(e) => setMoveType(e.target.value)}
