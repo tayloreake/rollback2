@@ -115,9 +115,10 @@ export async function createQuote(
   phoneNumber,
   location,
   destination,
-  bedrooms,
   moveType,
-  moveDate
+  bedrooms,
+  moveDate,
+  referrals
 ) {
   try {
     return createClient(clientConfig).create({
@@ -128,9 +129,10 @@ export async function createQuote(
       phoneNumber,
       location,
       destination,
+      moveType,
       bedrooms,
       moveDate,
-      moveType,
+      referrals
     })
   } catch (error) {
     console.log(error)

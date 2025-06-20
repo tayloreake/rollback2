@@ -125,9 +125,10 @@ const QuoteForm = () => {
         number,
         location,
         destination,
-        bedrooms,
         moveType,
-        moveDate
+        bedrooms,
+        moveDate,
+        ref
       );
 
       setLastSubmissionTime(now);
@@ -270,7 +271,7 @@ const QuoteForm = () => {
                 required
                 placeholder="John Doe"
                 onChange={(e) => setFname(e.target.value)}
-                className='border border-slate-300 px-2 py-1 w-full rounded-xl'
+                className='border border-slate-300 px-2 py-2 w-full rounded-xl'
               />
               <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                 Full Name
