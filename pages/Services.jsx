@@ -3,7 +3,6 @@ import Image from "next/image"
 import { generateServicesPageMetadata } from "../SEO/seo"
 import { getServicesData, getServicesPageData } from "../sanity/sanity-utils"
 import { useRouter } from "next/router"
-import PageTitle from "../components/PageTitle"
 import Script from 'next/script';
 import Jumbotron from "../components/jumbotron"
 import { isMobile } from "react-device-detect"
