@@ -28,12 +28,7 @@ const Footer = () => {
               <span className="block text-sm my-1 font-[500]">Feel Free to ask, or send your request via chat</span>
             </h1>
             <div className="col-12 items-center flex">
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="my-4 mx-auto btn text-white !bg-[#313D39] rounded-2xl font-[600] px-4 py-3">
-                REQUEST QUOTE
-              </button>
-              <QuoteModal isModalOpen={isModalOpen} />
+              < QuoteModal quotebtn={"default"} />
             </div>
           </div>
         </div>
@@ -59,25 +54,25 @@ const Footer = () => {
               Our Services
             </h3>
             <div className='text-sm text-[#BECCC7] flex flex-col justify-between items-start'>
-              <Link className="my-1" href='/Services?service=Household Moving&&subservice=Premoving'>
+              <Link className="my-1" href='/services/household-moving'>
                 <div className='flex flex-row items-center '>
                   {/* <BsArrowRight size={20} className=' my-2 mr-2' /> */}
                   <p className=''>Household Moving</p>
                 </div>
               </Link>
-              <Link className="my-1" href='/Services?service=Office Moving&&subservice=Office Move'>
+              <Link className="my-1" href='/services/office-moving'>
                 <div className='flex flex-row items-center'>
                   {/* <BsArrowRight size={20} className='my-2 mr-2' /> */}
                   <p className=''>Office Moving</p>
                 </div>
               </Link>
-              <Link className="my-1" href='/Services?service=Corporate Moving&&subservice=Coporate Relocations'>
+              <Link className="my-1" href='/services/corporate-moving'>
                 <div className='flex flex-row items-center'>
                   {/* <BsArrowRight size={20} className='my-2 mr-2' /> */}
                   <p className=''>Corporate Relocation Services</p>
                 </div>
               </Link>
-              <Link className="my-1" href='/Services?service=Warehouse Moving&&subservice=Our Warehouse Services'>
+              <Link className="my-1" href='/services/warehousing'>
                 <div className='flex flex-row items-center'>
                   {/* <BsArrowRight size={20} className='my-2 mr-2' /> */}
                   <p className=''>Warehousing</p>

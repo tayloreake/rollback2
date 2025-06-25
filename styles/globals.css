@@ -145,3 +145,28 @@ pre {
 .plain-tabs .nav-link {
   text-transform: capitalize !important;
 }
+
+.close-toggle-quote-form {
+  position: absolute;
+  width: 40px;
+  height: 30px;
+  right: 0;
+  top: 0;
+  cursor: pointer;
+  background-color: black;
+  color: white;
+  text-align: center;
+  padding: 4px;
+  font-weight: bold;
+}
+
+.no-pad-modal .ant-modal-content {
+  padding: 0 !important;
+  /* width: ; */
+}
+
+.anticon svg {
+  display: inline-block;
+  font-weight: bold !important;
+  color: white;
+}

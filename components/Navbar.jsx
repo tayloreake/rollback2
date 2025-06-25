@@ -51,7 +51,8 @@ const Navbar = () => {
 
                 {open && (
                     <div
-                        className="absolute right-0 mt-2 bg-white rounded-md shadow-lg z-20">
+                        className="absolute right-0 mt-2 bg-white rounded-md shadow-lg z-[9999]">
+                        <span className='close-toggle-quote-form' onClick={() => setOpen(false)}>X</span>
                         <QuoteForm />
                     </div>
                 )}

@@ -93,7 +93,7 @@ const QuoteForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: email,
+          to: "sales@taylorea.com",
           message: userMessageContent,
           recaptchaToken: "emailToken"
         }),

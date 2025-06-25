@@ -11,7 +11,7 @@ const About = ({ content, urlFor }) => {
 
     const aboutContent = {
         title: "The Premier Moving Company",
-        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut tempus eros nec velit pretium, eget laoreet enim tempor. Etiam erat ex, lacinia nec mattis quis, efficitur et magna. Nam auctor odio vitae nulla scelerisque, vel porttitor eros sodales. Aenean scelerisque felis id est facilisis ornare. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. ",
+        text: "Our key focus and goal is to understand our clients experience from their point of view. We see this as our central focus that drives every aspect of how we conduct our business and relate to our customers. We guarantee professional moving services in Kenya. Whether moving within Nairobi or around the globe, Taylor movers Kenya will have a custom tailored moving solution for you. ",
         image: "about.png"
     }
 
@@ -25,7 +25,7 @@ const About = ({ content, urlFor }) => {
                     </div>
                     <div>
                         <Link href={"/About"}>
-                            <button className="btn rounded-2xl px-3 py-2 text-white bg-[#F05423] my-5">ABOUT US</button>
+                            <button className="hover:opacity-60 btn rounded-2xl px-3 py-2 text-white !bg-[#F05423] my-5">ABOUT US</button>
                         </Link>
                     </div>
                 </div>
