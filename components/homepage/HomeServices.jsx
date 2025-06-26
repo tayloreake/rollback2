@@ -37,7 +37,7 @@ const HomeServices = () => {
         },
         {
             name: "warehousing",
-            image: "house.jpg",
+            image: "warehousing.jpg",
             desc: "Seamless Warehousing tailored to your business needs by Taylor Movers."
 
         }

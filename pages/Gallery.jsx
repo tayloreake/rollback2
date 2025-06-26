@@ -81,16 +81,16 @@ const Gallery = () => {
             </button>
           ))}
         </div>
-        <div className="md:columns-6 gap-1">
+        <div className="md:columns-5 gap-1">
           {/* Do Active category instead */}
           {imagePaths.map((src, i) => (
             <Image
               key={`${"gallery-images-"}-${i}`}
               alt={`img-${i}`}
               src={src}
-              width={isMobile ? 0 : 200}
+              width={isMobile ? 0 : 250}
               height={isMobile ? 0 : 100}
-              className="break-inside-avoid inline-block mb-2 w-full md:w-[200px] h-auto object-cover rounded-lg"
+              className="break-inside-avoid inline-block mb-2 w-full md:w-[250px] h-auto object-cover rounded-lg"
               loading="lazy"
             // style={{ width: "200px", marginRight: "12px" }}
             />

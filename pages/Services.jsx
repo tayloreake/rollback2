@@ -81,13 +81,13 @@ const Services = ({ content, servicesData }) => {
     return (
       <div className="row">
         <div className="col-md-6 bg-[#EDEDED] p-8">
-          <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">Local <br /> Moves</h1>
+          <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Warehousing" : <span>Local <br />Moves</span>}</h1>
           <div className="my-3">
             <PortableText value={activeTab?.local} />
           </div>
         </div>
         <div className="col-md-6 bg-[#E1DEDE] p-8">
-          <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">International <br /> Moves</h1>
+          <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Storage" : <span>Local <br />Moves</span>}</h1>
           <div className="my-3">
             <PortableText value={activeTab?.international} />
           </div>
