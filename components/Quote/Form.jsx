@@ -119,17 +119,18 @@ const QuoteForm = () => {
 
 
       // Save to Sanity
-      await createQuote(
-        fname,
-        email,
-        number,
-        location,
-        destination,
-        moveType,
-        bedrooms,
-        moveDate,
-        ref
-      );
+
+      // await createQuote(
+      //   fname,
+      //   email,
+      //   number,
+      //   location,
+      //   destination,
+      //   moveType,
+      //   bedrooms,
+      //   moveDate,
+      //   ref
+      // );
 
       setLastSubmissionTime(now);
       toast.success("Quote request submitted successfully! We'll contact you soon.");
