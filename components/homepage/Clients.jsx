@@ -52,18 +52,7 @@ const Clients = ({ content }) => {
         <Accordion.Header className="font-bold !capitalize">
           {item.category}
         </Accordion.Header>
-        <Accordion.Body>
-          {clients.map((src, i) => (
-            <Image
-              key={`${item.name}`}
-              alt={`img-${i}`}
-              src={src}
-              width={100}
-              height={100}
-              className="inline-block mb-3 client-logo"
-              style={{ width: "100px", marginRight: "12px" }}
-            />
-          ))}
+        <Accordion.Body className="!p-2">
         </Accordion.Body>
       </Accordion.Item>
     )
@@ -139,6 +128,73 @@ const Clients = ({ content }) => {
       </div>
     )
   }
+
+  const ClientAccordion = () => {
+    const [clientCategories, setClientCategories] = useState([]);
+    const [clients, setClients] = useState([]);
+    const [activeKey, setActiveKey] = useState("banking")
+
+    useEffect(() => { }, [clients])
+
+
+    useEffect(() => {
+      const storedcategories = JSON.parse(window.localStorage.getItem("clientCategories"));
+      const storedClients = JSON.parse(window.localStorage.getItem("clients"));
+      setClientCategories(storedcategories);
+
+      setClients(storedClients?.filter(item => item?.logoCategories[0]?.key === "banking"));
+      console.log("clients", clients);
+
+    }, []);
+
+    useEffect(() => {
+      const storedClients = JSON.parse(window.localStorage.getItem("clients"));
+      setClients(storedClients?.filter(item => item?.logoCategories[0]?.key === activeKey));
+
+    }, [activeKey]);
+
+    return (
+      <div className="accordion">
+        <Accordion
+          className="accordion"
+          id="clients-accordion"
+          defaultActiveKey={"banking"}
+          allowMultipleExpanded={false}
+          uuid={63213}
+        >
+          {clientCategories?.map((category, idx) => (
+            <Accordion.Item eventKey={category?.key} key={`category-${idx}`}>
+              <div onClick={() => setActiveKey(category?.key)}><Accordion.Header className="font-bold !capitalize">
+                {category?.category}
+              </Accordion.Header>
+              </div>
+              <Accordion.Body className="!p-2">
+                {clients?.map((src, i) => (
+
+                  <Image
+                    key={`${category.name}`}
+                    alt={`img-${i}`}
+                    src={urlFor(src?.clientLogo)?.url() || '/assets/Clients/default.png'}
+                    width={100}
+                    height={200}
+                    className="inline-block mb-3 client-logo"
+                    style={{ width: "160px", marginRight: "8px" }}
+                  />
+                ))}
+
+                {clients?.length < 1 &&
+                  <div
+                    className="bg-gray-200 text-gray-700 rounded-md text-center border-dashed p-2 ">
+                    You'll be a unique client
+                  </div>
+                }
+              </Accordion.Body>
+            </Accordion.Item>
+          ))}
+        </Accordion>
+      </div>
+    )
+  }
   return (
     <div className='w-full h-full py-4 px-2 md:px-8 flex items-center justify-center'>
       <div className='container'>
@@ -164,29 +220,18 @@ const Clients = ({ content }) => {
           <div className="col-md-6">
             <h1 className="text-2xl my-4 font-bold">Our Clients</h1>
 
-            {isMobile
-              ?
-              <Accordion
-                className="accordion"
-                id="clients-accordion"
-                defaultActiveKey={"banking"}
-                allowMultipleExpanded={false}
-                uuid={63213}
-              >
-                {clientCategories?.map((category, idx) => (
-                  <AccordionItem item={category} />
-                ))}
-              </Accordion>
-              :
 
+            {isMobile ? (
+              <ClientAccordion />
+            ) : (
               <ClientTabs />
-            }
+            )}
 
           </div>
 
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 export default Clients;
