@@ -51,7 +51,18 @@ export default async function handler(req, res) {
     }
 
     const sms = africastalking.SMS;
-    const response = await sms.send({ to, message });
+    let response;
+    try {
+      response = await sms.send({ to, message });
+    } catch (error) {
+      console.error("AfricaTalking SMS send error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send SMS via AfricaTalking",
+        error: error?.message || error || "Unknown error during SMS send"
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: "SMS sent successfully",
