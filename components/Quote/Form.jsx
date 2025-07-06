@@ -88,59 +88,59 @@ const QuoteForm = () => {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for reset
 
       // Then send email
-      const emailToken = await recaptchaRef.current.executeAsync();
-      if (!emailToken) {
-        throw new Error('Failed to verify reCAPTCHA for email');
-      }
+      // const emailToken = await recaptchaRef.current.executeAsync();
+      // if (!emailToken) {
+      //   throw new Error('Failed to verify reCAPTCHA for email');
+      // }
 
 
-      const emailResponse = await fetch("/api/sendEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: "sales@taylorea.com",
-          message: userMessageContent,
-          recaptchaToken: emailToken
-        }),
-      });
+      // const emailResponse = await fetch("/api/sendEmail", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     to: "sales@taylorea.com",
+      //     message: userMessageContent,
+      //     recaptchaToken: emailToken
+      //   }),
+      // });
 
-      const salesMailResponse = await fetch("/api/sendEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: "sales@taylorea.com",
-          message: tayloreaMessageContent,
-          recaptchaToken: "emailToken"
-        }),
-      });
+      // const salesMailResponse = await fetch("/api/sendEmail", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     to: "sales@taylorea.com",
+      //     message: tayloreaMessageContent,
+      //     recaptchaToken: "emailToken"
+      //   }),
+      // });
 
-      if (!emailResponse.ok || !salesMailResponse.ok) {
-        const errorData = await emailResponse.json();
-        throw new Error(errorData.message || 'Failed to send email');
-      }
+      // if (!emailResponse.ok || !salesMailResponse.ok) {
+      //   const errorData = await emailResponse.json();
+      //   throw new Error(errorData.message || 'Failed to send email');
+      // }
 
 
 
-      // Save to Sanity
-      try {
-        await createQuote(
-          fname,
-          email,
-          number,
-          location,
-          destination,
-          moveType,
-          bedrooms,
-          moveDate,
-          ref
-        );
-      } catch (error) {
-        console.error("Error saving quote to Sanity did not submit..:", error);
-      }
+      // // Save to Sanity
+      // try {
+      //   await createQuote(
+      //     fname,
+      //     email,
+      //     number,
+      //     location,
+      //     destination,
+      //     moveType,
+      //     bedrooms,
+      //     moveDate,
+      //     ref
+      //   );
+      // } catch (error) {
+      //   console.error("Error saving quote to Sanity did not submit..:", error);
+      // }
 
       setLastSubmissionTime(now);
       toast.success("Quote request submitted successfully! We'll contact you soon.");
