@@ -321,7 +321,7 @@ const QuoteForm = () => {
               <input
                 type='text'
                 value={destination}
-                placeholder="Mathare"
+                placeholder="Nairobi CBD"
                 onChange={(e) => setDestination(e.target.value)}
                 className='px-4 py-2 w-full rounded-xl'
               />
@@ -436,7 +436,7 @@ const QuoteForm = () => {
                 </option>
               </select>
               <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                How did you hear about us
+                How you found us
               </label>
             </div>
           </div>
