@@ -63,22 +63,24 @@ const QuoteForm = () => {
 
       // the default phone number
       // 254743505069
-      const smsResponse = await fetch("/api/sendSms", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: ["+254721410517"],
-          message: tayloreaMessageContent,
-          recaptchaToken: smsToken
-        }),
-      });
 
-      if (!smsResponse.ok) {
-        const errorData = await smsResponse.json();
-        // throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
-      }
+
+      // const smsResponse = await fetch("/api/sendSms", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     to: ["+254721410517"],
+      //     message: tayloreaMessageContent,
+      //     recaptchaToken: smsToken
+      //   }),
+      // });
+
+      // if (!smsResponse.ok) {
+      //   const errorData = await smsResponse.json();
+      //   // throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
+      // }
 
       // Reset reCAPTCHA for email
       // Reset reCAPTCHA for email
