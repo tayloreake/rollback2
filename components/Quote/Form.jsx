@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { toast } from "react-toastify"
 // import { createQuote } from "../sanity/sanity-utils"
 import ReCAPTCHA from "react-google-recaptcha"
@@ -25,6 +25,11 @@ const QuoteForm = () => {
   const isValidPhoneNumber = (phoneNumber) => {
     return /^\0\d{9}$/.test(phoneNumber)
   }
+  useEffect(() => {
+    window.addEventListener('unhandledrejection', event => {
+      console.error('🚨 Unhandled promise rejection:', event.reason);
+    });
+  }, []);
 
   const isValidName = (name) => {
     return name.length >= 2 && /^[a-zA-Z\s]+$/.test(name);

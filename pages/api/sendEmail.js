@@ -61,25 +61,25 @@ export default async function handler(req, res) {
       text: message,
     };
 
-    await transporter.sendMail(mailOptions);
-    return res.status(200).json({ 
-      success: true, 
-      message: "Email sent successfully" 
+    // await transporter.sendMail(mailOptions);
+    return res.status(200).json({
+      success: true,
+      message: "Email sent successfully"
     });
   } catch (error) {
     console.error("Error sending email:", error);
-    
+
     if (error.message === 'Too many requests') {
-      return res.status(429).json({ 
-        success: false, 
-        message: 'Too many requests. Please try again later.' 
+      return res.status(429).json({
+        success: false,
+        message: 'Too many requests. Please try again later.'
       });
     }
 
-    return res.status(500).json({ 
-      success: false, 
+    return res.status(500).json({
+      success: false,
       message: "Failed to send email",
-      error: error.message 
+      error: error.message
     });
   }
 }

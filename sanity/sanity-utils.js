@@ -136,6 +136,7 @@ export async function createQuote(
     })
   } catch (error) {
     console.log(error)
+    throw new Error("Failed to create quote");
   }
 }
 
