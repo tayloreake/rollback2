@@ -104,17 +104,17 @@ const QuoteForm = () => {
         }),
       });
 
-      const salesMailResponse = await fetch("/api/sendEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: "sales@taylorea.com",
-          message: tayloreaMessageContent,
-          recaptchaToken: "emailToken"
-        }),
-      });
+      // const salesMailResponse = await fetch("/api/sendEmail", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     to: "sales@taylorea.com",
+      //     message: tayloreaMessageContent,
+      //     recaptchaToken: emailToken
+      //   }),
+      // });
 
       if (!emailResponse.ok || !salesMailResponse.ok) {
         const errorData = await emailResponse.json();
