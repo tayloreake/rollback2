@@ -15,6 +15,7 @@ const QuoteForm = () => {
   const [moveDate, setMoveDate] = useState(getCurrentDate())
   const [ref, setRef] = useState("Referal")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formSubmitted, setFormSubmitted] = useState(false)
   const [lastSubmissionTime, setLastSubmissionTime] = useState(0)
   const recaptchaRef = useRef(null)
 
@@ -26,10 +27,13 @@ const QuoteForm = () => {
     return /^\0\d{9}$/.test(phoneNumber)
   }
   useEffect(() => {
-    window.addEventListener('unhandledrejection', event => {
-      console.error('🚨 Unhandled promise rejection:', event.reason);
-    });
-  }, []);
+    if (formSubmitted) {
+      window.dispatchEvent(new CustomEvent("tayloreaFormSubmitted", {
+        detail: { status: "success", timestamp: Date.now() }
+      }));
+    }
+
+  }, [formSubmitted]);
 
   const isValidName = (name) => {
     return name.length >= 2 && /^[a-zA-Z\s]+$/.test(name);
@@ -104,19 +108,7 @@ const QuoteForm = () => {
         }),
       });
 
-      // const salesMailResponse = await fetch("/api/sendEmail", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     to: "sales@taylorea.com",
-      //     message: tayloreaMessageContent,
-      //     recaptchaToken: emailToken
-      //   }),
-      // });
-
-      if (!emailResponse.ok || !salesMailResponse.ok) {
+      if (!emailResponse.ok) {
         const errorData = await emailResponse.json();
         throw new Error(errorData.message || 'Failed to send email');
       }
@@ -149,6 +141,8 @@ const QuoteForm = () => {
       setLocation("");
       setDestination("");
       setNumber("");
+      setFormSubmitted(true);
+      setMoveType("Local House Move");
 
     } catch (error) {
       console.error("Error:", error);

@@ -8,6 +8,7 @@ import { AiOutlineClose, AiOutlineCloseCircle, AiOutlineMenu } from 'react-icons
 import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa'
 import { Drawer } from 'antd';
 import QuoteForm from './Quote/Form'
+import { set } from 'sanity';
 
 const Navbar = () => {
     const [open, setOpen] = useState(false)
@@ -23,10 +24,17 @@ const Navbar = () => {
         setPlacement(e.target.value);
     };
 
+
+
     const ShowQuote = () => {
         const [open, setOpen] = useState(false);
         const menuRef = useRef(null);
+        useEffect(() => {
+            // Add event listener to close the drawer when clicking outside of it
+            window.addEventListener("tayloreaFormSubmitted", () => setOpen(false));
 
+            return () => document.removeEventListener('tayloreaFormSubmitted', () => setOpen(false));
+        }, []);
 
         useEffect(() => {
             const handler = (e) => {
