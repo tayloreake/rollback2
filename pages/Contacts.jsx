@@ -1,20 +1,20 @@
 import Image from "next/image"
-import React, { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Featured from "../components/Contacts/Featured"
 import Testimonials from "../components/homepage/Testimonials"
 import { toast } from "react-toastify"
 import PageTitle from "../components/PageTitle"
 import Jumbotron from "../components/jumbotron"
+import ReCAPTCHA from "react-google-recaptcha"
 
 const Contacts = () => {
-
-
   const ContactForm = () => {
     const [fname, setFname] = useState("")
     const [lname, setLname] = useState("")
     const [email, setEmail] = useState("")
     const [number, setNumber] = useState("")
     const [message, setMessage] = useState("")
+    const recaptchaRef = useRef(null)
 
     const isValidPhoneNumber = (phoneNumber) => {
       return /0\d{9}$/.test(phoneNumber)
@@ -27,11 +27,26 @@ const Contacts = () => {
         const options = {
           to: [`+254721410517`],
           message: messageContent,
+          recaptchaToken: null, // Will be set after reCAPTCHA verification
         }
 
+        const smsToken = await recaptchaRef.current.executeAsync();
+        if (!smsToken) {
+          throw new Error('Failed to verify reCAPTCHA for SMS');
+        }
+        options.recaptchaToken = smsToken;
+
+        recaptchaRef.current.reset();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for reset
+        // Then send email
+        const emailToken = await recaptchaRef.current.executeAsync();
+        if (!emailToken) {
+          throw new Error('Failed to verify reCAPTCHA for email');
+        }
         const emailOptions = {
           to: email,
           message: messageContent,
+          recaptchaToken: emailToken,
         }
         const smsResponse = await fetch("/api/sendSms", {
           method: "POST",
@@ -162,7 +177,11 @@ const Contacts = () => {
           placeholder="Message"
           className='p-3 my-2 border border-grey-500 rounded-xl w-full max-w-[351px] md:max-w-[800px]'
         />
-
+        <ReCAPTCHA
+          ref={recaptchaRef}
+          size="invisible"
+          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+        />
         <button
           type='submit'
           className='font-bold px-4 py-2 mb-2 bg-[#F05423] text-white w-full rounded-xl'>
