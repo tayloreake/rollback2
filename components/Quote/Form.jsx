@@ -259,7 +259,7 @@ const QuoteForm = () => {
   }
 
   return (
-    <div className='md:w-[320px]'>
+    <div className='w-[320px] md:w-[320px]'>
       <div className='py-4 flex flex-col px-4 mx-auto mb-4 bg-[#DB421B]'>
         <h1 className="font-bold text-2xl text-white">Request a Quote</h1>
         <h1 className='mb-2 text-white '>Feel Free To Ask</h1>
