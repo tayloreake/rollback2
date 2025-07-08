@@ -7,6 +7,7 @@ import TawkTo from "next-tawkto";
 import { useEffect } from "react";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import Script from "next/script";
 
 
 function MyApp({ Component, pageProps }) {
@@ -18,14 +19,23 @@ function MyApp({ Component, pageProps }) {
     tawk.onStatusChange((status) => {
       // console.log(status)
     })
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+
+
+    gtag('config', 'AW-966026451');
 
   }, [])
   return (
-
     <Layout>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=AW-966026451"></script>
+
       <ToastContainer position='top-center' />
       <Component {...pageProps} />
     </Layout>
+
   )
 }
 
