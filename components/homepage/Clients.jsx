@@ -178,7 +178,7 @@ const Clients = ({ content }) => {
                     width={100}
                     height={200}
                     className="inline-block mb-3 client-logo"
-                    style={{ width: "160px", marginRight: "8px" }}
+                    style={{ width: "132px", marginRight: "8px" }}
                   />
                 ))}
 

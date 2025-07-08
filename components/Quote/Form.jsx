@@ -222,6 +222,10 @@ const QuoteForm = () => {
 
     const selectedDate = new Date(moveDate);
     const currentDate = new Date();
+    selectedDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
+
+    console.log("Selected Date:", selectedDate, "Current Date:", currentDate);
     if (selectedDate < currentDate) {
       toast.error("Please select a future date for the move");
       return false;
@@ -319,18 +323,6 @@ const QuoteForm = () => {
             <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
               <input
                 type='text'
-                value={destination}
-                placeholder="Nairobi CBD"
-                onChange={(e) => setDestination(e.target.value)}
-                className='px-4 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Destination Location
-              </label>
-            </div>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-              <input
-                type='text'
                 value={location}
                 placeholder=""
                 onChange={(e) => setLocation(e.target.value)}
@@ -338,6 +330,19 @@ const QuoteForm = () => {
               />
               <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                 Current Location
+              </label>
+            </div>
+            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+
+              <input
+                type='text'
+                value={destination}
+                placeholder="Nairobi CBD"
+                onChange={(e) => setDestination(e.target.value)}
+                className='px-4 py-2 w-full rounded-xl'
+              />
+              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
+                Destination Location
               </label>
             </div>
 
