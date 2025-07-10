@@ -73,7 +73,7 @@ const QuoteForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          to: ["+254721410517"],
+          to: ["+254792924299"],
           message: tayloreaMessageContent,
           recaptchaToken: smsToken
         }),
