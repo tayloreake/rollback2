@@ -16,7 +16,7 @@ const HeroSection: React.FC = () => {
         <section className="w-full bg-[url('/assets/Bgs/boxes.png')] bg-cover bg-center">
             <div className='row'>
                 <div className="md:bg-[#EDEDED] md:w-1/2 py-16 px-6 clip-path-card lg:px-16 items-center justify-center text-center lg:text-left lg:items-start">
-                    <Http2ServerRequest className="text-4xl lg:text-5xl font-bold text-white text-center md:text-left md:!text-gray-900 mb-4 !leading-[1.2]">
+                    <h2 className="text-4xl lg:text-5xl font-bold text-white text-center md:text-left md:!text-gray-900 mb-4 !leading-[1.2]">
                         Experience <br /> Delightful Moving!
                     </h2>
                     <div className="h-0.5 w-24 bg-orange-500 mb-6" />
