@@ -20,25 +20,29 @@ const HomeServices = () => {
         {
             name: "Household moving",
             image: "house.jpg",
-            desc: "Seamless Household relocations tailored to your moving needs by Taylor Movers."
+            desc: "Seamless Household relocations tailored to your moving needs by Taylor Movers.",
+            alt: "Image of our team Moving our Household Clients"
 
         },
         {
             name: "corporate moving",
             image: "corporate.jpg",
-            desc: "Seamless corporate relocations tailored to your business needs by Taylor Movers."
+            desc: "Seamless corporate relocations tailored to your business needs by Taylor Movers.",
+            alt: "Image of our team Moving our Corporate Clients"
 
         },
         {
             name: "Office moving",
             image: "office.png",
-            desc: "Seamless Office relocations tailored to your business needs by Taylor Movers."
+            desc: "Seamless Office relocations tailored to your business needs by Taylor Movers.",
+            alt: "Image of our team Moving our Business Office Clients"
 
         },
         {
             name: "warehousing",
             image: "warehousing.jpg",
-            desc: "Seamless Warehousing tailored to your business needs by Taylor Movers."
+            desc: "Seamless Warehousing tailored to your business needs by Taylor Movers.",
+            alt: "Image of our Warehouse and storage facilities"
 
         }
     ]
@@ -54,7 +58,7 @@ const HomeServices = () => {
                         // width={0}
                         fill
                         className="object-cover z-10"
-                        alt=""
+                        alt={service?.alt}
                     />
                     <div
                         className="font-[500] z-40 capitalize absolute bg-[#FF5000] text-white px-4 py-3 bottom-[20%]">
@@ -75,9 +79,9 @@ const HomeServices = () => {
             <div className="container">
                 <div className="row">
                     <div className="col-12 my-4">
-                        <h1 className="mt-3 text-center text-3xl font-[600]">
+                        <h2 className="mt-3 text-center text-3xl font-[600]">
                             Taylor Movers is a Premier <br />Moving Company
-                        </h1>
+                        </h2>
                         <div className="my-4 text-center text-sm">
                             Whether moving within Nairobi or around the globe, Taylor Movers Kenya will <br />have a custom tailored moving solution for your admin
                         </div>

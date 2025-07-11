@@ -158,7 +158,7 @@ const Quotes = () => {
       <div className='max-w-[1240px] my-12'>
       {!isLoggedIn ? (
         <div className='flex flex-col h-screen items-center justify-center'>
-            <h1 className='my-4 text-xl'>Please Login To View This Page</h1>
+            <h2 className='my-4 text-xl'>Please Login To View This Page</h2>
             <button className='px-4 py-2 text-white bg-[#DB112B] rounded-lg' type='primary' onClick={() => setModalVisible(true)}>
                 Log In
             </button>

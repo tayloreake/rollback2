@@ -63,7 +63,7 @@ const Services = ({ content, servicesData }) => {
         className='max-w-[300px] px-0 bg-black  h-full hover:animate-pulse cursor-pointer relative'>
         <Image
           src={urlFor(item?.image).url()}
-          alt=""
+          alt={item?.name}
           width={420}
           height={420}
           // fill
@@ -81,13 +81,13 @@ const Services = ({ content, servicesData }) => {
     return (
       <div className="row">
         <div className="col-md-6 bg-[#EDEDED] p-8">
-          <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Warehousing" : <span>Local <br />Moves</span>}</h1>
+          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Warehousing" : <span>Local <br />Moves</span>}</h2>
           <div className="my-3">
             <PortableText value={activeTab?.local} />
           </div>
         </div>
         <div className="col-md-6 bg-[#E1DEDE] p-8">
-          <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Storage" : <span>Local <br />Moves</span>}</h1>
+          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Storage" : <span>Local <br />Moves</span>}</h2>
           <div className="my-3">
             <PortableText value={activeTab?.international} />
           </div>
@@ -256,7 +256,7 @@ const Services = ({ content, servicesData }) => {
         <div className='border-[3px] border-[#FF5000] mb-8 md:p-12 p-6 rounded-sm'>
           <div className="text-3xl text-[#FF5000] font-bold py-2 flex items-center justify-center my-2">
             <div className="mr-3">
-              {activeTab?.icon && <Image src={`${activeTab?.icon}`} alt="" width={50} height={50} />}
+              {activeTab?.icon && <Image src={`${activeTab?.icon}`} alt="Image of moving boxes" width={50} height={50} />}
             </div>
             <div className="">{activeTab?.name}</div>
           </div>
