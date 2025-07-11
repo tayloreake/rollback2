@@ -210,7 +210,7 @@ const Contacts = () => {
 
   return (
     <>
-      <Jumbotron image={"contacts.png"} text={"We would love to hear from you"} />
+      <Jumbotron image={"taylor-movers-kenya-packing-boxes.png"} text={"We would love to hear from you"} alt={"Stack of sturdy, professional moving boxes used by Taylor Movers Kenya for secure packing."} />
 
       <div className='container pt-6'>
         <p className="text-xl py-4 !pt-8">

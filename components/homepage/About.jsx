@@ -12,7 +12,7 @@ const About = ({ content, urlFor }) => {
     const aboutContent = {
         title: "The Premier Moving Company",
         text: "Our key focus and goal is to understand our clients experience from their point of view. We see this as our central focus that drives every aspect of how we conduct our business and relate to our customers. We guarantee professional moving services in Kenya. Whether moving within Nairobi or around the globe, Taylor movers Kenya will have a custom tailored moving solution for you. ",
-        image: "about.png"
+        image: "taylor-movers-kenya-unloading-new-home.png"
     }
 
     return (
@@ -33,7 +33,7 @@ const About = ({ content, urlFor }) => {
                     <Image
                         // width={600}
                         // height={600}
-                        alt={aboutContent?.title}
+                        alt="Taylor Movers Kenya professional unloading a box of luggage from a moving vehicle at a client's new residence."
                         fill
                         style={{ objectFit: 'cover' }}
                         src={`/assets/About/${aboutContent?.image}`}
