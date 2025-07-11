@@ -52,6 +52,7 @@ const Reviews = () => {
                   width={0}
                   height={0}
                   sizes="auto"
+                  alt={review.name}
                   // style={{ width: "200px", height: "150px" }}
                   className=" mr-3 rounded-lg !w-[150px] !h-[100px] object-cover"
                   loading="lazy"

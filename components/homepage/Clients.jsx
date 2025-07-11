@@ -105,7 +105,7 @@ const Clients = ({ content }) => {
 
                   <Image
                     key={`${item.name}`}
-                    alt={`img-${i}`}
+                    alt={`img-${item.name}`}
                     src={urlFor(src?.clientLogo)?.url() || '/assets/Clients/default.png'}
                     width={100}
                     height={200}
@@ -173,7 +173,7 @@ const Clients = ({ content }) => {
 
                   <Image
                     key={`${category.name}`}
-                    alt={`img-${i}`}
+                    alt={`img-${category.name}`}
                     src={urlFor(src?.clientLogo)?.url() || '/assets/Clients/default.png'}
                     width={100}
                     height={200}
@@ -206,7 +206,7 @@ const Clients = ({ content }) => {
 
         <div className='row'>
           <div className="col-md-6 md:pr-5">
-            <h1 className="my-3 text-3xl font-bold">What Our Customers Say</h1>
+            <h4 className="my-3 text-3xl font-bold">What Our Customers Say</h4>
 
             <div className="my-2">
               We have a diversified portfolio of moving services in Kenya that include residential moving, corporate moving, office moving and industrial moving services. Whether you&apos;re moving within Nairobi, moving anywhere in Kenya or international moving, Taylor Movers Kenya has a solution tailor made for you.
@@ -218,7 +218,7 @@ const Clients = ({ content }) => {
           </div>
 
           <div className="col-md-6">
-            <h1 className="text-2xl my-4 font-bold">Our Clients</h1>
+            <h4 className="text-2xl my-4 font-bold">Our Clients</h4>
 
 
             {isMobile ? (

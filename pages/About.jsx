@@ -49,9 +49,9 @@ const About = ({ aboutPage }) => {
       <div className="row mx-0 items-top">
         <div className="col-md-6 ">
           <div className="md:mx-[160px] mx-2 py-8 md:text-left text-center">
-            <h1 className="my-6 text-3xl font-[600] text-[#FF5000]">
+            <h2 className="my-6 text-3xl font-[600] text-[#FF5000]">
               The premier <br />Moving <br />Company
-            </h1>
+            </h2>
             <div className="my-3 leading-[1.5]">
               <div dangerouslySetInnerHTML={{ __html: data?.about_us }} />
             </div>
@@ -60,14 +60,14 @@ const About = ({ aboutPage }) => {
 
         <div className="col-md-6">
           <div className="bg-[#F0EFEF] mx-2 px-2 md:px-[160px] py-8 md:text-left text-center">
-            <h1 className="text-[#ff5000] py-3 font-bold text-2xl">Our Vision</h1>
+            <h3 className="text-[#ff5000] py-3 font-bold text-2xl">Our Vision</h3>
             <div className="py-6">
               <div dangerouslySetInnerHTML={{ __html: data?.vision }} />
 
             </div>
           </div>
           <div className="bg-[#ff5000] mx-2 px-2 md:px-[160px] py-12 md:text-left text-center">
-            <h1 className="text-[#070707] py-3 font-bold text-2xl">Our Mission</h1>
+            <h3 className="text-[#070707] py-3 font-bold text-2xl">Our Mission</h3>
             <div className="py-2 text-white">
               <div dangerouslySetInnerHTML={{ __html: data?.mission }} />
             </div>

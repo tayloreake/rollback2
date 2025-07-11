@@ -19,7 +19,7 @@ const About = ({ content, urlFor }) => {
         <div className='w-full h-full py-8 justify-center'>
             <div className="row">
                 <div className="col-md-6 px-3 text-center md:text-left md:!px-[200px] md:py-8 bg-[#EDEDED]">
-                    <h1 className="text-2xl font-bold text-[#F05423] my-3">{aboutContent?.title}</h1>
+                    <h3 className="text-2xl font-bold text-[#F05423] my-3">{aboutContent?.title}</h3>
                     <div className="my-2">
                         {aboutContent?.text}
                     </div>
@@ -33,6 +33,7 @@ const About = ({ content, urlFor }) => {
                     <Image
                         // width={600}
                         // height={600}
+                        alt={aboutContent?.title}
                         fill
                         style={{ objectFit: 'cover' }}
                         src={`/assets/About/${aboutContent?.image}`}

@@ -63,7 +63,7 @@ const Services = ({ content, servicesData }) => {
         className='max-w-[300px] px-0 bg-black  h-full hover:animate-pulse cursor-pointer relative'>
         <Image
           src={urlFor(item?.image).url()}
-          alt=""
+          alt={item?.name}
           width={420}
           height={420}
           // fill
@@ -81,13 +81,13 @@ const Services = ({ content, servicesData }) => {
     return (
       <div className="row">
         <div className="col-md-6 bg-[#EDEDED] p-8">
-          <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Warehousing" : <span>Local <br />Moves</span>}</h1>
+          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Warehousing" : <span>Local <br />Moves</span>}</h2>
           <div className="my-3">
             <PortableText value={activeTab?.local} />
           </div>
         </div>
         <div className="col-md-6 bg-[#E1DEDE] p-8">
-          <h1 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Storage" : <span>Local <br />Moves</span>}</h1>
+          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Storage" : <span>Local <br />Moves</span>}</h2>
           <div className="my-3">
             <PortableText value={activeTab?.international} />
           </div>

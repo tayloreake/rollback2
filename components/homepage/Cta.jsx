@@ -12,9 +12,9 @@ const Cta = ({ content }) => {
         className='w-full h-[700px] object-cover'
       />
       <div className='absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-[#DB421B]/60'>
-        <h1 className='text-white text-xl font-bold text-center'>
+        <h2 className='text-white text-xl font-bold text-center'>
           {content.goalsTitle}
-        </h1>
+        </h2>
         <p className='text-center text-white max-w-[700px] mt-4'>
           {content.goalsDescription}
         </p>
