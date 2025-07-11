@@ -256,7 +256,7 @@ const Services = ({ content, servicesData }) => {
         <div className='border-[3px] border-[#FF5000] mb-8 md:p-12 p-6 rounded-sm'>
           <div className="text-3xl text-[#FF5000] font-bold py-2 flex items-center justify-center my-2">
             <div className="mr-3">
-              {activeTab?.icon && <Image src={`${activeTab?.icon}`} alt="" width={50} height={50} />}
+              {activeTab?.icon && <Image src={`${activeTab?.icon}`} alt="Image of moving boxes" width={50} height={50} />}
             </div>
             <div className="">{activeTab?.name}</div>
           </div>
