@@ -19,30 +19,30 @@ const HomeServices = () => {
     const services = [
         {
             name: "Household moving",
-            image: "house.jpg",
-            desc: "Seamless Household relocations tailored to your moving needs by Taylor Movers.",
-            alt: "Image of our team Moving our Household Clients"
+            image: "taylor-movers-kenya-carrying-boxes.jpg",
+            desc: "Taylor Movers Kenya team members carefully carrying client's packed boxes and luggage during a move.",
+            alt: "Taylor Movers Kenya team members carefully carrying client's packed boxes and luggage during a move."
 
         },
         {
             name: "corporate moving",
-            image: "corporate.jpg",
-            desc: "Seamless corporate relocations tailored to your business needs by Taylor Movers.",
-            alt: "Image of our team Moving our Corporate Clients"
+            image: "taylor-movers-kenya-luggage-handling.jpg",
+            desc: "Taylor Movers Kenya professional carefully holding a client's packed luggage.",
+            alt: "Taylor Movers Kenya professional carefully holding a client's packed luggage."
 
         },
         {
             name: "Office moving",
-            image: "office.png",
-            desc: "Seamless Office relocations tailored to your business needs by Taylor Movers.",
-            alt: "Image of our team Moving our Business Office Clients"
+            image: "taylor-movers-kenya-office-relocation-boxes.png",
+            desc: "Taylor Movers Kenya crew carrying packed office boxes inside a client's office for a corporate relocation.",
+            alt: "Taylor Movers Kenya crew carrying packed office boxes inside a client's office for a corporate relocation."
 
         },
         {
             name: "warehousing",
-            image: "warehousing.jpg",
-            desc: "Seamless Warehousing tailored to your business needs by Taylor Movers.",
-            alt: "Image of our Warehouse and storage facilities"
+            image: "taylor-movers-kenya-storage-warehouse.jpg",
+            desc: "Secure warehouse facility of Taylor Movers Kenya with client belongings safely stored.",
+            alt: "Secure warehouse facility of Taylor Movers Kenya with client belongings safely stored."
 
         }
     ]

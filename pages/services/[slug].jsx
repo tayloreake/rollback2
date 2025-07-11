@@ -220,7 +220,7 @@ const ServicesItem = ({ content, servicesData }) => {
                 "warehousingAndStorage",
             ])}
 
-            <Jumbotron image={"services.png"} text={"What we do"} />
+            <Jumbotron image={"taylor-movers-kenya-packing-boxe.png"} text={"What we do"} />
 
             <div className="container my-4">
                 <h1 className="text-3xl font-[500] text-[#ff5000] py-2 !mt-12">We specialize in</h1>
