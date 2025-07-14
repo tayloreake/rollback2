@@ -2,6 +2,11 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    ".",
+    "pages/*",
+    "packages/*"
+  ],
   "scripts": {
     "sanity": "sanity dev --cwd sanity",
     "dev": "next dev -p 3002",
@@ -45,6 +50,7 @@
     "react-dom": "18.2.0",
     "react-google-recaptcha": "^3.1.0",
     "react-icons": "^4.8.0",
+    "react-is": "^19.1.0",
     "react-markdown": "^8.0.7",
     "react-phone-input-2": "^2.15.1",
     "react-slick": "^0.30.3",

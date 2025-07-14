@@ -67,6 +67,7 @@ const RAW_RUNTIME_STATE =
           ["react-dom", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:18.2.0"],\
           ["react-google-recaptcha", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:3.1.0"],\
           ["react-icons", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:4.12.0"],\
+          ["react-is", "npm:19.1.0"],\
           ["react-markdown", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:8.0.7"],\
           ["react-phone-input-2", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:2.15.1"],\
           ["react-slick", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:0.30.3"],\
@@ -6102,7 +6103,7 @@ const RAW_RUNTIME_STATE =
           ["react", "npm:18.2.0"],\
           ["react-compiler-runtime", "virtual:27598c58249eb8aab89842c03b8572a9de1e9c2becccdf4b4e3bb7fa1456442d4b1a5583c4dd0fcce12f6c14b9eb3109809580b9d6024807d4365ed33ee952f6#npm:19.1.0-rc.2"],\
           ["react-dom", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:18.2.0"],\
-          ["react-is", null],\
+          ["react-is", "npm:19.1.0"],\
           ["react-refractor", "virtual:27598c58249eb8aab89842c03b8572a9de1e9c2becccdf4b4e3bb7fa1456442d4b1a5583c4dd0fcce12f6c14b9eb3109809580b9d6024807d4365ed33ee952f6#npm:2.2.0"],\
           ["styled-components", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:6.1.19"],\
           ["use-effect-event", "virtual:27598c58249eb8aab89842c03b8572a9de1e9c2becccdf4b4e3bb7fa1456442d4b1a5583c4dd0fcce12f6c14b9eb3109809580b9d6024807d4365ed33ee952f6#npm:2.0.2"]\
@@ -14162,6 +14163,7 @@ const RAW_RUNTIME_STATE =
           ["react-dom", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:18.2.0"],\
           ["react-google-recaptcha", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:3.1.0"],\
           ["react-icons", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:4.12.0"],\
+          ["react-is", "npm:19.1.0"],\
           ["react-markdown", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:8.0.7"],\
           ["react-phone-input-2", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:2.15.1"],\
           ["react-slick", "virtual:ddccc941eb8b35cd4b898a64351d8bba4ecc85eb47e8f1b36dce7852d6c3635665e0fc5464861f723d175edb2248ce0fa54dfefb9b5e4d2fdaef4b2353c4aa82#npm:0.30.3"],\
@@ -17160,6 +17162,13 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../../AppData/Local/Yarn/Berry/cache/react-is-npm-18.3.1-370a81e1e9-10c0.zip/node_modules/react-is/",\
         "packageDependencies": [\
           ["react-is", "npm:18.3.1"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:19.1.0", {\
+        "packageLocation": "../../../../../AppData/Local/Yarn/Berry/cache/react-is-npm-19.1.0-969a96b5b0-10c0.zip/node_modules/react-is/",\
+        "packageDependencies": [\
+          ["react-is", "npm:19.1.0"]\
         ],\
         "linkType": "HARD"\
       }]\
