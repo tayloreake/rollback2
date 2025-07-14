@@ -17,22 +17,7 @@ const Clients = ({ content }) => {
   function urlFor(source) {
     return builder.image(source)
   }
-  // useEffect(() => {
-  //   setInfo(
-  //     content.clientsAccordions.map((item, index) => {
-  //       const { _key, clientsAccordionTitle, clientsAccordionImages } = item
-  //       const imagesArray = clientsAccordionImages.map((image) =>
-  //         urlFor(image).url()
-  //       )
-  //       return {
-  //         id: _key,
-  //         title: clientsAccordionTitle,
-  //         images: imagesArray,
-  //         open: index === 0,
-  //       }
-  //     })
-  //   )
-  // }, [urlFor])
+
 
   const handleClick = (id) => {
     const newInfo = info.map((item) => {
@@ -185,7 +170,7 @@ const Clients = ({ content }) => {
                 {clients?.length < 1 &&
                   <div
                     className="bg-gray-200 text-gray-700 rounded-md text-center border-dashed p-2 ">
-                    You'll be a unique client
+                    You&apos;ll be a unique client
                   </div>
                 }
               </Accordion.Body>
