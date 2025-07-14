@@ -102,7 +102,7 @@ const Clients = ({ content }) => {
                 {clients?.length < 1 &&
                   <div
                     className="bg-gray-200 text-gray-700 rounded-md text-center border-dashed p-2 ">
-                    You'll be a unique client
+                    You&apos;ll be a unique client
                   </div>
                 }
               </Tab>
