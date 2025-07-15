@@ -22,10 +22,28 @@ function MyApp({ Component, pageProps }) {
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
-
-
-
     gtag('config', 'AW-966026451');
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+    // Disable some dev tools key combinations
+    const handleKeyDown = (e) => {
+      if (
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) || // Ctrl+Shift+I/J/C
+        e.key === 'F12'
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
 
   }, [])
   return (
