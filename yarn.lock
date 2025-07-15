@@ -10700,7 +10700,7 @@ __metadata:
     react-slick: "npm:^0.30.3"
     react-toastify: "npm:^9.1.3"
     reactjs-nextjs-carousel: "npm:^0.0.7"
-    sanity: "npm:^3.12.1"
+    sanity: "npm:^3.80.1"
     slick-carousel: "npm:^1.8.1"
     styled-components: "npm:^6.0.0-rc.3"
     tailwindcss: "npm:^3.3.2"
@@ -13533,7 +13533,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sanity@npm:^3.12.1":
+"sanity@npm:^3.80.1":
   version: 3.99.0
   resolution: "sanity@npm:3.99.0"
   dependencies:
