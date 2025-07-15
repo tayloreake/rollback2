@@ -53,7 +53,9 @@ export default async function handler(req, res) {
     const sms = africastalking.SMS;
     let response;
     try {
-      response = await sms.send({ to, message });
+      response = await sms.send({
+        to: ['+254721410517'], message, from: process.env.AT_USER_ID || 'TaylorMover'
+      });
     } catch (error) {
       console.error("AfricaTalking SMS send error:", error);
       return res.status(500).json({
