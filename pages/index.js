@@ -1,4 +1,4 @@
-import { getClientCategories, getClientLogos, getClientReviews, getLandingPageData } from "../sanity/sanity-utils"
+import { getClientCategories, getClientLogos, getClientReviews, getLandingAbout, getLandingPageData, getLandingServices, getSiteLogos } from "../sanity/sanity-utils"
 import imageUrlBuilder from "@sanity/image-url"
 import client from "../sanity/config/client-config"
 import getPageMetadata from "../SEO/seo"
@@ -18,7 +18,7 @@ const Testimonials = dynamic(() =>
 )
 const Reviews = dynamic(() => import("../components/Reviews/reviews"))
 
-export default function Home({ landingPage, reviews, clients, clientCategories }) {
+export default function Home({ landingPage, reviews, clients, clientCategories, siteLogos, landingAbout, landingServices }) {
   const builder = imageUrlBuilder(client)
   const [reviewsData, setReviewsData] = useState(reviews || [])
   const clientReviews = reviews || []
@@ -28,8 +28,17 @@ export default function Home({ landingPage, reviews, clients, clientCategories }
       window.localStorage.setItem("clientReviews", JSON.stringify(reviews))
       window.localStorage.setItem("clients", JSON.stringify(clients))
       window.localStorage.setItem("clientCategories", JSON.stringify(clientCategories))
+      console.log("LANDING SERVICES:::: ", landingServices)
+
     }
   }, [reviews])
+
+  useEffect(() => {
+    window.localStorage.setItem("siteLogos", JSON.stringify(siteLogos))
+    window.localStorage.setItem("landingAbout", JSON.stringify(landingAbout))
+    window.localStorage.setItem("landingServices", JSON.stringify(landingServices))
+    console.log("LANDING SERVICES:::: ", landingServices)
+  }, [])
 
   function urlFor(source) {
     return builder.image(source)
@@ -43,7 +52,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories }
       {/* <Services content={data} urlFor={urlFor} /> */}
       {/* <Mirage content={data} urlFor={urlFor} /> */}
       {/* <Cta content={data} /> */}
-      <HomeServices />
+      <HomeServices services={landingServices} />
       <About />
       <Clients content={data} urlFor={urlFor} />
       {/* <Testimonials /> */}
@@ -60,13 +69,19 @@ export async function getServerSideProps({ re, res }) {
   const landingPage = await getLandingPageData();
   const reviews = await getClientReviews();
   const clients = await getClientLogos();
+  const siteLogos = await getSiteLogos();
+  const landingServices = await getLandingServices();
+  const landingAbout = await getLandingAbout();
   const clientCategories = await getClientCategories();
   return {
     props: {
       landingPage,
       reviews,
       clients,
-      clientCategories
+      clientCategories,
+      siteLogos,
+      landingAbout,
+      landingServices
     },
   }
 }

@@ -78,9 +78,34 @@ export async function getClientLogos() {
       }`
   )
 }
+
 export async function getClientReviews() {
   return createClient(clientConfig).fetch(
     groq`*[_type == "newreview"]{
+        ...,
+        
+      }`
+  )
+}
+export async function getSiteLogos() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "siteLogos"]{
+        ...,
+        
+      }`
+  )
+}
+export async function getLandingServices() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "landingService"]{
+        ...,
+        
+      }`
+  )
+}
+export async function getLandingAbout() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "landingAbout"]{
         ...,
         
       }`

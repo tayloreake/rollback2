@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react"
-import dynamic from "next/dynamic"
-import Image from "next/image"
-import { isMobile } from "react-device-detect"
-import Slider from "react-slick"
+import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import { isMobile } from "react-device-detect";
+import Slider from "react-slick";
+import imageUrlBuilder from "@sanity/image-url";
+import client from "../../sanity/config/client-config"
+
 
 const ServiceCard = dynamic(() => import("./ServiceCard"))
 const settings = {
@@ -14,56 +17,35 @@ const settings = {
     autoplay: true,
     autoplaySpeed: 3000,
 };
-const HomeServices = () => {
+const HomeServices = ({ services }) => {
     // load from url
-    const services = [
-        {
-            name: "Household moving",
-            image: "house.jpg",
-            desc: "Seamless Household relocations tailored to your moving needs by Taylor Movers."
-
-        },
-        {
-            name: "corporate moving",
-            image: "corporate.jpg",
-            desc: "Seamless corporate relocations tailored to your business needs by Taylor Movers."
-
-        },
-        {
-            name: "Office moving",
-            image: "office.png",
-            desc: "Seamless Office relocations tailored to your business needs by Taylor Movers."
-
-        },
-        {
-            name: "warehousing",
-            image: "warehousing.jpg",
-            desc: "Seamless Warehousing tailored to your business needs by Taylor Movers."
-
-        }
-    ]
-
+    useEffect(() => { console.log("THE SERVICES:::::::::::::::", services) }, [])
     const ServiceCard = ({ service }) => {
+        const builder = imageUrlBuilder(client)
+
+        function urlFor(source) {
+            return builder.image(source)
+        }
         return (
             <>
 
                 <div className="z-30 group relative w-full my-2 h-[400px] overflow-hidden">
 
                     <Image
-                        src={`/assets/home/services/${service?.image}`}
+                        src={urlFor(service?.serviceImage?.image).url()}
                         // width={0}
                         fill
                         className="object-cover z-10"
-                        alt=""
+                        alt={service?.serviceImage?.alt}
                     />
                     <div
                         className="font-[500] z-40 capitalize absolute bg-[#FF5000] text-white px-4 py-3 bottom-[20%]">
-                        {service?.name}
+                        {service?.title}
                     </div>
 
                     <div
                         className="z-50 absolute text-2xl text-white left-0 p-4 md:p-[30%] flex items-center text-center top-0 h-full w-full bg-[#F05423D1] -translate-x-full transition-transform duration-300 group-hover:translate-x-0">
-                        {service?.desc}
+                        {service?.serviceText}
                     </div>
 
                 </div>
