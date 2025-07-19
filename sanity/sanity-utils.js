@@ -126,6 +126,14 @@ export async function getAboutData() {
       }`
   )
 }
+
+export async function getThankYouMessageData() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "thankYouMessage"][0]{
+        ...,
+      }`
+  )
+}
 export async function getTags() {
   return createClient(clientConfig).fetch(
     groq`*[_type == "tags"]{

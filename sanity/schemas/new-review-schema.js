@@ -48,12 +48,12 @@ export default {
         },
         {
             name: "imageAlt",
+            title: "Logo Alternative Text",
+            type: "string",
             options: {
                 source: "title",
                 maxLength: 20,
             },
-            title: "Logo Alternative Text",
-
         },
         {
             name: "createdAt",
