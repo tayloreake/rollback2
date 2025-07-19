@@ -32,5 +32,15 @@ export default {
             },
             validation: Rule => Rule.required(),
         },
+        {
+            name: "alt",
+            title: "Alternative Text",
+            type: "text",
+            options: {
+                source: "blogTitle",
+                maxLength: 20,
+            },
+            validation: Rule => Rule.required(),
+        }
     ],
 }

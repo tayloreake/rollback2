@@ -47,6 +47,15 @@ export default {
             validation: Rule => Rule.required(),
         },
         {
+            name: "imageAlt",
+            options: {
+                source: "title",
+                maxLength: 20,
+            },
+            title: "Logo Alternative Text",
+
+        },
+        {
             name: "createdAt",
             title: "Created At",
             type: "datetime",

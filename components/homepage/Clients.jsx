@@ -105,7 +105,7 @@ const Clients = ({ content }) => {
 
                   <Image
                     key={`${item.name}`}
-                    alt={`img-${i}`}
+                    alt={item?.alt}
                     src={urlFor(src?.clientLogo)?.url() || '/assets/Clients/default.png'}
                     width={100}
                     height={200}
@@ -173,7 +173,7 @@ const Clients = ({ content }) => {
 
                   <Image
                     key={`${category.name}`}
-                    alt={`img-${i}`}
+                    alt={src?.alt}
                     src={urlFor(src?.clientLogo)?.url() || '/assets/Clients/default.png'}
                     width={100}
                     height={200}

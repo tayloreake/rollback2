@@ -52,7 +52,7 @@ const Reviews = () => {
                   width={0}
                   height={0}
                   sizes="auto"
-                  // style={{ width: "200px", height: "150px" }}
+                  alt={review.imageAlt}
                   className=" mr-3 rounded-lg !w-[150px] !h-[100px] object-cover"
                   loading="lazy"
                   src={urlFor(review?.logo).url()} />
