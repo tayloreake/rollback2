@@ -31,6 +31,9 @@ const QuoteForm = () => {
       window.dispatchEvent(new CustomEvent("tayloreaFormSubmitted", {
         detail: { status: "success", timestamp: Date.now() }
       }));
+
+      window.location.href = "/ThankYou";
+
     }
 
   }, [formSubmitted]);
@@ -115,22 +118,22 @@ const QuoteForm = () => {
 
 
 
-      // Save to Sanity
-      try {
-        await createQuote(
-          fname,
-          email,
-          number,
-          location,
-          destination,
-          moveType,
-          bedrooms,
-          moveDate,
-          ref
-        );
-      } catch (error) {
-        console.error("Error saving quote to Sanity did not submit..:", error);
-      }
+      // Save Skip to Sanity
+      // try {
+      //   await createQuote(
+      //     fname,
+      //     email,
+      //     number,
+      //     location,
+      //     destination,
+      //     moveType,
+      //     bedrooms,
+      //     moveDate,
+      //     ref
+      //   );
+      // } catch (error) {
+      //   console.error("Error saving quote to Sanity did not submit..:", error);
+      // }
 
       setLastSubmissionTime(now);
       toast.success("Quote request submitted successfully! We'll contact you soon.");

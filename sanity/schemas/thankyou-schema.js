@@ -6,12 +6,12 @@ export default {
         {
             name: "message",
             title: "Message",
-            type: "array",
-            of: [
-                {
-                    type: "block",
-                },
-            ]
+            type: "string",
+        },
+        {
+            name: "subMessage",
+            title: "Sub message",
+            type: "string",
         },
     ],
 }

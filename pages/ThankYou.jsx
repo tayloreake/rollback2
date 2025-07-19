@@ -5,20 +5,45 @@ import { getThankYouMessageData } from "../sanity/sanity-utils"
 import { portableTextComponents } from "../components/portable-text"
 import { PortableText } from '@portabletext/react';
 import Jumbotron from "../components/jumbotron"
-
+import { CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const ThankYou = ({ thankYou }) => {
     const [data, setData] = useState(thankYou)
 
-
     return (
         <div className='w-full h-full'>
             <Jumbotron image={'about.png'} text={""} />
-
             <div className="row mx-auto items-center">
                 <div className="mx-auto min-h-[400px] border border-gray-100 rounded-md my-4 max-w-3xl">
+                    <div className="flex flex-col items-center justify-center h-[70vh] text-center px-4 py-5">
+                        <motion.div
+                            initial={{ scale: 0, rotate: -45, opacity: 0 }}
+                            animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                            className="text-green-500 mb-6"
+                        >
+                            <CheckCircle size={80} />
+                        </motion.div>
 
-                    <PortableText value={thankYou?.message} components={portableTextComponents} />
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="text-3xl font-semibold mb-3"
+                        >
+                            {thankYou?.message}
+                        </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.5 }}
+                            className="text-gray-600 max-w-md"
+                        >
+                            {thankYou?.subMessage}
+                        </motion.p>
+                    </div>
                 </div>
             </div>
         </div>
