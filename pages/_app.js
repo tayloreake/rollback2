@@ -39,7 +39,7 @@ function MyApp({ Component, pageProps }) {
 
     document.addEventListener('contextmenu', handleContextMenu);
 
-    // document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu);

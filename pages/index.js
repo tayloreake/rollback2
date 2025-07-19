@@ -28,16 +28,18 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
       window.localStorage.setItem("clientReviews", JSON.stringify(reviews))
       window.localStorage.setItem("clients", JSON.stringify(clients))
       window.localStorage.setItem("clientCategories", JSON.stringify(clientCategories))
-      console.log("LANDING SERVICES:::: ", landingServices)
+      console.log("LANDING ABOUTS  ===== :::: ", landingAbout)
 
     }
   }, [reviews])
 
   useEffect(() => {
+    console.log("LOCALSTORAGE SITE LOGOS:::: ", siteLogos[0])
     window.localStorage.setItem("siteLogos", JSON.stringify(siteLogos))
     window.localStorage.setItem("landingAbout", JSON.stringify(landingAbout))
     window.localStorage.setItem("landingServices", JSON.stringify(landingServices))
-    console.log("LANDING SERVICES:::: ", landingServices)
+    // Manually dispatch an event to notify listeners in the same tab
+    window.dispatchEvent(new Event("site-logos"));
   }, [])
 
   function urlFor(source) {
@@ -53,7 +55,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
       {/* <Mirage content={data} urlFor={urlFor} /> */}
       {/* <Cta content={data} /> */}
       <HomeServices services={landingServices} />
-      <About />
+      <About content={landingAbout[0]} />
       <Clients content={data} urlFor={urlFor} />
       {/* <Testimonials /> */}
       {/* <Reviews /> */}

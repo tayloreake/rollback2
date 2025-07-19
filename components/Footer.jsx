@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   BsArrowBarRight,
   BsArrowRight,
@@ -12,11 +12,21 @@ import {
 import { FaFacebook, FaLinkedin } from "react-icons/fa";
 import { RiTwitterXLine } from "react-icons/ri";
 import QuoteModal from "./Quote/QuoteModal";
+import { urlFor } from '../lib/sanity';
 
 
 const Footer = () => {
   const timestamp = new Date().getTime();
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [logoImage, setLogoImage] = useState(null)
+
+  useEffect(() => {
+    const handleManualStorageChange = () => {
+      const logos = localStorage.getItem("siteLogos");
+      setLogoImage(JSON.parse(logos)[0]?.footerLogo);
+    };
+    window.addEventListener("site-logos", handleManualStorageChange);
+  }, [])
 
   return (
     <>
@@ -151,12 +161,23 @@ const Footer = () => {
         <div className="container w-full row py-3 text-sm border-t-[2px] border-[#313D39]">
           <div className="col-6">
             <div className="py-1">
-              <Image
-                width={0}
-                height={0}
-                sizes="auto"
-                style={{ height: 'auto', width: 'auto' }}
-                src={`/assets/General/logo-light.png?cb=${timestamp}`} alt='Taylor Movers Logo' />
+              {!logoImage ?
+                <Image
+                  width={0}
+                  height={0}
+                  sizes="auto"
+                  style={{ height: 'auto', width: 'auto' }}
+                  src={`/assets/General/logo-light.png?cb=${timestamp}`} alt='Taylor Movers Logo' />
+                :
+                < Image
+                  src={urlFor(logoImage?.image)?.url()}
+                  alt={logoImage?.alt}
+                  width={120}
+                  height={1}
+                  className='object-contain'
+                />
+              }
+
               <div className="my-1 text-sm font-[500]">Experience delightful moving!</div>
             </div>
           </div>

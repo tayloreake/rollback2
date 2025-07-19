@@ -6,22 +6,20 @@ import Reviews from "../Reviews/reviews";
 import { isMobile } from "react-device-detect";
 import { Tab, Tabs } from "react-bootstrap";
 import Link from "next/link";
+import { portableTextComponents } from "../../components/portable-text"
+import { PortableText } from '@portabletext/react';
+import { urlFor } from '../../lib/sanity';
 
-const About = ({ content, urlFor }) => {
 
-    const aboutContent = {
-        title: "The Premier Moving Company",
-        text: "Our key focus and goal is to understand our clients experience from their point of view. We see this as our central focus that drives every aspect of how we conduct our business and relate to our customers. We guarantee professional moving services in Kenya. Whether moving within Nairobi or around the globe, Taylor movers Kenya will have a custom tailored moving solution for you. ",
-        image: "about.png"
-    }
 
+const About = ({ content }) => {
     return (
         <div className='w-full h-full py-8 justify-center'>
             <div className="row">
                 <div className="col-md-6 px-3 text-center md:text-left md:!px-[200px] md:py-8 bg-[#EDEDED]">
-                    <h1 className="text-2xl font-bold text-[#F05423] my-3">{aboutContent?.title}</h1>
+                    <h1 className="text-2xl font-bold text-[#F05423] my-3">{content?.title}</h1>
                     <div className="my-2">
-                        {aboutContent?.text}
+                        <PortableText value={content?.text} components={portableTextComponents} />
                     </div>
                     <div>
                         <Link href={"/About"}>
@@ -31,11 +29,11 @@ const About = ({ content, urlFor }) => {
                 </div>
                 <div className="col-md-6 relative">
                     <Image
-                        // width={600}
-                        // height={600}
+                        src={urlFor(content.aboutImage.image).url()}
+                        alt={content.aboutImage.alt}
                         fill
                         style={{ objectFit: 'cover' }}
-                        src={`/assets/About/${aboutContent?.image}`}
+                        className='mb-6 md:mb-0 cursor-pointer w-full max-h-[500px] my-4'
                     />
                 </div>
             </div>

@@ -19,7 +19,6 @@ const settings = {
 };
 const HomeServices = ({ services }) => {
     // load from url
-    useEffect(() => { console.log("THE SERVICES:::::::::::::::", services) }, [])
     const ServiceCard = ({ service }) => {
         const builder = imageUrlBuilder(client)
 

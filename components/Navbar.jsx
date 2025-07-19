@@ -9,11 +9,15 @@ import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa'
 import { Drawer } from 'antd';
 import QuoteForm from './Quote/Form'
 import { set } from 'sanity';
+import { urlFor } from '../lib/sanity';
+
 
 const Navbar = () => {
     const [open, setOpen] = useState(false)
     // const [open, setOpen] = useState(false);
     const [placement, setPlacement] = useState('left');
+    const [logoImage, setLogoImage] = useState(null);
+
     const showDrawer = () => {
         setOpen(true);
     };
@@ -42,6 +46,11 @@ const Navbar = () => {
                     setOpen(false);
                 }
             };
+            const handleManualStorageChange = () => {
+                const logos = localStorage.getItem("siteLogos");
+                setLogoImage(JSON.parse(logos)[0]?.headerLogo);
+            };
+            window.addEventListener("site-logos", handleManualStorageChange);
             document.addEventListener('mousedown', handler);
             return () => document.removeEventListener('mousedown', handler);
         }, []);
@@ -88,7 +97,16 @@ const Navbar = () => {
                 <div className='md:hidden py-2 my-2  md:px-4  flex-row justify-center items-center'>
                     <div className='w-full flex flex-row items-center justify-between'>
                         <Link href='/'>
-                            <Image className='object-contain' src='/assets/General/logo.png' width={120} height={1} alt='Taylor Movers Logo' />
+                            {!logoImage ?
+                                <Image className='object-contain' src='/assets/General/logo.png' width={120} height={100} alt='Taylor Movers Logo' />
+                                : <Image
+                                    src={urlFor(logoImage?.image).url()}
+                                    alt={logoImage?.alt}
+                                    width={120}
+                                    height={1}
+                                    className='object-contain'
+                                />
+                            }
                         </Link>
                         <AiOutlineMenu size={40} className='mx-2' onClick={() => setOpen(true)} />
                         <ShowQuote />
@@ -99,7 +117,15 @@ const Navbar = () => {
                 <div className='hidden md:flex w-full py-2 my-2 px-2  md:px-8  flex-row justify-center items-center'>
                     <div className='w-full flex flex-row justify-between'>
                         <Link href='/'>
-                            <Image src='/assets/General/logo.png' width={205} height={48} alt='Taylor Movers Logo' />
+                            {!logoImage ?
+                                <Image src='/assets/General/logo.png' width={205} height={48} alt='Taylor Movers Logo' />
+                                : <Image
+                                    src={urlFor(logoImage?.image).url()}
+                                    alt={logoImage?.alt}
+                                    width={120}
+                                    height={1}
+                                    className='object-contain'
+                                />}
                         </Link>
                         <div className='mb-2 left-slanted-box !pl-[32px] text-white font-[500] bg-[#FF5000] px-3 flex flex-row items-center text-sm'>
                             <Link href='/'>
