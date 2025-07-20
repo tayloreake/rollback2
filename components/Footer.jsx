@@ -169,7 +169,7 @@ const Footer = () => {
                   style={{ height: 'auto', width: 'auto' }}
                   src={`/assets/General/logo-light.png?cb=${timestamp}`} alt='Taylor Movers Logo' />
                 :
-                < Image
+                <Image
                   src={urlFor(logoImage?.image)?.url()}
                   alt={logoImage?.alt}
                   width={120}
