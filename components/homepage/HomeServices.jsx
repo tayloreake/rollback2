@@ -56,9 +56,9 @@ const HomeServices = ({ services }) => {
             <div className="container">
                 <div className="row">
                     <div className="col-12 my-4">
-                        <h1 className="mt-3 text-center text-3xl font-[600]">
+                        <h2 className="mt-3 text-center text-3xl font-[600]">
                             Taylor Movers is a Premier <br />Moving Company
-                        </h1>
+                        </h2>
                         <div className="my-4 text-center text-sm">
                             Whether moving within Nairobi or around the globe, Taylor Movers Kenya will <br />have a custom tailored moving solution for your admin
                         </div>

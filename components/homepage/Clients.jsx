@@ -206,7 +206,7 @@ const Clients = ({ content }) => {
 
         <div className='row'>
           <div className="col-12">
-            <h1 className="my-5 text-center text-3xl font-bold">What Our Customers Say</h1>
+            <h3 className="my-5 text-center text-3xl font-bold">What Our Customers Say</h3>
             <div className="row">
               <div className="my-2 col-md-6">
                 We have a diversified portfolio of moving services in Kenya that include residential moving, corporate moving, office moving and industrial moving services. Whether you&apos;re moving within Nairobi, moving anywhere in Kenya or international moving, Taylor Movers Kenya has a solution tailor made for you.
@@ -219,7 +219,7 @@ const Clients = ({ content }) => {
           </div>
 
           <div className="col-12">
-            <h1 className="text-2xl my-4 font-bold">Our Clients</h1>
+            <h3 className="text-2xl my-4 font-bold">Our Clients</h3>
             {isMobile ? (
               <ClientAccordion />
             ) : (

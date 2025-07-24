@@ -258,7 +258,7 @@ const Quote = () => {
       <PageTitle title={"Get Free Quote"} />
       <div className='w-full h-full flex flex-col items-center justify-center max-w-[1440px]'>
         <div className='py-12 max-w-[840px] flex flex-col px-4 mx-auto'>
-          <h1 className='mb-4 md:mb-7 text-xl font-bold'>Feel Free To Ask</h1>
+          <h2 className='mb-4 md:mb-7 text-xl font-bold'>Feel Free To Ask</h2>
           <p>
             Please feel free to
             contact us by filling out the form below, and we will respond to
