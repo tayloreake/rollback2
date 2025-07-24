@@ -33,10 +33,10 @@ const Footer = () => {
       <section className="bg-[#FF5000] text-white">
         <div className="container py-8">
           <div className="row py-5">
-            <h1 className="col-12 text-2xl my-1 text-center font-[600]">
+            <h2 className="col-12 text-2xl my-1 text-center font-[600]">
               Request a Quotation
               <span className="block text-sm my-1 font-[500]">Feel Free to ask, or send your request via chat</span>
-            </h1>
+            </h2>
             <div className="col-12 items-center flex">
               < QuoteModal quotebtn={"default"} />
             </div>

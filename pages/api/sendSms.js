@@ -57,7 +57,6 @@ export default async function handler(req, res) {
         to: ['+254721410517'], message, from: process.env.AT_USER_ID || 'TaylorMover'
       });
     } catch (error) {
-      console.error("AfricaTalking SMS send error:", error);
       return res.status(500).json({
         success: false,
         message: "Failed to send SMS via AfricaTalking",

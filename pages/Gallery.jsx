@@ -68,7 +68,7 @@ const Gallery = () => {
   return (
     <div className='w-full h-full bg-[#EDEDED] pt-8 pb-6'>
       <section className="container">
-        <h1 className="text-[#F05423] text-3xl font-[600] text-center">We would love to hear from you</h1>
+        <h2 className="text-[#F05423] text-3xl font-[600] text-center">We would love to hear from you</h2>
       </section>
       <section className="container">
         <div className="my-4">

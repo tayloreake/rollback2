@@ -34,7 +34,7 @@ const Blog = ({ blogs, tags, categories }) => {
       <div className='container my-4'>
 
         <div className='flex flex-col  mt-6 w-full'>
-          <h1 className='hidden md:block text-[#F05423] text-center mb-2 text-3xl font-[600] my-5'>Conversation Categories</h1>
+          <h2 className='hidden md:block text-[#F05423] text-center mb-2 text-3xl font-[600] my-5'>Conversation Categories</h2>
           <h3 className="font-[600] text-2xl text-center text-black my-3">Latest Story From Our Blog</h3>
 
           <div className='hidden md:flex items-justify justify-center pr-6   w-full overflow-x-auto pb-6 mr-6 '>

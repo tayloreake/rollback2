@@ -46,6 +46,28 @@ function MyApp({ Component, pageProps }) {
       document.removeEventListener('keydown', handleKeyDown);
     };
 
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+    // Disable some dev tools key combinations
+    const handleKeyDown = (e) => {
+      if (
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) || // Ctrl+Shift+I/J/C
+        e.key === 'F12'
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+
   }, [])
   return (
     <Layout>
