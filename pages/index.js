@@ -40,6 +40,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
     window.localStorage.setItem("landingServices", JSON.stringify(landingServices))
     // Manually dispatch an event to notify listeners in the same tab
     window.dispatchEvent(new Event("site-logos"));
+    
   }, [])
 
   function urlFor(source) {
