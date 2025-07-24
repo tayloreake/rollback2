@@ -33,6 +33,11 @@ function MyApp({ Component, pageProps }) {
         e.preventDefault();
       }
     };
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+
+
 
     document.addEventListener('contextmenu', handleContextMenu);
 
@@ -41,10 +46,6 @@ function MyApp({ Component, pageProps }) {
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('keydown', handleKeyDown);
-    };
-
-    const handleContextMenu = (e) => {
-      e.preventDefault();
     };
 
 
