@@ -23,9 +23,6 @@ function MyApp({ Component, pageProps }) {
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'AW-966026451');
-    const handleContextMenu = (e) => {
-      e.preventDefault();
-    };
 
     // Disable some dev tools key combinations
     const handleKeyDown = (e) => {
