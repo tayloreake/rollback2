@@ -220,7 +220,7 @@ const Services = ({ content, servicesData }) => {
       <Jumbotron image={"taylor-movers-kenya-packing-boxe.png"} text={"What we do"} alt={"Stack of sturdy, professional moving boxes used by Taylor Movers Kenya for secure packing."} />
 
       <div className="container my-4">
-        <h1 className="text-3xl font-[500] text-[#ff5000] py-2 !mt-12">We specialize in</h1>
+        <h2 className="text-3xl font-[500] text-[#ff5000] py-2 !mt-12">We specialize in</h2>
         <div className="py-3">
           <p>local and international relocation. Taylor Movers is a privately held firm committed to excellence through providing relocation, transportation, warehousing, expatriate mobility services and logistics services efficiently.</p>
         </div>

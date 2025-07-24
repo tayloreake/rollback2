@@ -24,7 +24,7 @@ const OurTalentedPeople = () => {
 
   return (
     <section>
-      <h1>Our Talented People</h1>
+      <h2>Our Talented People</h2>
       <div>
 
       </div>
@@ -44,7 +44,7 @@ const About = ({ aboutPage }) => {
     <div className='w-full h-full'>
       {getPageMetadata("about")}
 
-      <Jumbotron image={'taylor-movers-kenya-professional-team.png'} text={""} alt={"Professional and friendly team of Taylor Movers Kenya, ready to assist with your move"}/>
+      <Jumbotron image={'taylor-movers-kenya-professional-team.png'} text={""} alt={"Professional and friendly team of Taylor Movers Kenya, ready to assist with your move"} />
 
       <div className="row mx-0 items-top">
         <div className="col-md-6 ">
