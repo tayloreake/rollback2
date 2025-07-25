@@ -31,9 +31,18 @@ export default {
                     name: "alt",
                     title: "alternative text",
                     type: "string"
-                }
+                },
             ],
         },
+        {
+            name: "slug",
+            title: "Slug",
+            type: "slug",
+            options: {
+                source: "title",
+                maxLength: 96,
+            },
+        }
 
     ],
 }

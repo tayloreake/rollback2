@@ -12,6 +12,7 @@ import { Tab, Nav, Row, Col, Accordion } from 'react-bootstrap';
 import imageUrlBuilder from "@sanity/image-url"
 import client from "../sanity/config/client-config"
 import { PortableText } from '@portabletext/react';
+import Link from "next/link";
 
 
 
@@ -51,6 +52,12 @@ const Services = ({ content, servicesData }) => {
     setType("Household Moving");
     setSubType("Premoving");
     setActiveTab(services[0])
+
+    document.querySelector(".scroll").addEventListener("click", function () {
+      document.getElementById("view-detail").scrollIntoView({
+        behavior: "smooth"
+      });
+    });
   }, [])
 
 
@@ -81,13 +88,13 @@ const Services = ({ content, servicesData }) => {
     return (
       <div className="row">
         <div className="col-md-6 bg-[#EDEDED] p-8">
-          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Warehousing" : <span>Local <br />Moves</span>}</h2>
+          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type?.toLowerCase() == "warehousing & storage" ? "Warehousing" : <span>Local <br />Moves</span>}</h2>
           <div className="my-3">
             <PortableText value={activeTab?.local} />
           </div>
         </div>
         <div className="col-md-6 bg-[#E1DEDE] p-8">
-          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type.toLowerCase() == "warehousing & storage" ? "Storage" : <span>Local <br />Moves</span>}</h2>
+          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type?.toLowerCase() == "warehousing & storage" ? "Storage" : <span>Local <br />Moves</span>}</h2>
           <div className="my-3">
             <PortableText value={activeTab?.international} />
           </div>
@@ -228,14 +235,14 @@ const Services = ({ content, servicesData }) => {
       <div className='container'>
 
 
-        <div className='row items-center w-full h-full overflow-x-auto pb-4 mb-12'>
+        <div className='row items-center w-full h-full overflow-x-auto pb-4 mb-2'>
           {!isMobile
             ?
             services?.map((item, idx) => (
-              <div key={`service-list-${idx}`}
+              <Link href="#view-detail" key={`service-list-${idx}`}
                 onClick={() => setActiveTab(item)}
-                className="col-md-3 px-0">
-                <ServiceItem item={item} /></div>
+                className={`scroll col-md-3 px-0 ${activeTab == item && 'active'}`}>
+                <ServiceItem item={item} /></Link>
             ))
 
             :
@@ -253,7 +260,7 @@ const Services = ({ content, servicesData }) => {
           }
         </div>
 
-        <div className='border-[3px] border-[#FF5000] mb-8 md:p-12 p-6 rounded-sm'>
+        <div id="view-detail" className='border-[3px] border-[#FF5000] mb-8 md:p-12 p-6 rounded-sm'>
           <div className="text-3xl text-[#FF5000] font-bold py-2 flex items-center justify-center my-2">
             <div className="mr-3">
               {activeTab?.icon && <Image src={`${activeTab?.icon}`} alt="Image of moving boxes" width={50} height={50} />}
@@ -265,7 +272,7 @@ const Services = ({ content, servicesData }) => {
             {!isMobile ? <DesktopActiveItem /> : <MobileActiveItem />}
           </div>
 
-        </div>
+        </div >
 
       </div >
 

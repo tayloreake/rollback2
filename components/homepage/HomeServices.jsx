@@ -5,6 +5,7 @@ import { isMobile } from "react-device-detect";
 import Slider from "react-slick";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../sanity/config/client-config"
+import Link from "next/link";
 
 
 const ServiceCard = dynamic(() => import("./ServiceCard"))
@@ -17,8 +18,11 @@ const settings = {
     autoplay: true,
     autoplaySpeed: 3000,
 };
+
 const HomeServices = ({ services }) => {
     // load from url
+
+
     const ServiceCard = ({ service }) => {
         const builder = imageUrlBuilder(client)
 
@@ -29,24 +33,24 @@ const HomeServices = ({ services }) => {
             <>
 
                 <div className="z-30 group relative w-full my-2 h-[400px] overflow-hidden">
+                    <Link href={'services/' + service.slug.current}>
+                        <Image
+                            src={urlFor(service?.serviceImage?.image).url()}
+                            // width={0}
+                            fill
+                            className="object-cover z-10"
+                            alt={service?.serviceImage?.alt}
+                        />
+                        <div
+                            className="font-[500] z-40 capitalize absolute bg-[#FF5000] text-white px-4 py-3 bottom-[20%]">
+                            {service?.title}
+                        </div>
 
-                    <Image
-                        src={urlFor(service?.serviceImage?.image).url()}
-                        // width={0}
-                        fill
-                        className="object-cover z-10"
-                        alt={service?.serviceImage?.alt}
-                    />
-                    <div
-                        className="font-[500] z-40 capitalize absolute bg-[#FF5000] text-white px-4 py-3 bottom-[20%]">
-                        {service?.title}
-                    </div>
-
-                    <div
-                        className="z-50 absolute text-2xl text-white left-0 p-4 md:p-[30%] flex items-center text-center top-0 h-full w-full bg-[#F05423D1] -translate-x-full transition-transform duration-300 group-hover:translate-x-0">
-                        {service?.serviceText}
-                    </div>
-
+                        <div
+                            className="z-50 absolute text-2xl text-white left-0 p-4 md:p-[30%] flex items-center text-center top-0 h-full w-full bg-[#F05423D1] -translate-x-full transition-transform duration-300 group-hover:translate-x-0">
+                            {service?.serviceText}
+                        </div>
+                    </Link>
                 </div>
             </>
         )

@@ -33,7 +33,7 @@ const About = ({ content }) => {
                         alt={content.aboutImage.alt}
                         fill
                         style={{ objectFit: 'cover' }}
-                        className='mb-6 md:mb-0 cursor-pointer w-full max-h-[500px] my-4'
+                        className='mb-6 md:mb-0 cursor-pointer w-full m-h-[500px]'
                     />
                 </div>
             </div>

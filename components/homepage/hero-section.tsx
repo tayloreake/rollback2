@@ -3,12 +3,29 @@ import Image from 'next/image';
 import React from 'react';
 import QuoteModal from '../Quote/QuoteModal';
 import { Http2ServerRequest } from 'node:http2';
+import Link from "next/link";
 
 const services = [
-    { title: 'Household', icon: '/icons/household.png' },
-    { title: 'Office', icon: '/icons/office.png' },
-    { title: 'Corporate', icon: '/icons/corporate.png' },
-    { title: 'Warehousing', icon: '/icons/warehouse.png' },
+    {
+        title: 'Household',
+        link: '/services/household-moving',
+        icon: '/icons/household.png'
+    },
+    {
+        title: 'Office',
+        link: '/services/office-moving',
+        icon: '/icons/office.png'
+    },
+    {
+        title: 'Corporate',
+        link: '/services/corporate-moving',
+        icon: '/icons/corporate.png'
+    },
+    {
+        title: 'Warehousing',
+        link: '/services/warehousing-and-storage',
+        icon: '/icons/warehouse.png'
+    },
 ];
 
 const HeroSection: React.FC = () => {
@@ -27,11 +44,13 @@ const HeroSection: React.FC = () => {
 
                     <div className="grid grid-cols-2 sm:flex gap-6 mb-8">
                         {services.map((service) => (
-                            <div key={service.title} className="flex flex-col items-center">
-                                <div className="">
-                                    <Image src={service.icon} alt={service.title} width={40} height={40} />
-                                </div>
-                                <span className="text-white md:!text-gray-700 mt-2 text-sm font-medium">{service.title}</span>
+                            <div key={service?.title} className="flex flex-col">
+                                <Link href={service?.link} className="items-center flex flex-col">
+                                    <div className="">
+                                        <Image src={service.icon} alt={service.title} width={40} height={40} />
+                                    </div>
+                                    <span className="text-white md:!text-gray-700 mt-2 text-sm font-medium">{service.title}</span>
+                                </Link>
                             </div>
                         ))}
                     </div>
@@ -44,7 +63,7 @@ const HeroSection: React.FC = () => {
 
                 </div>
             </div>
-        </section>
+        </section >
     );
 };
 
