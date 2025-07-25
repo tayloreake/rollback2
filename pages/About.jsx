@@ -63,7 +63,6 @@ const About = ({ aboutPage }) => {
             <h3 className="text-[#ff5000] py-3 font-bold text-2xl">Our Vision</h3>
             <div className="py-6">
               <div dangerouslySetInnerHTML={{ __html: data?.vision }} />
-
             </div>
           </div>
           <div className="bg-[#ff5000] mx-2 px-2 md:px-[160px] py-12 md:text-left text-center">

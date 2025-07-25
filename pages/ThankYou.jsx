@@ -29,7 +29,7 @@ const ThankYou = ({ thankYou }) => {
         `}
             </Script>
             <div className='w-full h-full'>
-                <Jumbotron image={'about.png'} text={""} />
+                <Jumbotron image={'taylor-movers-kenya-professional-team.png'} text={""} />
                 <div className="row mx-auto items-center">
                     <div className="mx-auto min-h-[400px] border border-gray-100 rounded-md my-4 max-w-3xl">
                         <div className="flex flex-col items-center justify-center h-[70vh] text-center px-4 py-5">
