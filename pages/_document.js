@@ -10,7 +10,7 @@ export default function Document() {
                 <meta name="description" content="Experience reliable moving of your house/business" />
 
                 {/* Favicon */}
-                <link rel="icon" href="/favicon.ico" />
+                <link rel="icon" href="/favicon.svg" />
 
                 {/* Google Fonts example */}
                 <link
