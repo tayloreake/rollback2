@@ -34,8 +34,8 @@ function MyApp({ Component, pageProps }) {
       }
     }
 
-    document.addEventListener('contextmenu', handleContextMenu)
-    document.addEventListener('keydown', handleKeyDown) // Uncomment to block keys
+    // document.addEventListener('contextmenu', handleContextMenu)
+    // document.addEventListener('keydown', handleKeyDown) // Uncomment to block keys
 
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu)

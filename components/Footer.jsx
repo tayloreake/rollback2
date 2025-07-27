@@ -163,18 +163,20 @@ const Footer = () => {
             <div className="py-1">
               {!logoImage ?
                 <Image
-                  width={0}
-                  height={0}
-                  sizes="auto"
-                  style={{ height: 'auto', width: 'auto' }}
+                  width={200}
+                  height={1}
+                  className='object-contain w-[150px] md:w-[250px]'
+
+                  // style={{ height: 'auto', width: 'auto' }}
                   src={`/assets/General/logo-light.png?cb=${timestamp}`} alt='Taylor Movers Logo' />
                 :
                 <Image
                   src={urlFor(logoImage?.image)?.url()}
                   alt={logoImage?.alt}
-                  width={120}
+                  width={200}
                   height={1}
-                  className='object-contain'
+                  className='object-contain w-[150px] md:w-[250px]'
+
                 />
               }
 

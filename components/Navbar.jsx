@@ -122,9 +122,9 @@ const Navbar = () => {
                                 : <Image
                                     src={urlFor(logoImage?.image).url()}
                                     alt={logoImage?.alt}
-                                    width={120}
+                                    width={200}
                                     height={1}
-                                    className='object-contain'
+                                    className='object-contain w-[150px] md:w-[250px]'
                                 />}
                         </Link>
                         <div className='mb-2 left-slanted-box !pl-[32px] text-white font-[500] bg-[#FF5000] px-3 flex flex-row items-center text-sm'>
