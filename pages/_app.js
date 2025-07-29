@@ -10,8 +10,23 @@ import { ToastContainer } from 'react-toastify'
 import Script from 'next/script'
 import TawkTo from 'next-tawkto'
 import { useEffect } from 'react'
+import { useRouter } from 'next/router';
+import * as gtag from '../lib/gtag';
 
 function MyApp({ Component, pageProps }) {
+  const router = useRouter()
+
+
+  useEffect(() => {
+    const handleRouteChange = (url) => {
+      gtag.pageview(url);
+    };
+    router.events.on('routeChangeComplete', handleRouteChange);
+    return () => router.events.off('routeChangeComplete', handleRouteChange);
+  }, [router.events]);
+
+
+
   useEffect(() => {
     // Init Tawk.to
     const tawk = new TawkTo(
@@ -58,6 +73,26 @@ function MyApp({ Component, pageProps }) {
           gtag('config', 'AW-966026451');
         `}
       </Script>
+
+      {/* google analytics */}
+      <Script
+        strategy="afterInteractive"
+        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_ANALYTICS_MEASUREMENT_ID}`}
+      />
+      <Script
+        id="google-analytics"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', ${process.env.NEXT_PUBLIC_ANALYTICS_MEASUREMENT_ID}, {
+              page_path: window.location.pathname,
+            });
+          `,
+        }}
+      />
 
       <ToastContainer position="top-center" />
       <Component {...pageProps} />
