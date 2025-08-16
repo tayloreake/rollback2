@@ -17,6 +17,7 @@ import landingAbout from "./sanity/schemas/landing-about-schema"
 import landingService from "./sanity/schemas/landing-services-schema"
 import siteLogos from "./sanity/schemas/site-logos-schema";
 import thankYouMessage from "./sanity/schemas/thankyou-schema";
+import blacklistedip from "./sanity/schemas/blacklisted-schema";
 const config = defineConfig({
   projectId: "bsg3746e",
   dataset: "production",
@@ -27,7 +28,7 @@ const config = defineConfig({
     "skOIZWPqgTE6cFwT6u3RQ3r9f1eHfJ7CC1l29wlRsK0YyO21iUCuiZNuezGwIfNv7SHWq1vIxuYidCJJ06Xm140oeKv4Cp5zPaWc5ybkvJVczRsFH4mISePmqhDNqqiuOb3qhIRstZOeWfp2VVD7bg7xQlIovICLVHEKNNFoBQxEBM3u5fDH",
   plugins: [deskTool()],
   schema: {
-    types: [service, landingPage, aboutPage, servicespage, category, tag, blog, quote, review, clientcategory, clientlogo, clientreview, about, landingAbout, landingService, siteLogos, thankYouMessage],
+    types: [service, landingPage, aboutPage, servicespage, category, tag, blog, quote, review, clientcategory, clientlogo, clientreview, about, landingAbout, landingService, siteLogos, thankYouMessage, blacklistedip],
   },
 })
 

@@ -141,6 +141,13 @@ export async function getTags() {
       }`
   )
 }
+export async function getBlacklistedIps() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "blacklistedips"]{
+        ...,
+      }`
+  )
+}
 
 export async function createQuote(
   firstName,
