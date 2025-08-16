@@ -84,15 +84,21 @@ function MyApp({ Component, pageProps }) {
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', ${process.env.NEXT_PUBLIC_ANALYTICS_MEASUREMENT_ID}, {
-              page_path: window.location.pathname,
-            });
-          `,
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      // Google Analytics
+      gtag('config', '${process.env.NEXT_PUBLIC_ANALYTICS_MEASUREMENT_ID}', {
+        page_path: window.location.pathname,
+      });
+
+      // Google Ads
+      gtag('config', 'AW-966026451');
+    `,
         }}
       />
+
 
       <ToastContainer position="top-center" />
       <Component {...pageProps} />
