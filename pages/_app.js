@@ -11,28 +11,27 @@ import Script from 'next/script'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-const GA_MEASUREMENT_ID = "G-GRKXLN7WHG"; // your GA ID
+const GA_MEASUREMENT_ID = "G-GRKXLN7WHG"
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
 
   useEffect(() => {
     const handleRouteChange = (url) => {
-      if (window.gtag) {
-        window.gtag("config", GA_MEASUREMENT_ID, {
-          page_path: url,
-        });
-      }
-    };
-    router.events.on("routeChangeComplete", handleRouteChange);
+      console.log("Logging pageview:", url)
+      window.gtag('event', 'page_view', {
+        page_path: url,
+      })
+    }
+    router.events.on("routeChangeComplete", handleRouteChange)
     return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
-    };
-  }, [router.events]);
+      router.events.off("routeChangeComplete", handleRouteChange)
+    }
+  }, [router.events])
 
   return (
     <Layout>
-      {/* Google Analytics */}
+      {/* GA Script */}
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         strategy="afterInteractive"
@@ -48,7 +47,6 @@ function MyApp({ Component, pageProps }) {
         `}
       </Script>
 
-      {/* Other scripts (Tawk.to, Zoho, etc.) untouched */}
       <ToastContainer position="top-center" />
       <Component {...pageProps} />
     </Layout>
