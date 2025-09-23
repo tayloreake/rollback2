@@ -86,6 +86,11 @@ const HomeServices = ({ services }) => {
                         </Slider>
                     }
                 </div>
+                <div className="col-12 text-center mt-6">
+<Link href="/services" className="inline-block px-6 py-3 rounded-full bg-[#FF5000] text-white font-semibold hover:bg-[#e04400] transition-colors">
+                        View all services
+                    </Link>
+                </div>
             </div>
         </div>
     )

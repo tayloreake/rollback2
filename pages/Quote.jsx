@@ -5,6 +5,8 @@ import { createQuote } from "../sanity/sanity-utils"
 import PhoneInput from "react-phone-input-2"
 import ReCAPTCHA from "react-google-recaptcha"
 import PageTitle from "../components/PageTitle"
+import getPageMetadata from "../SEO/seo"
+import Head from 'next/head'
 
 const Quote = () => {
   const [fname, setFname] = useState("")
@@ -253,8 +255,25 @@ const Quote = () => {
     }
   }
 
+  // Get SEO metadata
+  const seoData = getPageMetadata("quote", {
+    location: 'Nairobi',
+    customTitle: 'Get Free Moving Quote Nairobi | Professional Movers | Taylor Movers',
+    customDescription: 'Get your free moving quote for Nairobi, Kenya in under 5 minutes. Professional movers with transparent pricing. No hidden fees. Call +254 721 410 517 now!',
+    includeLocalBusiness: false,
+    includeService: true
+  })
+
   return (
     <div className='w-full h-full flex flex-col items-center justify-center'>
+      <Head>
+        <title>{seoData.title}</title>
+        <meta name="description" content={seoData.description} />
+        <meta name="keywords" content={seoData.keywords} />
+        <meta property="og:title" content={seoData.openGraph.title} />
+        <meta property="og:description" content={seoData.openGraph.description} />
+        <meta property="og:type" content={seoData.openGraph.type} />
+      </Head>
       <PageTitle title={"Get Free Quote"} />
       <div className='w-full h-full flex flex-col items-center justify-center max-w-[1440px]'>
         <div className='py-12 max-w-[840px] flex flex-col px-4 mx-auto'>

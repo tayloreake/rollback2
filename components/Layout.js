@@ -7,12 +7,12 @@ import dynamic from "next/dynamic"
 const Footer = dynamic(() => import("./Footer"))
 const Navbar = dynamic(() => import("./Navbar"))
 
-const Layout = ({ children }) => {
+const Layout = ({ children, caseStudies = [] }) => {
   return (
     <>
       <Navbar />
       {children}
-      <Footer />
+      <Footer caseStudies={caseStudies} />
     </>
   )
 }

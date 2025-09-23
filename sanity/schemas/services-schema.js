@@ -22,6 +22,40 @@ export default {
             validation: Rule => Rule.required(),
         },
         {
+            name: "category",
+            title: "Category",
+            type: 'reference',
+            to: [{ type: 'categories' }]
+        },
+        {
+            name: "description",
+            title: "Service Description",
+            type: 'array',
+            of: [{
+                type: 'block'
+            }],
+            description: 'Main description of the service that appears on the individual service page'
+        },
+        {
+            name: "videoUrl",
+            title: "YouTube Video URL",
+            type: 'url',
+            description: 'Optional YouTube URL to embed on the service page'
+        },
+        {
+            name: "featuresLinks",
+            title: "Features Links",
+            type: 'array',
+            of: [{
+                type: 'object',
+                name: 'featureLink',
+                fields: [
+                    { name: 'label', title: 'Label', type: 'string' },
+                    { name: 'href', title: 'URL', type: 'string' }
+                ]
+            }]
+        },
+        {
             name: "titlePos",
             title: "Title Position",
             type: "string",

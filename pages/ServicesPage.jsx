@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { generateServicesPageMetadata } from "../SEO/seo"
+import Head from 'next/head'
 import { getServicesData, getServicesPageData } from "../sanity/sanity-utils"
 import { useRouter } from "next/router"
 import Script from 'next/script';
@@ -51,34 +52,48 @@ const Services = ({ content, servicesData }) => {
   useEffect(() => {
     setType("Household Moving");
     setSubType("Premoving");
-    setActiveTab(services[0])
+    if (services && services.length > 0) {
+      setActiveTab(services[0])
+    }
 
-    document.querySelector(".scroll").addEventListener("click", function () {
-      document.getElementById("view-detail").scrollIntoView({
-        behavior: "smooth"
+    // Add scroll event listener with safety check
+    const scrollElement = document.querySelector(".scroll");
+    if (scrollElement) {
+      scrollElement.addEventListener("click", function () {
+        const detailElement = document.getElementById("view-detail");
+        if (detailElement) {
+          detailElement.scrollIntoView({
+            behavior: "smooth"
+          });
+        }
       });
-    });
-  }, [])
+    }
+  }, [services])
 
 
 
   const ServiceItem = ({ item }) => {
+    if (!item) return null;
 
     return (
       <div
         onClick={() => setType(item?.name)}
-        className='max-w-[300px] px-0 bg-black  h-full hover:animate-pulse cursor-pointer relative'>
-        <Image
-          src={urlFor(item?.image).url()}
-          alt={item?.name}
-          width={420}
-          height={420}
-          // fill
-          // style={{ width: "300px", height: "400px", objectFit: "cover" }}
-          className=''
-        />
-        <div className={`absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full ${item?.titlePos}-0 py-4`}>
-          <h3 className='text-white text-center'>{item?.name}</h3>
+        className='max-w-[300px] px-0 bg-black h-full hover:animate-pulse cursor-pointer relative transition-all duration-300'>
+        {item?.image ? (
+          <Image
+            src={urlFor(item.image).url()}
+            alt={item?.name || 'Service image'}
+            width={420}
+            height={420}
+            className='object-cover w-full h-full'
+          />
+        ) : (
+          <div className='w-full h-[420px] bg-gray-300 flex items-center justify-center'>
+            <span className='text-gray-600'>No image available</span>
+          </div>
+        )}
+        <div className={`absolute bg-gradient-to-t from-[#DB421B] to-[#DB421B]/40 w-full ${item?.titlePos || 'bottom'}-0 py-4`}>
+          <h3 className='text-white text-center font-semibold'>{item?.name || 'Service'}</h3>
         </div>
       </div>
     )
@@ -94,7 +109,7 @@ const Services = ({ content, servicesData }) => {
           </div>
         </div>
         <div className="col-md-6 bg-[#E1DEDE] p-8">
-          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type?.toLowerCase() == "warehousing & storage" ? "Storage" : <span>Local <br />Moves</span>}</h2>
+          <h2 className="my-3 uppercase text-2xl font-bold text-[#ff5000]">{type?.toLowerCase() == "warehousing & storage" ? "Storage" : <span>International <br />Moves</span>}</h2>
           <div className="my-3">
             <PortableText value={activeTab?.international} />
           </div>
@@ -215,14 +230,24 @@ const Services = ({ content, servicesData }) => {
     )
   }
 
+  // Get SEO metadata
+  const seoData = generateServicesPageMetadata([
+    "householdMoving",
+    "office",
+    "corporate",
+    "warehousingAndStorage",
+  ])
+
   return (
     <>
-      {generateServicesPageMetadata([
-        "householdMoving",
-        "office",
-        "corporate",
-        "warehousingAndStorage",
-      ])}
+      <Head>
+        <title>{seoData.title}</title>
+        <meta name="description" content={seoData.description} />
+        <meta name="keywords" content={seoData.keywords} />
+        <meta property="og:title" content={seoData.openGraph.title} />
+        <meta property="og:description" content={seoData.openGraph.description} />
+        <meta property="og:type" content={seoData.openGraph.type} />
+      </Head>
 
       <Jumbotron image={"taylor-movers-kenya-packing-boxe.png"} text={"What we do"} alt={"Stack of sturdy, professional moving boxes used by Taylor Movers Kenya for secure packing."} />
 

@@ -9,6 +9,7 @@ import review from "./review-schema"
 import landingAbout from "./landing-about-schema"
 import landingService from "./landing-services-schema"
 import siteLogos from "./site-logos-schema"
+import service from "./services-schema"
 
 const schemas = [
   landingPage,
@@ -21,7 +22,8 @@ const schemas = [
   review,
   landingAbout,
   landingService,
-  siteLogos
+  siteLogos,
+  service
 ]
 
 export default schemas

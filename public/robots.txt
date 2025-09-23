@@ -1,9 +1,18 @@
 # *
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
 
 # Host
 Host: https://taylorea.com
 
 # Sitemaps
 Sitemap: https://taylorea.com/sitemap.xml
+Sitemap: https://taylorea.com/server-sitemap.xml

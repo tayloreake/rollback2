@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { generateServicesPageMetadata } from "../../SEO/seo"
+import Head from 'next/head'
 import { getServicesData, getServicesPageData } from "../../sanity/sanity-utils"
 import { useRouter } from "next/router"
 import Jumbotron from "../../components/jumbotron"
@@ -10,6 +11,10 @@ import { Tab, Nav, Row, Col, Accordion } from 'react-bootstrap';
 import imageUrlBuilder from "@sanity/image-url"
 import client from "../../sanity/config/client-config"
 import { PortableText } from '@portabletext/react';
+import QuoteModal from '../../components/Quote/QuoteModal'
+import Link from 'next/link'
+import { BsCheckCircle } from 'react-icons/bs'
+import SuccessStory from '../../components/TrustBadges';
 
 
 const settings = {
@@ -21,6 +26,7 @@ const settings = {
     autoplay: true,
     autoplaySpeed: 3000,
 };
+
 const ServicesItem = ({ content, servicesData }) => {
     const router = useRouter();
     const videoRef = useRef(null);
@@ -47,14 +53,15 @@ const ServicesItem = ({ content, servicesData }) => {
     useEffect(() => {
         setSubType("Premoving");
 
-        const activeService = services.find(
-            service => service?.slug?.current?.toLowerCase() === slug?.toLowerCase()
-        );
+        if (services && Array.isArray(services) && slug) {
+            const activeService = services.find(
+                service => service?.slug?.current?.toLowerCase() === slug?.toLowerCase()
+            );
 
-        setType(activeService?.name);
-
-        setActiveTab(activeService)
-    }, [])
+            setType(activeService?.name);
+            setActiveTab(activeService);
+        }
+    }, [services, slug])
 
 
 
@@ -211,67 +218,170 @@ const ServicesItem = ({ content, servicesData }) => {
         )
     }
 
+    // Get SEO metadata
+    const seoData = generateServicesPageMetadata([
+        "householdMoving",
+        "office",
+        "corporate",
+        "warehousingAndStorage",
+    ])
+
     return (
         <>
-            {generateServicesPageMetadata([
-                "householdMoving",
-                "office",
-                "corporate",
-                "warehousingAndStorage",
-            ])}
+            <Head>
+                <title>{seoData.title}</title>
+                <meta name="description" content={seoData.description} />
+                <meta name="keywords" content={seoData.keywords} />
+                <meta property="og:title" content={seoData.openGraph.title} />
+                <meta property="og:description" content={seoData.openGraph.description} />
+                <meta property="og:type" content={seoData.openGraph.type} />
+            </Head>
 
             <Jumbotron image={"taylor-movers-kenya-packing-boxe.png"} text={"What we do"} />
 
-            <div className="container my-4">
-                <h2 className="text-3xl font-[500] text-[#ff5000] py-2 !mt-12">We specialize in</h2>
-                <div className="py-3">
-                    <p>local and international relocation. Taylor Movers is a privately held firm committed to excellence through providing relocation, transportation, warehousing, expatriate mobility services and logistics services efficiently.</p>
+            {/* Top CTA: Phone and Quote */}
+            <div className="container mt-8">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div className="text-lg font-bold">
+                        Call: <a href='tel:+254721410517' className='text-[#FF5000] hover:underline'>+254 721 410 517</a>
+                    </div>
+                    <QuoteModal quotebtn="orange" />
                 </div>
             </div>
+
+            {/* Title and hero image for active service */}
+            <div className="container my-8">
+                <h1 className="text-4xl md:text-5xl font-bold text-[#FF5000] mb-6 text-center">{activeTab?.name}</h1>
+                {activeTab?.image && (
+                    <div className="relative h-[400px] md:h-[500px] w-full overflow-hidden rounded-2xl shadow-xl">
+                        <Image 
+                            src={urlFor(activeTab.image).url()} 
+                            alt={`${activeTab?.name} service`} 
+                            fill
+                            className="object-cover" 
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                    </div>
+                )}
+            </div>
+
+            {/* Success Story Stats - Trust Badges */}
+            <SuccessStory 
+                variant="compact"
+                className="mb-12"
+            />
+
+            {/* Main Content with Sidebar */}
             <div className='container'>
+                <div className='row'>
+                    {/* Sidebar - Features */}
+                    <div className='col-md-3 mb-8'>
+                        <div className='sticky top-24'>
+                            <div className='bg-gray-50 rounded-xl p-6 mb-6'>
+                                <h3 className='text-xl font-bold text-[#FF5000] mb-4'>Key Features</h3>
+                                <ul className='space-y-3'>
+                                    {Array.isArray(activeTab?.featuresLinks) && activeTab.featuresLinks.length > 0 ? (
+                                        activeTab.featuresLinks.map((link, idx) => (
+                                            <li key={idx} className='flex items-start'>
+                                                <BsCheckCircle className='text-[#FF5000] mr-2 mt-1 flex-shrink-0' />
+                                                <Link href={link.href || '#'} className='hover:text-[#FF5000] transition-colors'>
+                                                    {link.label || link.href}
+                                                </Link>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <>
+                                            <li className='flex items-start'>
+                                                <BsCheckCircle className='text-[#FF5000] mr-2 mt-1 flex-shrink-0' />
+                                                <span>Professional packing</span>
+                                            </li>
+                                            <li className='flex items-start'>
+                                                <BsCheckCircle className='text-[#FF5000] mr-2 mt-1 flex-shrink-0' />
+                                                <span>Secure transportation</span>
+                                            </li>
+                                            <li className='flex items-start'>
+                                                <BsCheckCircle className='text-[#FF5000] mr-2 mt-1 flex-shrink-0' />
+                                                <span>Full insurance coverage</span>
+                                            </li>
+                                            <li className='flex items-start'>
+                                                <BsCheckCircle className='text-[#FF5000] mr-2 mt-1 flex-shrink-0' />
+                                                <span>Experienced team</span>
+                                            </li>
+                                            <li className='flex items-start'>
+                                                <BsCheckCircle className='text-[#FF5000] mr-2 mt-1 flex-shrink-0' />
+                                                <span>Timely delivery</span>
+                                            </li>
+                                        </>
+                                    )}
+                                </ul>
+                            </div>
+                            
+                            {/* Related Services */}
+                            <div className='bg-white rounded-xl p-6 shadow-md'>
+                                <h3 className='text-xl font-bold text-[#FF5000] mb-4'>Related Services</h3>
+                                <ul className='space-y-2'>
+                                    {(Array.isArray(services) ? services : []).slice(0, 5).filter(s => s.slug?.current !== slug).map((service, idx) => (
+                                        <li key={idx}>
+                                            <Link href={`/services/${service.slug?.current}`} className='text-gray-700 hover:text-[#FF5000] transition-colors'>
+                                                → {service.name}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
 
+                    {/* Main Content */}
+                    <div className='col-md-9'>
+                        {/* Service Description */}
+                        <div className='bg-white rounded-xl p-8 shadow-md mb-8'>
+                            <h2 className='text-2xl font-bold mb-4 text-gray-800'>About This Service</h2>
+                            <div className='prose max-w-none text-gray-600'>
+                                {activeTab?.description ? (
+                                    <PortableText value={activeTab.description} />
+                                ) : (
+                                    <p>We provide professional {activeTab?.name?.toLowerCase()} services with utmost care and dedication. Our experienced team ensures your belongings are handled safely and efficiently throughout the entire process.</p>
+                                )}
+                            </div>
+                        </div>
 
-                <div className='row items-center w-full h-full overflow-x-auto pb-4 mb-12'>
-                    {!isMobile
-                        ?
-                        services?.map((item, idx) => (
-                            <div key={`service-list-${idx}`}
-                                onClick={() => setActiveTab(item)}
-                                className="col-md-3 px-0">
-                                <ServiceItem item={item} /></div>
-                        ))
+                        {/* YouTube Video Embed */}
+                        {activeTab?.videoUrl && (
+                            <div className='mb-8'>
+                                <h3 className='text-2xl font-bold mb-4 text-gray-800'>See How We Work</h3>
+                                <div className='aspect-video rounded-xl overflow-hidden shadow-lg'>
+                                    <iframe 
+                                        src={`https://www.youtube.com/embed/${(activeTab.videoUrl.match(/(?:v=|be\/|embed\/)([\w-]+)/)?.[1] || '')}`}
+                                        title={`${activeTab?.name} video`}
+                                        frameBorder='0'
+                                        allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+                                        allowFullScreen
+                                        className='w-full h-full'
+                                    />
+                                </div>
+                            </div>
+                        )}
 
-                        :
-                        <Slider {...settings}>
-                            {services?.map((service, idx) => (
-                                <div key={`services-${idx}`}
-                                    onClick={() => setActiveTab(service)}
-                                    className="col-12">
-                                    <ServiceItem item={service} />
+                        {/* Service Details Tabs */}
+                        <div className='bg-white rounded-xl shadow-md p-8'>
+                            <div className='border-[3px] border-[#FF5000] rounded-lg p-6'>
+                                <div className='text-3xl text-[#FF5000] font-bold py-2 flex items-center justify-center mb-6'>
+                                    <div className='mr-3'>
+                                        {activeTab?.icon && <Image src={`${activeTab?.icon}`} alt='' width={50} height={50} />}
+                                    </div>
+                                    <div className=''>{activeTab?.name}</div>
                                 </div>
 
-                            ))}
-                        </Slider>
-
-                    }
-                </div>
-
-                <div className='border-[3px] border-[#FF5000] mb-8 md:p-12 p-6 rounded-sm'>
-                    <div className="text-3xl text-[#FF5000] font-bold py-2 flex items-center justify-center my-2">
-                        <div className="mr-3">
-                            {activeTab?.icon && <Image src={`${activeTab?.icon}`} alt="" width={50} height={50} />}
+                                <div className='my-4 service-navigator'>
+                                    {!isMobile ? <DesktopActiveItem /> : <MobileActiveItem />}
+                                </div>
+                            </div>
                         </div>
-                        <div className="">{activeTab?.name}</div>
                     </div>
-
-                    <div className="my-4 service-navigator">
-                        {!isMobile ? <DesktopActiveItem /> : <MobileActiveItem />}
-                    </div>
-
                 </div>
 
-            </div >
-
+            </div>
         </>
     )
 }

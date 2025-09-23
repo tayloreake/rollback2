@@ -149,6 +149,55 @@ export async function getBlacklistedIps() {
   )
 }
 
+// Function to get case study blog posts (matching any blogs that could be case studies)
+export async function getCaseStudyBlogs(limit = 5) {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "blogs" && (
+      blogTitle match "*case study*" ||
+      blogTitle match "*Case Study*" ||
+      blogTitle match "*move*" ||
+      blogTitle match "*Move*" ||
+      blogTitle match "*relocation*" ||
+      blogTitle match "*Relocation*" ||
+      blogTitle match "*to*" ||
+      "case study" in blogCategories[]->category ||
+      "Case Study" in blogCategories[]->category ||
+      "case studies" in blogCategories[]->category ||
+      "Case Studies" in blogCategories[]->category ||
+      "moving case study" in blogCategories[]->category ||
+      "international move" in blogCategories[]->category ||
+      "relocation" in blogCategories[]->category ||
+      "moving" in blogCategories[]->category ||
+      "international" in blogCategories[]->category
+    )] | order(date desc) [0...${limit}] {
+      _id,
+      blogTitle,
+      slug,
+      blogExcerpt,
+      date,
+      blogCategories[]->{
+        category
+      }
+    }`
+  )
+}
+
+// Fallback function to get recent blog posts if no case studies found
+export async function getRecentBlogs(limit = 5) {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "blogs"] | order(date desc) [0...${limit}] {
+      _id,
+      blogTitle,
+      slug,
+      blogExcerpt,
+      date,
+      blogCategories[]->{
+        category
+      }
+    }`
+  )
+}
+
 export async function createQuote(
   firstName,
   email,

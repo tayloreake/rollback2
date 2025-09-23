@@ -3,9 +3,13 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
 import 'react-toastify/dist/ReactToastify.css'
+import 'antd/dist/reset.css'
+// import 'lightswind/lightswindv1.0.css' // Removed - using local implementations
 import '../styles/globals.css'
+import '../styles/hero-enhancements.css'
 
 import Layout from '../components/Layout'
+import WebVitals from '../components/SEO/WebVitals'
 import { ToastContainer } from 'react-toastify'
 import Script from 'next/script'
 import { useEffect } from 'react'
@@ -43,10 +47,20 @@ function MyApp({ Component, pageProps }) {
           gtag('js', new Date());
           gtag('config', '${GA_MEASUREMENT_ID}', {
             page_path: window.location.pathname,
+            custom_map: {
+              'metric1': 'CLS',
+              'metric2': 'FID',
+              'metric3': 'FCP',
+              'metric4': 'LCP',
+              'metric5': 'TTFB'
+            }
           });
         `}
       </Script>
 
+      {/* Web Vitals Tracking */}
+      <WebVitals />
+      
       <ToastContainer position="top-center" />
       <Component {...pageProps} />
     </Layout>

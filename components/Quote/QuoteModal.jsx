@@ -18,7 +18,7 @@ const QuoteModal = ({ quotebtn }) => {
 
       <button
         onClick={() => setIsModalOpen(true)}
-        className={`my-4 mx-auto btn text-white ${quotebtn == "orange" ? "!bg-[#FF5000]" : "!bg-[#313D39]"} rounded-2xl font-[600] px-4 py-3`}>
+        className={`quote-modal-trigger my-4 mx-auto btn text-white ${quotebtn == "orange" ? "!bg-[#FF5000]" : "!bg-[#313D39]"} rounded-2xl font-[600] px-4 py-3`}>
         REQUEST QUOTE
       </button>
       <Modal

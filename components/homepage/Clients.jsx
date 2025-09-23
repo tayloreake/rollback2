@@ -130,7 +130,7 @@ const Clients = ({ content }) => {
       setClients(storedClients?.filter(item => item?.logoCategories[0]?.key === "banking"));
       console.log("clients", clients);
 
-    }, []);
+    }, [clients]);
 
     useEffect(() => {
       const storedClients = JSON.parse(window.localStorage.getItem("clients"));
