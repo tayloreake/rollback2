@@ -821,6 +821,11 @@ pre {
   pointer-events: none;
 }
 
+/* Ensure decorative full-bleed overlays never block clicks */
+.absolute.inset-0 {
+  pointer-events: none;
+}
+
 /* Ensure proper stacking context for interactive elements */
 .interactive-layer {
   position: relative;
