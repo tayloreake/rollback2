@@ -67,12 +67,6 @@
       ]
     }
   ],
-  "redirects": [
-    {
-      "source": "/services",
-      "destination": "/services/residential-moving",
-      "permanent": false
-    }
-  ],
+  "redirects": [],
   "trailingSlash": false
 }

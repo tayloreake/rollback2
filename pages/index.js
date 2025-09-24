@@ -25,7 +25,14 @@ import {
   FaGem
 } from 'react-icons/fa';
 import QuoteModal from '../components/Quote/QuoteModal';
+import CaseStudies from '../components/CaseStudies';
 import { useRouter } from 'next/router';
+import { 
+  gtmTrackButtonClick, 
+  gtmTrackNewsletterSignup,
+  gtmTrackServiceView 
+} from '../utils/gtm';
+import { useSectionTracking } from '../hooks/useGTM';
 
 // Enhanced Home Components
 import { EnhancedHero } from '../components/modern/AnimatedHero';
@@ -53,6 +60,14 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState(null)
   
+  // GTM Section tracking refs
+  const heroSectionRef = useSectionTracking('Hero Section')
+  const servicesSectionRef = useSectionTracking('Services Section')
+  const whyChooseSectionRef = useSectionTracking('Why Choose Us Section')
+  const testimonialsSectionRef = useSectionTracking('Testimonials Section')
+  const caseStudiesSectionRef = useSectionTracking('Case Studies Section')
+  const newsletterSectionRef = useSectionTracking('Newsletter Section')
+  
   useEffect(() => {
     if (reviews && reviews.length > 0 && typeof window !== 'undefined') {
       window.localStorage.setItem("clientReviews", JSON.stringify(reviews))
@@ -77,6 +92,12 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
 
   // Enhanced Home Functions
   const handleGetQuote = () => {
+    // Track button click
+    gtmTrackButtonClick('Get Free Quote', 'primary_cta', {
+      section: 'Hero',
+      page_path: router.asPath
+    });
+    
     // Find and click the quote modal button
     const quoteButton = document.querySelector('.quote-modal-trigger');
     if (quoteButton) {
@@ -85,13 +106,33 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
   };
 
   const handleLearnMore = () => {
+    // Track navigation click
+    gtmTrackButtonClick('Learn More', 'secondary_cta', {
+      section: 'Hero',
+      destination: '/About',
+      page_path: router.asPath
+    });
+    
     router.push('/About');
+  };
+  
+  // Track service clicks
+  const handleServiceClick = (serviceName, serviceHref) => {
+    gtmTrackServiceView(serviceName, serviceHref);
+    gtmTrackButtonClick('View Service', 'service_card', {
+      service_name: serviceName,
+      destination: serviceHref,
+      section: 'Services'
+    });
   };
 
   // Newsletter handlers (client-side only placeholder)
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Track newsletter signup
+      gtmTrackNewsletterSignup(newsletterEmail);
+      
       // Placeholder success without backend wiring
       setNewsletterStatus({ type: 'success', message: "Thanks for subscribing! You'll hear from us soon." })
       setNewsletterEmail('')
@@ -118,31 +159,55 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
+        <link rel="canonical" href={seoData.canonical} />
+        
+        {/* Open Graph */}
         <meta property="og:title" content={seoData.openGraph.title} />
         <meta property="og:description" content={seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />
+        <meta property="og:url" content={seoData.openGraph.url} />
+        <meta property="og:site_name" content={seoData.openGraph.siteName} />
+        <meta property="og:locale" content={seoData.openGraph.locale} />
+        <meta property="og:image" content={seoData.openGraph.image} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content={seoData.twitter.card} />
+        <meta name="twitter:site" content={seoData.twitter.site} />
+        <meta name="twitter:title" content={seoData.twitter.title} />
+        <meta name="twitter:description" content={seoData.twitter.description} />
+        <meta name="twitter:image" content={seoData.twitter.image} />
+        
+        {/* Structured Data */}
+        {seoData.structuredData && (
+          <script 
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(seoData.structuredData) }}
+          />
+        )}
       </Head>
 
       {/* Enhanced Hero Section with Rocket Animation */}
-      <EnhancedHero
-        subtitle="Professional Moving Services"
-        title="Trusted Professional Movers"
-        description="We specialize in local and international relocations with modern approach and exceptional quality. Let us make your next move extraordinary!"
-        primaryButtonText="Get Free Quote"
-        secondaryButtonText="Learn More"
-        onPrimaryClick={handleGetQuote}
-        onSecondaryClick={handleLearnMore}
-        clientCount={40000}
-        stats={[
-          { icon: <FaUsers />, number: 40000, label: "successful moves", suffix: "+" },
-          { icon: <FaGlobe />, number: 38, label: "Destination Countries we have moved clients.", suffix: "" },
-          { icon: <FaCalendar />, number: 17, label: "Years - Established in 2008", suffix: "+" },
-          { icon: <FaStar />, number: 4.9, label: "Rating Google Reviews / 4,000+ Reviews", suffix: "/5" }
-        ]}
-      />
+      <div ref={heroSectionRef}>
+        <EnhancedHero
+          subtitle="Professional Moving Services"
+          title="Trusted Professional Movers"
+          description="We specialize in local and international relocations with modern approach and exceptional quality. Let us make your next move extraordinary!"
+          primaryButtonText="Get Free Quote"
+          secondaryButtonText="Learn More"
+          onPrimaryClick={handleGetQuote}
+          onSecondaryClick={handleLearnMore}
+          clientCount={40000}
+          stats={[
+            { icon: <FaUsers />, number: 40000, label: "successful moves", suffix: "+" },
+            { icon: <FaGlobe />, number: 38, label: "Destination Countries we have moved clients.", suffix: "" },
+            { icon: <FaCalendar />, number: 17, label: "Years - Established in 2008", suffix: "+" },
+            { icon: <FaStar />, number: 4.9, label: "Rating Google Reviews / 4,000+ Reviews", suffix: "/5" }
+          ]}
+        />
+      </div>
 
       {/* Services Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+      <section ref={servicesSectionRef} className="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-6">
           <ScrollReveal>
             <div className="text-center mb-16">
@@ -185,7 +250,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
               title="Corporate Staff Relocation"
               description="Support your employees with reliable relocation solutions. From moving households to settling-in assistance, we make staff transitions easier—for them and for your business."
               backgroundImage="/assets/gallery/images/KURA-15.jpg"
-              href="/services/consolidated-moves"
+              href="/services/corporate-staff-relocation"
               delay={0.4}
             />
             <FeatureCard
@@ -195,6 +260,14 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
               backgroundImage="/assets/gallery/images/KURA-25.jpg"
               href="/services/storage-services"
               delay={0.5}
+            />
+            <FeatureCard
+              icon={<FaGem />}
+              title="Our Complete Services"
+              description="Discover our full range of professional moving and relocation services. From residential moves to specialized logistics solutions, we have everything you need for a successful move."
+              backgroundImage="/assets/featured/services-overview.jpg"
+              href="/services"
+              delay={0.6}
             />
           </div>
         </div>
@@ -207,7 +280,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
       />
 
       {/* Why Choose Us */}
-      <section className="py-20 bg-gradient-to-br from-[#FF5000] via-[#FF6B35] to-[#FF8A50] text-white relative overflow-hidden">
+      <section ref={whyChooseSectionRef} className="py-20 bg-gradient-to-br from-[#FF5000] via-[#FF6B35] to-[#FF8A50] text-white relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-32 h-32 bg-white rounded-full animate-float"></div>
@@ -262,15 +335,26 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
       </section>
 
       {/* Moving Testimonials */}
-      <MovingTestimonials
-        title="What Our Clients Say"
-        subtitle="Real experiences from our satisfied customers across Kenya and beyond"
-        autoPlay={true}
-        interval={5000}
-      />
+      <div ref={testimonialsSectionRef}>
+        <MovingTestimonials
+          title="What Our Clients Say"
+          subtitle="Real experiences from our satisfied customers across Kenya and beyond"
+          autoPlay={true}
+          interval={5000}
+        />
+      </div>
+
+      {/* Case Studies */}
+      <div ref={caseStudiesSectionRef}>
+        <CaseStudies
+          title="Success Stories"
+          subtitle="Real case studies of our long-distance and international moves across Kenya and beyond"
+          showAll={false}
+        />
+      </div>
 
       {/* Newsletter Section */}
-      <section className="py-20 bg-gradient-to-r from-gray-900 to-gray-800 text-white relative overflow-hidden">
+      <section ref={newsletterSectionRef} className="py-20 bg-gradient-to-r from-gray-900 to-gray-800 text-white relative overflow-hidden">
         {/* Background accents */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-gradient-to-r from-[#FF5000]/20 to-[#FF8A50]/20"></div>

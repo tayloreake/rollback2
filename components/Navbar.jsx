@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 import client from '../sanity/config/client-config'
 import QuoteForm from './Quote/Form'
 import imageUrlBuilder from '@sanity/image-url'
+import { gtmTrackPhoneClick } from '../utils/gtm'
 
 const Navbar = () => {
     const [open, setOpen] = useState(false)
@@ -21,6 +22,11 @@ const Navbar = () => {
     // Create urlFor function
     const builder = imageUrlBuilder(client)
     const urlFor = (source) => builder.image(source)
+    
+    // Phone click tracking
+    const handlePhoneClick = () => {
+        gtmTrackPhoneClick()
+    }
 
     const mainServicesItems = [
         { name: 'Residential Moving', href: '/services/residential-moving' },
@@ -28,7 +34,7 @@ const Navbar = () => {
         { name: 'Corporate Staff Relocation', href: '/services/corporate-staff-relocation' },
         { name: 'International Moving', href: '/services/international-moving' },
         { name: 'Storage Services', href: '/services/storage-services' },
-        { name: 'Consolidated Moves', href: '/services/consolidated-moves' }
+        { name: 'Long-Distance Moving', href: '/services/long-distance-moving' }
     ]
 
     useEffect(() => {
@@ -109,7 +115,7 @@ const Navbar = () => {
                 </div>
 
                 {isClient && quoteOpen && (
-                    <div className="absolute right-0 mt-2 bg-white rounded-md shadow-lg z-[9999]">
+                    <div className="absolute right-0 mt-2 bg-white rounded-md shadow-lg z-[80]">
                         <span 
                             className='close-toggle-quote-form' 
                             onClick={() => setQuoteOpen(false)}
@@ -149,7 +155,7 @@ const Navbar = () => {
                 
                 {servicesDropdownOpen && (
                     <div 
-                        className="absolute top-full left-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-100 z-[9999] animate-fade-in-down"
+                        className="absolute top-full left-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-100 z-[70] animate-fade-in-down"
                         onMouseLeave={() => setServicesDropdownOpen(false)}
                     >
                         <div className="py-2">
@@ -175,6 +181,17 @@ const Navbar = () => {
                                         </Link>
                                     </div>
                                 ))}
+                                
+                                {/* Specialized Services */}
+                                <div className="border-t border-gray-100 mt-2 pt-2">
+                                    <Link 
+                                        href="/services/specialized-services"
+                                        className="block px-3 py-2 text-gray-700 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 font-medium text-sm rounded-md mb-1"
+                                        onClick={() => setServicesDropdownOpen(false)}
+                                    >
+                                        🐾 Specialized Services
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -194,7 +211,7 @@ const Navbar = () => {
         <div className="w-full">
             {/* Phone number bar - always at top */}
             <div className={`w-full hidden md:block ${
-                isEnhancedHomePage ? 'fixed top-0 left-0 right-0 z-50' : ''
+                isEnhancedHomePage ? 'fixed top-0 left-0 right-0 z-[60]' : ''
             }`}>
                 <div className={`w-full flex flex-row items-center justify-end px-8 py-2 ${
                     isEnhancedHomePage 
@@ -202,6 +219,7 @@ const Navbar = () => {
                         : 'bg-gradient-to-r from-gray-50 to-white border-b border-gray-100'
                 }`}>
                     <a href='tel:+254721410517'
+                        onClick={handlePhoneClick}
                         className={`flex flex-row justify-end font-bold hover-glow rounded-lg px-3 py-1 transition-all duration-300 ${
                             isEnhancedHomePage ? 'text-white' : 'text-[#FF5000]'
                         }`}>
@@ -215,7 +233,7 @@ const Navbar = () => {
                 
             {/* Mobile phone number bar */}
             <div className={`md:hidden w-full ${
-                isEnhancedHomePage ? 'fixed top-0 left-0 right-0 z-50' : ''
+                isEnhancedHomePage ? 'fixed top-0 left-0 right-0 z-[60]' : ''
             }`}>
                 <div className={`w-full flex flex-row items-center justify-center px-4 py-2 ${
                     isEnhancedHomePage 
@@ -223,6 +241,7 @@ const Navbar = () => {
                         : 'bg-gradient-to-r from-gray-50 to-white border-b border-gray-100'
                 }`}>
                     <a href='tel:+254721410517'
+                        onClick={handlePhoneClick}
                         className={`flex flex-row justify-center font-bold hover-glow rounded-lg px-3 py-1 transition-all duration-300 ${
                             isEnhancedHomePage ? 'text-white' : 'text-[#FF5000]'
                         }`}>
@@ -235,7 +254,7 @@ const Navbar = () => {
             </div>
                 
             {/* Mobile navbar */}
-            <div className={`md:hidden fixed left-0 right-0 z-40 ${
+            <div className={`md:hidden fixed left-0 right-0 z-[50] ${
                 isEnhancedHomePage 
                     ? 'top-10' 
                     : 'top-10 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm'
@@ -278,7 +297,7 @@ const Navbar = () => {
 
             {/* Desktop navbar */}
             <div className={`hidden md:flex w-full py-3 px-6 flex-row justify-center items-center ${
-                isEnhancedHomePage ? 'fixed top-10 left-0 right-0 z-40' : ''
+                isEnhancedHomePage ? 'fixed top-10 left-0 right-0 z-[50]' : ''
             }`}>
                 <div className={`w-full max-w-7xl flex flex-row justify-between items-center px-6 py-3 animate-fade-in-up ${
                     isEnhancedHomePage 
@@ -430,6 +449,17 @@ const Navbar = () => {
                                                         </Link>
                                                     </div>
                                                 ))}
+                                                
+                                                {/* Specialized Services */}
+                                                <div className='border-t border-gray-100 mt-2 pt-2'>
+                                                    <Link 
+                                                        href='/services/specialized-services' 
+                                                        onClick={() => {setOpen(false); setMobileServicesOpen(false);}} 
+                                                        className='block py-2.5 px-3 text-sm text-gray-600 hover:text-[#FF5000] hover:bg-gray-50 rounded-md transition-all duration-200'
+                                                    >
+                                                        🐾 Specialized Services
+                                                    </Link>
+                                                </div>
                                             </div>
                                         </div>
                                     )}

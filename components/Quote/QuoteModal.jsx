@@ -2,6 +2,7 @@ import { Modal } from "antd"
 import Image from "next/image"
 import React, { useState, useRef, useEffect } from "react"
 import QuoteForm from "./Form"
+import { gtmTrackButtonClick } from '../../utils/gtm'
 // import ReCAPTCHA from "react-google-recaptcha"
 // import ReviewsForm from "./reviews-form"
 
@@ -9,6 +10,11 @@ const QuoteModal = ({ quotebtn }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const showModal = () => {
+    // Track quote modal open
+    gtmTrackButtonClick('Request Quote Modal Open', 'quote_modal', {
+      modal_type: 'Quote Request',
+      button_color: quotebtn
+    });
     setIsModalOpen(true);
   }
 
@@ -17,7 +23,7 @@ const QuoteModal = ({ quotebtn }) => {
     <>
 
       <button
-        onClick={() => setIsModalOpen(true)}
+        onClick={showModal}
         className={`quote-modal-trigger my-4 mx-auto btn text-white ${quotebtn == "orange" ? "!bg-[#FF5000]" : "!bg-[#313D39]"} rounded-2xl font-[600] px-4 py-3`}>
         REQUEST QUOTE
       </button>

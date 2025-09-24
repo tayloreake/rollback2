@@ -18,11 +18,14 @@ module.exports = {
 
     // Add service pages dynamically
     const services = [
-      { slug: 'household-moving', priority: 0.9, changefreq: 'monthly' },
+      { slug: 'residential-moving', priority: 0.9, changefreq: 'monthly' },
       { slug: 'office-relocation', priority: 0.9, changefreq: 'monthly' },
-      { slug: 'corporate-relocation', priority: 0.8, changefreq: 'monthly' },
-      { slug: 'warehousing-storage', priority: 0.8, changefreq: 'monthly' },
-      { slug: 'international-moving', priority: 0.9, changefreq: 'weekly' }
+      { slug: 'corporate-staff-relocation', priority: 0.9, changefreq: 'monthly' },
+      { slug: 'international-moving', priority: 0.9, changefreq: 'weekly' },
+      { slug: 'storage-services', priority: 0.8, changefreq: 'monthly' },
+      { slug: 'long-distance-moving', priority: 0.9, changefreq: 'monthly' },
+      { slug: 'specialized-services', priority: 0.8, changefreq: 'monthly' },
+      { slug: 'consolidated-moves', priority: 0.8, changefreq: 'monthly' }
     ]
 
     services.forEach(service => {

@@ -155,10 +155,35 @@ const ResidentialMoving = () => {
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
+        <link rel="canonical" href={seoData.canonical} />
+        
+        {/* Open Graph */}
         <meta property="og:title" content={seoData.openGraph.title} />
         <meta property="og:description" content={seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />
+        <meta property="og:url" content={seoData.openGraph.url} />
+        <meta property="og:site_name" content={seoData.openGraph.siteName} />
+        <meta property="og:locale" content={seoData.openGraph.locale} />
+        <meta property="og:image" content={seoData.openGraph.image} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content={seoData.twitter.card} />
+        <meta name="twitter:site" content={seoData.twitter.site} />
+        <meta name="twitter:title" content={seoData.twitter.title} />
+        <meta name="twitter:description" content={seoData.twitter.description} />
+        <meta name="twitter:image" content={seoData.twitter.image} />
+        
+        {/* Structured Data */}
+        {seoData.structuredData && (
+          <script 
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(seoData.structuredData) }}
+          />
+        )}
       </Head>
+      
+      {/* Spacer for fixed navbar */}
+      <div className="h-[100px] md:h-[80px]"></div>
 
       <Jumbotron 
         image="residential-moving-nairobi.png" 

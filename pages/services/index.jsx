@@ -120,6 +120,9 @@ const ServicesIndex = () => {
         <meta property="og:description" content={seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />
       </Head>
+      
+      {/* Spacer for fixed navbar */}
+      <div className="h-[100px] md:h-[80px]"></div>
 
       <Jumbotron 
         image="taylor-movers-services-hero.png" 

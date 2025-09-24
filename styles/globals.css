@@ -811,6 +811,51 @@ pre {
   border: 0;
 }
 
+/* Clickability Fixes */
+.clickable {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+.non-clickable {
+  pointer-events: none;
+}
+
+/* Ensure proper stacking context for interactive elements */
+.interactive-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix for elements that might be covered by fixed navbar */
+.navbar-safe-margin {
+  margin-top: 100px;
+}
+
+@media (min-width: 768px) {
+  .navbar-safe-margin {
+    margin-top: 80px;
+  }
+}
+
+/* Ensure buttons and links are always clickable */
+a, button, [role="button"], .btn, .quote-modal-trigger {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix for overlapping elements */
+.prevent-overlap {
+  isolation: isolate;
+}
+
+/* Debug helper - remove in production */
+.debug-clickable:hover {
+  outline: 2px solid red;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
 /* Focus States for Dark Theme */
 .focus-ring-orange {
   @apply focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-2 focus:ring-offset-gray-900;

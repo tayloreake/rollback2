@@ -14,11 +14,18 @@ import { ToastContainer } from 'react-toastify'
 import Script from 'next/script'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useGTM, useScrollTracking } from '../hooks/useGTM'
 
 const GA_MEASUREMENT_ID = "G-GRKXLN7WHG"
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
+
+  // Initialize GTM tracking
+  useGTM()
+  
+  // Initialize scroll depth tracking
+  useScrollTracking()
 
   useEffect(() => {
     const handleRouteChange = (url) => {
