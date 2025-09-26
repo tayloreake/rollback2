@@ -262,19 +262,21 @@ const QuoteForm = () => {
   }
 
   return (
-    <div className='w-[320px] md:w-[320px]'>
-      <div className='py-4 flex flex-col px-4 mx-auto mb-4 bg-[#DB421B]'>
-        <h1 className="font-bold text-2xl text-white">Request a Quote</h1>
-        <h2 className='mb-2 text-white '>Feel Free To Ask</h2>
-
+    <div className='w-full max-w-[360px] mx-auto'>
+      {/* Header Section */}
+      <div className='py-4 px-4 mb-4 bg-gradient-to-r from-[#FF5000] to-[#FF6B35] rounded-t-xl'>
+        <h1 className="font-bold text-xl text-white mb-1">Request a Quote</h1>
+        <p className='text-white text-sm opacity-90'>Get your free moving estimate</p>
       </div>
-      <div className='flwe flex-col w-full px-4 mb-4'>
+      
+      {/* Form Container */}
+      <div className='px-4 pb-4'>
         {/* <h3 className='text-lg mb-4'>Contact Us</h3> */}
         <form
           onSubmit={handleSubmit}
           className='w-full flex flex-col items-center justify-center'>
           <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className=' rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+            <div className='rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
               <input
                 type='text'
                 value={fname}
@@ -287,7 +289,7 @@ const QuoteForm = () => {
                 Full Name
               </label>
             </div>
-            <div className=' relative w-full max-w-[351px] mb-4 md:mr-2'>
+            <div className='relative w-full max-w-[351px] mb-3 md:mr-2'>
               {/* <PhoneInput
                   country={"ke"}
                   value={number}
@@ -308,7 +310,7 @@ const QuoteForm = () => {
             </div>
           </div>
           <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
               <input
                 type='email'
                 value={email}
@@ -323,7 +325,7 @@ const QuoteForm = () => {
 
           </div>
           <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
               <input
                 type='text'
                 value={location}
@@ -335,7 +337,7 @@ const QuoteForm = () => {
                 Current Location
               </label>
             </div>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
 
               <input
                 type='text'
@@ -351,7 +353,7 @@ const QuoteForm = () => {
 
           </div>
           <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
               <select
                 onChange={(e) => setMoveType(e.target.value)}
                 value={moveType}
@@ -374,7 +376,7 @@ const QuoteForm = () => {
                 Move Type
               </label>
             </div>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
               {/* <input type='text' value={email} onChange={() => setEmail(email)} className='px-4 py-2 rounded-xl' /> */}
               <select
                 onChange={(e) => setBedrooms(e.target.value)}
@@ -400,7 +402,7 @@ const QuoteForm = () => {
 
           </div>
           <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
               <input
                 type='date'
                 value={moveDate}
@@ -415,7 +417,7 @@ const QuoteForm = () => {
 
           <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
 
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
               <select
                 onChange={(e) => setRef(e.target.value)}
                 value={ref}

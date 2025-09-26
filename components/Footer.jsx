@@ -117,31 +117,31 @@ const Footer = ({ caseStudies = [] }) => {
                 Our services
               </h3>
               <div className='space-y-3'>
-                <Link className="block" href='/services/residential-moving'>
+                <Link className="block" href='/services/home'>
                   <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
                     <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
                     <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Residential Moving</p>
                   </div>
                 </Link>
-                <Link className="block" href='/services/office-relocation'>
+                <Link className="block" href='/services/office'>
                   <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
                     <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
                     <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Office Relocation</p>
                   </div>
                 </Link>
-                <Link className="block" href='/services/corporate-staff-relocation'>
+                <Link className="block" href='/services/corporate'>
                   <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
                     <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
                     <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Corporate Staff Relocation</p>
                   </div>
                 </Link>
-                <Link className="block" href='/services/international-moving'>
+                <Link className="block" href='/services/intl'>
                   <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
                     <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
                     <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>International Moving</p>
                   </div>
                 </Link>
-                <Link className="block" href='/services/storage-services'>
+                <Link className="block" href='/services/storage'>
                   <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
                     <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
                     <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Storage Services</p>

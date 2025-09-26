@@ -226,7 +226,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
               title="Household & Long-Distance Moves"
               description="Whether you're moving across town or across counties, we make your relocation seamless. Our team handles your belongings with care and ensures every mile of your move is stress-free."
               backgroundImage="/assets/featured/house.jpg"
-              href="/services/residential-moving"
+              href="/services/home"
               delay={0.1}
             />
             <FeatureCard
@@ -234,7 +234,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
               title="Office Moves"
               description="Relocating your office doesn't have to disrupt business. We specialize in moving workstations, IT equipment, and furniture quickly and securely—so your team can get back to work faster."
               backgroundImage="/assets/featured/corporate.jpg"
-              href="/services/office-relocation"
+              href="/services/office"
               delay={0.2}
             />
             <FeatureCard
@@ -242,7 +242,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
               title="International Moves"
               description="Planning a move abroad? From customs clearance to safe shipping and delivery, we handle the details that make international relocation smooth and worry-free."
               backgroundImage="/assets/featured/warehouse.jpg"
-              href="/services/international-moving"
+              href="/services/intl"
               delay={0.3}
             />
             <FeatureCard
@@ -250,7 +250,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
               title="Corporate Staff Relocation"
               description="Support your employees with reliable relocation solutions. From moving households to settling-in assistance, we make staff transitions easier—for them and for your business."
               backgroundImage="/assets/gallery/images/KURA-15.jpg"
-              href="/services/corporate-staff-relocation"
+              href="/services/corporate"
               delay={0.4}
             />
             <FeatureCard
@@ -258,7 +258,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
               title="Warehousing and Storage"
               description="Whether you need short-term storage during a move or long-term warehousing for your business, we provide secure, flexible, and professionally managed facilities with 24/7 security and climate control."
               backgroundImage="/assets/gallery/images/KURA-25.jpg"
-              href="/services/storage-services"
+              href="/services/storage"
               delay={0.5}
             />
             <FeatureCard

@@ -29,12 +29,12 @@ const Navbar = () => {
     }
 
     const mainServicesItems = [
-        { name: 'Residential Moving', href: '/services/residential-moving' },
-        { name: 'Office Relocation', href: '/services/office-relocation' },
-        { name: 'Corporate Staff Relocation', href: '/services/corporate-staff-relocation' },
-        { name: 'International Moving', href: '/services/international-moving' },
-        { name: 'Storage Services', href: '/services/storage-services' },
-        { name: 'Long-Distance Moving', href: '/services/long-distance-moving' }
+        { name: 'Residential Moving', href: '/services/home' },
+        { name: 'Office Relocation', href: '/services/office' },
+        { name: 'Corporate Staff Relocation', href: '/services/corporate' },
+        { name: 'International Moving', href: '/services/intl' },
+        { name: 'Storage Services', href: '/services/storage' },
+        { name: 'Long-Distance Moving', href: '/services/long' }
     ]
 
     useEffect(() => {
@@ -185,7 +185,7 @@ const Navbar = () => {
                                 {/* Specialized Services */}
                                 <div className="border-t border-gray-100 mt-2 pt-2">
                                     <Link 
-                                        href="/services/specialized-services"
+                                        href="/services/special"
                                         className="block px-3 py-2 text-gray-700 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 font-medium text-sm rounded-md mb-1"
                                         onClick={() => setServicesDropdownOpen(false)}
                                     >

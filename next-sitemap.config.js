@@ -16,16 +16,16 @@ module.exports = {
   additionalPaths: async (config) => {
     const result = []
 
-    // Add service pages dynamically
+    // Add service pages dynamically with shortened URLs
     const services = [
-      { slug: 'residential-moving', priority: 0.9, changefreq: 'monthly' },
-      { slug: 'office-relocation', priority: 0.9, changefreq: 'monthly' },
-      { slug: 'corporate-staff-relocation', priority: 0.9, changefreq: 'monthly' },
-      { slug: 'international-moving', priority: 0.9, changefreq: 'weekly' },
-      { slug: 'storage-services', priority: 0.8, changefreq: 'monthly' },
-      { slug: 'long-distance-moving', priority: 0.9, changefreq: 'monthly' },
-      { slug: 'specialized-services', priority: 0.8, changefreq: 'monthly' },
-      { slug: 'consolidated-moves', priority: 0.8, changefreq: 'monthly' }
+      { slug: 'home', priority: 0.9, changefreq: 'monthly' },
+      { slug: 'office', priority: 0.9, changefreq: 'monthly' },
+      { slug: 'corporate', priority: 0.9, changefreq: 'monthly' },
+      { slug: 'intl', priority: 0.9, changefreq: 'weekly' },
+      { slug: 'storage', priority: 0.8, changefreq: 'monthly' },
+      { slug: 'long', priority: 0.9, changefreq: 'monthly' },
+      { slug: 'special', priority: 0.8, changefreq: 'monthly' },
+      { slug: 'moves', priority: 0.8, changefreq: 'monthly' }
     ]
 
     services.forEach(service => {

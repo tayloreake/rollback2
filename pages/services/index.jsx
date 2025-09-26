@@ -38,7 +38,7 @@ const ServicesIndex = () => {
       subtitle: 'Home Relocations Made Easy',
       description: 'Professional residential moving services for local and long-distance relocations across Kenya.',
       icon: <BsHouse className="text-4xl" />,
-      link: '/services/residential-moving',
+      link: '/services/home',
       features: ['Local & Long-distance', 'Professional Packing', 'Insurance Coverage', '24/7 Support'],
       gradient: 'from-[#FF5000] to-[#FF8A50]',
       stats: '40,000+ Successful Moves'
@@ -49,7 +49,7 @@ const ServicesIndex = () => {
       subtitle: 'Business Moves Without Downtime',
       description: 'Seamless office relocations with minimal business disruption and professional handling.',
       icon: <BsBuilding className="text-4xl" />,
-      link: '/services/office-relocation',
+      link: '/services/office',
       features: ['Minimal Downtime', 'IT Equipment Care', 'Weekend Moves', 'Secure Handling'],
       gradient: 'from-[#FF5000] to-[#FF8A50]',
       stats: 'Enterprise Trusted'
@@ -60,7 +60,7 @@ const ServicesIndex = () => {
       subtitle: 'Employee Moves Made Seamless',
       description: 'Professional staff relocation services for corporate employees and their families.',
       icon: <BsPeople className="text-4xl" />,
-      link: '/services/corporate-staff-relocation',
+      link: '/services/corporate',
       features: ['HR Coordination', 'Housing Support', 'Family Services', 'Global Coverage'],
       gradient: 'from-[#FF5000] to-[#FF8A50]',
       stats: 'Corporate Trusted'
@@ -71,7 +71,7 @@ const ServicesIndex = () => {
       subtitle: 'Global Relocations Made Simple',
       description: 'Expert international moving services to Europe, Middle East, North America, Asia & Africa.',
       icon: <BsGlobe className="text-4xl" />,
-      link: '/services/international-moving',
+      link: '/services/intl',
       features: ['Air & Sea Freight', 'Customs Clearance', 'Global Network', 'Door-to-Door'],
       gradient: 'from-[#FF5000] to-[#FF8A50]',
       stats: '5 Continents'
@@ -85,7 +85,7 @@ const ServicesIndex = () => {
       subtitle: 'Secure & Convenient Storage',
       description: 'Professional storage solutions with 24/7 security near JKIA.',
       icon: <FaWarehouse className="text-3xl text-white" />,
-      link: '/services/storage-services',
+      link: '/services/storage',
       features: ['Climate Controlled', '24/7 Security', 'Near JKIA', 'Flexible Access']
     },
     {
@@ -94,7 +94,7 @@ const ServicesIndex = () => {
       subtitle: 'Cost-Effective Solutions',
       description: 'Share transport space and save up to 40% on moving costs.',
       icon: <FaDollarSign className="text-3xl text-white" />,
-      link: '/services/consolidated-moves',
+      link: '/services/moves',
       features: ['Up to 40% Savings', 'Shared Transport', 'Professional Handling', 'Flexible Scheduling']
     }
   ]
