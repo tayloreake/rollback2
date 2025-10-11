@@ -1,6 +1,7 @@
 import config from "../../africastalking.config"
 import AfricaTalking from "africastalking"
 import { rateLimiter } from "./middleware/rateLimiter"
+import { getClientIp, getDetailedIpInfo } from "../../utils/getClientIp";
 
 const africastalking = AfricaTalking(config)
 
@@ -20,10 +21,13 @@ async function verifyRecaptcha(token) {
     });
 
     const data = await response.json();
-    return data.success;
+    return {
+      success: data.success,
+      score: data.score || null,
+    };
   } catch (error) {
     console.error('reCAPTCHA verification error:', error);
-    return false;
+    return { success: false, score: null };
   }
 }
 
@@ -33,10 +37,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, message: "Method not allowed" });
   }
 
+  // Capture IP information
+  const ipAddress = getClientIp(req);
+  const ipDetails = getDetailedIpInfo(req);
+
   try {
     // Apply rate limiting
     await limiter(req);
-
 
     const { to, message, recaptchaToken } = req.body;
 
@@ -45,18 +52,31 @@ export default async function handler(req, res) {
     }
 
     // Verify reCAPTCHA
-    const isHuman = await verifyRecaptcha(recaptchaToken);
-    if (!isHuman) {
+    const recaptchaResult = await verifyRecaptcha(recaptchaToken);
+    if (!recaptchaResult.success) {
       return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
     }
 
+    // Warn on low score
+    if (recaptchaResult.score !== null && recaptchaResult.score < 0.5) {
+      console.warn(`Low reCAPTCHA score in SMS: ${recaptchaResult.score} from IP: ${ipAddress}`);
+    }
+
     const sms = africastalking.SMS;
+    
+    // Append IP address to message for tracking
+    const messageWithIp = `${message}\n\n[Submitted from IP: ${ipAddress}]`;
+    
     let response;
     try {
       response = await sms.send({
-        to: ['+254721410517'], message, from: process.env.AT_USER_ID || 'TaylorMover'
+        to: ['+254721410517'], 
+        message: messageWithIp, 
+        from: process.env.AT_USER_ID || 'TaylorMover'
       });
+      console.log(`SMS sent successfully from IP: ${ipAddress}`);
     } catch (error) {
+      console.error(`SMS send failed from IP: ${ipAddress}`, error);
       return res.status(500).json({
         success: false,
         message: "Failed to send SMS via AfricaTalking",
@@ -67,6 +87,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       message: "SMS sent successfully",
+      ipAddress: ipAddress,
       data: response
     });
   } catch (error) {

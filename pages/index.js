@@ -4,7 +4,9 @@ import imageUrlBuilder from "@sanity/image-url"
 import client from "../sanity/config/client-config"
 import getPageMetadata from "../SEO/seo"
 import Head from 'next/head'
+import dynamic from 'next/dynamic'
 import { useEffect, useState } from "react"
+import { useBatchLocalStorage } from '../hooks/useLocalStorage'
 import { 
   FaUsers,
   FaTruck,
@@ -25,7 +27,19 @@ import {
   FaGem
 } from 'react-icons/fa';
 import QuoteModal from '../components/Quote/QuoteModal';
-import CaseStudies from '../components/CaseStudies';
+
+// Lazy load heavy components - improves initial load time
+const CaseStudies = dynamic(
+  () => import('../components/CaseStudies'),
+  { 
+    loading: () => (
+      <div className="py-20 flex items-center justify-center">
+        <div className="animate-pulse text-gray-600">Loading case studies...</div>
+      </div>
+    ),
+    ssr: true // Still render on server for SEO
+  }
+);
 import { useRouter } from 'next/router';
 import { 
   gtmTrackButtonClick, 
@@ -68,23 +82,26 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
   const caseStudiesSectionRef = useSectionTracking('Case Studies Section')
   const newsletterSectionRef = useSectionTracking('Newsletter Section')
   
+  // Batch localStorage writes with debouncing - prevents blocking main thread
+  useBatchLocalStorage({
+    clientReviews: reviews,
+    clients: clients,
+    clientCategories: clientCategories,
+    siteLogos: siteLogos,
+    landingAbout: landingAbout,
+    landingServices: landingServices
+  }, 1500);
+  
+  // Dispatch site-logos event after initial mount
   useEffect(() => {
-    if (reviews && reviews.length > 0 && typeof window !== 'undefined') {
-      window.localStorage.setItem("clientReviews", JSON.stringify(reviews))
-      window.localStorage.setItem("clients", JSON.stringify(clients))
-      window.localStorage.setItem("clientCategories", JSON.stringify(clientCategories))
-      console.log("LANDING ABOUTS  ===== :::: ", landingAbout)
+    if (typeof window !== 'undefined' && siteLogos?.length > 0) {
+      // Delay event dispatch to not block initial render
+      const timer = setTimeout(() => {
+        window.dispatchEvent(new Event("site-logos"));
+      }, 2000);
+      return () => clearTimeout(timer);
     }
-  }, [reviews, clients, clientCategories, landingAbout])
-
-  useEffect(() => {
-    console.log("LOCALSTORAGE SITE LOGOS:::: ", siteLogos[0])
-    window.localStorage.setItem("siteLogos", JSON.stringify(siteLogos))
-    window.localStorage.setItem("landingAbout", JSON.stringify(landingAbout))
-    window.localStorage.setItem("landingServices", JSON.stringify(landingServices))
-    // Manually dispatch an event to notify listeners in the same tab
-    window.dispatchEvent(new Event("site-logos"));
-  }, [siteLogos, landingAbout, landingServices])
+  }, [siteLogos])
 
   function urlFor(source) {
     return builder.image(source)
@@ -406,27 +423,50 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
   )
 }
 
-export async function getServerSideProps({ req, res }) {
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=10, stale-while-revalidate=1"
-  )
-  const landingPage = await getLandingPageData();
-  const reviews = await getClientReviews();
-  const clients = await getClientLogos();
-  const siteLogos = await getSiteLogos();
-  const landingServices = await getLandingServices();
-  const landingAbout = await getLandingAbout();
-  const clientCategories = await getClientCategories();
-  return {
-    props: {
-      landingPage,
-      reviews,
-      clients,
-      clientCategories,
-      siteLogos,
-      landingAbout,
-      landingServices
-    },
+// Use getStaticProps with ISR for better performance
+// Pages are pre-built at build time and revalidated in background
+export async function getStaticProps() {
+  try {
+    // Parallel data fetching - much faster than sequential
+    const [landingPage, reviews, clients, siteLogos, landingServices, landingAbout, clientCategories] = 
+      await Promise.all([
+        getLandingPageData(),
+        getClientReviews(),
+        getClientLogos(),
+        getSiteLogos(),
+        getLandingServices(),
+        getLandingAbout(),
+        getClientCategories()
+      ]);
+
+    return {
+      props: {
+        landingPage: landingPage || [],
+        reviews: reviews || [],
+        clients: clients || [],
+        clientCategories: clientCategories || [],
+        siteLogos: siteLogos || [],
+        landingAbout: landingAbout || [],
+        landingServices: landingServices || []
+      },
+      // Revalidate every hour (3600 seconds) instead of 10 seconds
+      // This dramatically reduces database load and improves performance
+      revalidate: 3600
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    // Return empty props on error to prevent build failure
+    return {
+      props: {
+        landingPage: [],
+        reviews: [],
+        clients: [],
+        clientCategories: [],
+        siteLogos: [],
+        landingAbout: [],
+        landingServices: []
+      },
+      revalidate: 60 // Retry in 1 minute on error
+    }
   }
 }

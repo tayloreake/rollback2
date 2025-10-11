@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, useAnimation } from 'framer-motion';
+import { useReducedMotion } from '../../hooks/useReducedMotion';
 import { 
   FaRocket, 
   FaArrowRight, 
@@ -42,55 +43,108 @@ const taylorMoversImages = [
   }
 ];
 
-// Background Slideshow Component
+// Shimmer blur placeholder for images
+const shimmer = (w, h) => `
+<svg width="${w}" height="${h}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="g">
+      <stop stop-color="#333" offset="20%" />
+      <stop stop-color="#222" offset="50%" />
+      <stop stop-color="#333" offset="70%" />
+    </linearGradient>
+  </defs>
+  <rect width="${w}" height="${h}" fill="#333" />
+  <rect id="r" width="${w}" height="${h}" fill="url(#g)" />
+  <animate xlink:href="#r" attributeName="x" from="-${w}" to="${w}" dur="1s" repeatCount="indefinite"  />
+</svg>`;
+
+const toBase64 = (str) =>
+  typeof window === 'undefined'
+    ? Buffer.from(str).toString('base64')
+    : window.btoa(str);
+
+// Background Slideshow Component - OPTIMIZED
 const TaylorMoversBackgroundSlideshow = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [loadedImages, setLoadedImages] = useState(new Set([0])); // Track loaded images
 
   // Auto-slide functionality
   useEffect(() => {
     const interval = setInterval(() => {
       setIsTransitioning(true);
       setTimeout(() => {
-        setCurrentImageIndex((prevIndex) => 
-          (prevIndex + 1) % taylorMoversImages.length
-        );
+        setCurrentImageIndex((prevIndex) => {
+          const nextIndex = (prevIndex + 1) % taylorMoversImages.length;
+          return nextIndex;
+        });
         setIsTransitioning(false);
       }, 300);
     }, 6000); // 6 second intervals
 
     return () => clearInterval(interval);
   }, []);
+  
+  // Preload next images when current index changes
+  useEffect(() => {
+    const nextIndex = (currentImageIndex + 1) % taylorMoversImages.length;
+    const nextNextIndex = (currentImageIndex + 2) % taylorMoversImages.length;
+    setLoadedImages(prev => {
+      const newSet = new Set(prev);
+      newSet.add(currentImageIndex);
+      newSet.add(nextIndex);
+      newSet.add(nextNextIndex);
+      return newSet;
+    });
+  }, [currentImageIndex]);
 
   return (
     <div className="absolute inset-0 z-0">
-      {taylorMoversImages.map((image, index) => (
-        <div
-          key={image.id}
-          className={`absolute inset-0 transition-opacity duration-800 ${
-            index === currentImageIndex ? 'opacity-100' : 'opacity-0'
-          } ${isTransitioning ? 'transition-opacity duration-300' : ''}`}
-        >
-          <Image
-            src={image.src}
-            alt={image.alt}
-            fill
-            priority={index === 0}
-            quality={90}
-            sizes="100vw"
-            style={{
-              objectFit: 'cover',
-              objectPosition: 'center',
-            }}
-          />
-        </div>
-      ))}
+      {taylorMoversImages.map((image, index) => {
+        // Only render current image and next image (and previous for transition)
+        const isActive = index === currentImageIndex;
+        const isNext = index === (currentImageIndex + 1) % taylorMoversImages.length;
+        const isPrevious = index === (currentImageIndex - 1 + taylorMoversImages.length) % taylorMoversImages.length;
+        const shouldLoad = loadedImages.has(index);
+        
+        // Don't render images that aren't active, next, or previous
+        if (!isActive && !isNext && !isPrevious) return null;
+        
+        return (
+          <div
+            key={image.id}
+            className={`absolute inset-0 transition-opacity duration-800 ${
+              isActive ? 'opacity-100' : 'opacity-0'
+            } ${isTransitioning ? 'transition-opacity duration-300' : ''}`}
+          >
+            {shouldLoad && (
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                priority={index === 0}
+                quality={50} // Further reduced for faster LCP - still acceptable quality
+                sizes="100vw"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                placeholder="blur"
+                blurDataURL={`data:image/svg+xml;base64,${toBase64(shimmer(1920, 1080))}`}
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                }}
+              />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };
 
 // Floating Particle Component
-const FloatingParticle = ({ delay = 0, x = 0, y = 0, size = 4 }) => {
+const FloatingParticle = ({ delay = 0, x = 0, y = 0, size = 4, shouldAnimate = true }) => {
+  if (!shouldAnimate) return null; // Skip rendering if animations are disabled
+  
   return (
     <motion.div
       className="absolute bg-white/30 rounded-full"
@@ -116,13 +170,23 @@ const FloatingParticle = ({ delay = 0, x = 0, y = 0, size = 4 }) => {
 };
 
 // Animated Rocket Component
-const AnimatedRocket = ({ clientCount, onCountComplete }) => {
+const AnimatedRocket = ({ clientCount, onCountComplete, shouldAnimate = true }) => {
   const [displayCount, setDisplayCount] = useState(0);
   const rocketControls = useAnimation();
 
   useEffect(() => {
     // Animate rocket launch
     const animateRocket = async () => {
+      if (!shouldAnimate) {
+        // Skip animations if reduced motion is preferred
+        await rocketControls.start({
+          y: -50,
+          rotate: -15,
+          scale: 1,
+        });
+        return;
+      }
+      
       // Initial position
       await rocketControls.start({
         y: 0,
@@ -167,11 +231,12 @@ const AnimatedRocket = ({ clientCount, onCountComplete }) => {
     };
 
     // Start animations
+    const delay = shouldAnimate ? 1000 : 0;
     setTimeout(() => {
       animateRocket();
       animateCount();
-    }, 1000);
-  }, [clientCount, onCountComplete, rocketControls]);
+    }, delay);
+  }, [clientCount, onCountComplete, rocketControls, shouldAnimate]);
 
   return (
     <motion.div
@@ -332,6 +397,8 @@ export const EnhancedHero = ({
   ]
 }) => {
   const [statsVisible, setStatsVisible] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+  const shouldAnimate = !prefersReducedMotion;
 
   // Particle positions
   const particles = [
@@ -364,6 +431,7 @@ export const EnhancedHero = ({
               y={particle.y}
               size={particle.size}
               delay={particle.delay}
+              shouldAnimate={shouldAnimate}
             />
           ))}
         </div>
@@ -471,6 +539,7 @@ export const EnhancedHero = ({
               <AnimatedRocket 
                 clientCount={clientCount}
                 onCountComplete={() => setStatsVisible(true)}
+                shouldAnimate={shouldAnimate}
               />
             </div>
           </div>

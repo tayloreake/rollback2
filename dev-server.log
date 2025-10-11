@@ -1,0 +1,93 @@
+
+> my-app@0.1.0 dev
+> next dev -p 3002
+
+- ready started server on 0.0.0.0:3002, url: http://localhost:3002
+- [36minfo[39m Loaded env from /home/ace/rollback2/.env
+- [33mwarn[39m [1mYou have enabled experimental feature (esmExternals) in next.config.js.[22m
+- [33mwarn[39m Experimental features are not covered by semver, and may cause unexpected or broken application behavior. Use at your own risk.
+
+- [35mevent[39m compiled client and server successfully in 7.9s (3508 modules)
+- [36mwait[39m compiling...
+- [35mevent[39m compiled successfully in 1498 ms (3415 modules)
+- [36mwait[39m compiling...
+- [35mevent[39m compiled client and server successfully in 1189 ms (3508 modules)
+- [36mwait[39m compiling /Blog (client and server)...
+- [35mevent[39m compiled client and server successfully in 2.5s (3533 modules)
+- [36mwait[39m compiling /About (client and server)...
+- [35mevent[39m compiled client and server successfully in 1752 ms (4256 modules)
+Since you haven't set a value for `useCdn`, we will deliver content using our global, edge-cached API-CDN. If you wish to have content delivered faster, set `useCdn: false` to use the Live API. Note: You may incur higher costs using the live API.
+Warning: React does not recognize the `fetchPriority` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `fetchpriority` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+    at img
+    at eval (webpack-internal:///./node_modules/next/dist/client/image.js:233:11)
+    at eval (webpack-internal:///./node_modules/next/dist/client/image.js:306:11)
+    at a
+    at LinkComponent (webpack-internal:///./node_modules/next/dist/client/link.js:104:19)
+    at div
+    at div
+    at div
+    at Navbar (webpack-internal:///./components/Navbar.jsx:42:76)
+    at LoadableComponent (/home/ace/rollback2/node_modules/next/dist/shared/lib/loadable.js:111:9)
+    at Layout (webpack-internal:///./components/Layout.js:31:19)
+    at MyApp (webpack-internal:///./pages/_app.js:52:18)
+    at StyleRegistry (/home/ace/rollback2/node_modules/styled-jsx/dist/index/index.js:449:36)
+    at PathnameContextProviderAdapter (/home/ace/rollback2/node_modules/next/dist/shared/lib/router/adapters.js:78:11)
+    at AppContainer (/home/ace/rollback2/node_modules/next/dist/server/render.js:337:29)
+    at AppContainerWithIsomorphicFiberStructure (/home/ace/rollback2/node_modules/next/dist/server/render.js:373:57)
+    at div
+    at Body (/home/ace/rollback2/node_modules/next/dist/server/render.js:673:21)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: data for page "/Blog" is 243 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
+See more info here: https://nextjs.org/docs/messages/large-page-data
+- [36mwait[39m compiling /404 (client and server)...
+- [35mevent[39m compiled client and server successfully in 3.7s (4259 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+- [36mwait[39m compiling /...
+- [36mwait[39m compiling /Blog (client and server)...
+- [35mevent[39m compiled client and server successfully in 4.8s (4281 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: data for page "/Blog" is 243 kB which exceeds the threshold of 128 kB, this amount of data can reduce performance.
+See more info here: https://nextjs.org/docs/messages/large-page-data
+- [36mwait[39m compiling /404 (client and server)...
+- [35mevent[39m compiled client and server successfully in 1244 ms (4284 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+- [36mwait[39m compiling /Gallery...
+- [35mevent[39m compiled client and server successfully in 20.8s (4226 modules)
+- [36mwait[39m compiling /services/piano-moving...
+- [35mevent[39m compiled client and server successfully in 3.8s (3816 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+- [36mwait[39m compiling /404 (client and server)...
+- [35mevent[39m compiled client and server successfully in 1852 ms (3630 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+- [36mwait[39m compiling /services/long...
+- [35mevent[39m compiled client and server successfully in 3.3s (3526 modules)
+- [36mwait[39m compiling /services/home...
+- [35mevent[39m compiled client and server successfully in 1585 ms (3527 modules)
+- [36mwait[39m compiling /404 (client and server)...
+- [35mevent[39m compiled client and server successfully in 1626 ms (3524 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+- [36mwait[39m compiling /...
+- [35mevent[39m compiled client and server successfully in 4.6s (3940 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+- [36mwait[39m compiling /404 (client and server)...
+- [35mevent[39m compiled client and server successfully in 1153 ms (3943 modules)
+Warning: viewport meta tags should not be used in _document.js's <Head>. https://nextjs.org/docs/messages/no-document-viewport-meta
+- [36mwait[39m compiling...
+- [35mevent[39m compiled successfully in 7.2s (3823 modules)
+- [36mwait[39m compiling /404 (client and server)...
+- [35mevent[39m compiled client and server successfully in 2.4s (3934 modules)
+- [36mwait[39m compiling /_error (client and server)...
+- [35mevent[39m compiled client and server successfully in 1769 ms (3935 modules)
+[?25h

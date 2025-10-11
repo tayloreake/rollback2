@@ -186,11 +186,29 @@ const Navbar = () => {
                                 <div className="border-t border-gray-100 mt-2 pt-2">
                                     <Link 
                                         href="/services/special"
-                                        className="block px-3 py-2 text-gray-700 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 font-medium text-sm rounded-md mb-1"
+                                        className="block px-3 py-2 text-gray-700 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 font-semibold text-sm rounded-md mb-1"
                                         onClick={() => setServicesDropdownOpen(false)}
                                     >
-                                        🐾 Specialized Services
+                                        ✨ Special Services
                                     </Link>
+                                    
+                                    {/* Sub-items under Special Services - indented */}
+                                    <div className="ml-4 space-y-1">
+                                        <Link 
+                                            href="/services/piano-moving"
+                                            className="block px-3 py-2 text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 text-sm rounded-md"
+                                            onClick={() => setServicesDropdownOpen(false)}
+                                        >
+                                            🎹 Piano Moving
+                                        </Link>
+                                        <Link 
+                                            href="/services/pet-relocation"
+                                            className="block px-3 py-2 text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 text-sm rounded-md"
+                                            onClick={() => setServicesDropdownOpen(false)}
+                                        >
+                                            🐾 Pet Relocation
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -344,6 +362,11 @@ const Navbar = () => {
                                 FAQ
                             </div>
                         </Link>
+                        <Link href='/Contacts' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                Contact Us
+                            </div>
+                        </Link>
                     </nav>
                     <ShowQuote />
                 </div>
@@ -453,12 +476,30 @@ const Navbar = () => {
                                                 {/* Specialized Services */}
                                                 <div className='border-t border-gray-100 mt-2 pt-2'>
                                                     <Link 
-                                                        href='/services/specialized-services' 
+                                                        href='/services/special' 
                                                         onClick={() => {setOpen(false); setMobileServicesOpen(false);}} 
-                                                        className='block py-2.5 px-3 text-sm text-gray-600 hover:text-[#FF5000] hover:bg-gray-50 rounded-md transition-all duration-200'
+                                                        className='block py-2.5 px-3 text-sm font-semibold text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-md transition-all duration-200'
                                                     >
-                                                        🐾 Specialized Services
+                                                        ✨ Special Services
                                                     </Link>
+                                                    
+                                                    {/* Sub-items under Special Services - indented */}
+                                                    <div className='ml-4 mt-2 space-y-1'>
+                                                        <Link 
+                                                            href='/services/piano-moving' 
+                                                            onClick={() => {setOpen(false); setMobileServicesOpen(false);}} 
+                                                            className='block py-2 px-3 text-sm text-gray-600 hover:text-[#FF5000] hover:bg-gray-50 rounded-md transition-all duration-200'
+                                                        >
+                                                            🎹 Piano Moving
+                                                        </Link>
+                                                        <Link 
+                                                            href='/services/pet-relocation' 
+                                                            onClick={() => {setOpen(false); setMobileServicesOpen(false);}} 
+                                                            className='block py-2 px-3 text-sm text-gray-600 hover:text-[#FF5000] hover:bg-gray-50 rounded-md transition-all duration-200'
+                                                        >
+                                                            🐾 Pet Relocation
+                                                        </Link>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -474,6 +515,12 @@ const Navbar = () => {
                                 <Link href='/faq' onClick={() => setOpen(false)} className='block'>
                                     <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
                                         FAQ
+                                    </div>
+                                </Link>
+                                
+                                <Link href='/Contacts' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        Contact Us
                                     </div>
                                 </Link>
                             </div>

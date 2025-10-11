@@ -6,10 +6,12 @@ import Link from "next/link"
 import imageUrlBuilder from "@sanity/image-url"
 import client from "../../sanity/config/client-config"
 import moment from "moment"
+import { useBlogTheme } from '../../contexts/BlogThemeContext'
 
 const BlogCard = ({ blog }) => {
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
+  const { theme } = useBlogTheme()
   const builder = imageUrlBuilder(client)
 
   function urlFor(source) {
@@ -50,7 +52,11 @@ const BlogCard = ({ blog }) => {
   }
 
   return (
-    <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden hover:border-gray-600 transition-colors duration-200 group">
+    <div className={`rounded-lg border overflow-hidden transition-all duration-200 group ${
+      theme === 'dark' 
+        ? 'bg-gray-800 border-gray-700 hover:border-gray-600 hover:shadow-xl hover:shadow-orange-500/10' 
+        : 'bg-white border-gray-200 hover:border-orange-300 hover:shadow-xl hover:shadow-orange-500/20'
+    }`}>
       <Link href={`/Blog/${blog.slug.current}`}>
         <div className="cursor-pointer">
           {/* Image */}
@@ -78,7 +84,9 @@ const BlogCard = ({ blog }) => {
           {/* Content */}
           <div className="p-4">
             {/* Author and Date */}
-            <div className="flex items-center mb-3 text-sm text-gray-400">
+            <div className={`flex items-center mb-3 text-sm ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
               {blog.author && (
                 <div className="flex items-center mr-4">
                   {blog.author.authorImage && (
@@ -102,12 +110,16 @@ const BlogCard = ({ blog }) => {
             </div>
 
             {/* Title */}
-            <h3 className="text-white font-semibold text-lg mb-2 line-clamp-2 group-hover:text-orange-400 transition-colors">
+            <h3 className={`font-semibold text-lg mb-2 line-clamp-2 group-hover:text-orange-500 transition-colors ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
               {blog.blogTitle}
             </h3>
 
             {/* Excerpt */}
-            <p className="text-gray-400 text-sm mb-4 line-clamp-3">
+            <p className={`text-sm mb-4 line-clamp-3 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
               {blog.blogExcerpt}
             </p>
 
@@ -126,19 +138,29 @@ const BlogCard = ({ blog }) => {
       </Link>
 
       {/* Actions */}
-      <div className="px-4 pb-4 flex items-center justify-between border-t border-gray-700 pt-3">
+      <div className={`px-4 pb-4 flex items-center justify-between border-t pt-3 ${
+        theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+      }`}>
         <div className="flex items-center space-x-4">
           <button
             onClick={handleLike}
             className={`flex items-center space-x-1 text-sm transition-colors ${
-              isLiked ? 'text-red-500' : 'text-gray-400 hover:text-red-400'
+              isLiked 
+                ? 'text-red-500' 
+                : theme === 'dark'
+                  ? 'text-gray-400 hover:text-red-400'
+                  : 'text-gray-500 hover:text-red-500'
             }`}
           >
             <BsHeart size={16} className={isLiked ? 'fill-current' : ''} />
             <span>70</span>
           </button>
           
-          <button className="flex items-center space-x-1 text-sm text-gray-400 hover:text-blue-400 transition-colors">
+          <button className={`flex items-center space-x-1 text-sm transition-colors ${
+            theme === 'dark'
+              ? 'text-gray-400 hover:text-blue-400'
+              : 'text-gray-500 hover:text-blue-500'
+          }`}>
             <BsChat size={16} />
             <span>43</span>
           </button>
@@ -150,7 +172,9 @@ const BlogCard = ({ blog }) => {
             className={`p-2 rounded transition-colors ${
               isBookmarked 
                 ? 'text-orange-500 bg-orange-500/10' 
-                : 'text-gray-400 hover:text-orange-400 hover:bg-gray-700'
+                : theme === 'dark'
+                  ? 'text-gray-400 hover:text-orange-400 hover:bg-gray-700'
+                  : 'text-gray-500 hover:text-orange-500 hover:bg-gray-100'
             }`}
           >
             <BsBookmark size={16} className={isBookmarked ? 'fill-current' : ''} />
@@ -158,13 +182,21 @@ const BlogCard = ({ blog }) => {
           
           <button
             onClick={handleShare}
-            className="p-2 rounded text-gray-400 hover:text-blue-400 hover:bg-gray-700 transition-colors"
+            className={`p-2 rounded transition-colors ${
+              theme === 'dark'
+                ? 'text-gray-400 hover:text-blue-400 hover:bg-gray-700'
+                : 'text-gray-500 hover:text-blue-500 hover:bg-gray-100'
+            }`}
           >
             <BsShare size={16} />
           </button>
           
           <Link href={`/Blog/${blog.slug.current}`}>
-            <button className="p-2 rounded text-gray-400 hover:text-white hover:bg-gray-700 transition-colors">
+            <button className={`p-2 rounded transition-colors ${
+              theme === 'dark'
+                ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+            }`}>
               <HiOutlineExternalLink size={16} />
             </button>
           </Link>

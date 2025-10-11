@@ -186,7 +186,8 @@ export const FeatureCard = ({
   description, 
   delay = 0,
   className = '',
-  href = null 
+  href = null,
+  backgroundImage = null 
 }) => {
   const cardContent = (
     <motion.div
@@ -194,20 +195,41 @@ export const FeatureCard = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.6 }}
       whileHover={{ y: -10, scale: 1.03 }}
-      className={`card-glass p-8 text-center hover-glow ${href ? 'cursor-pointer' : ''} ${className}`}
+      className={`relative overflow-hidden rounded-2xl shadow-xl group ${href ? 'cursor-pointer' : ''} ${className}`}
     >
-      <div className="text-4xl mb-6 text-[#FF5000] flex justify-center">
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold mb-4 gradient-text">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
-      {href && (
-        <div className="mt-6">
-          <span className="text-[#FF5000] font-semibold hover:text-[#FF8A50] transition-colors flex items-center justify-center">
-            Learn More →
-          </span>
+      {/* Background Image with Overlay */}
+      {backgroundImage && (
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={backgroundImage} 
+            alt={title} 
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30"></div>
         </div>
       )}
+      
+      {/* Content */}
+      <div className={`relative z-10 p-8 text-center min-h-[320px] flex flex-col justify-end ${backgroundImage ? 'text-white' : ''}`}>
+        <div className="flex justify-center mb-4">
+          <div className={`text-5xl ${backgroundImage ? 'text-white' : 'text-[#FF5000]'} transition-transform duration-300 group-hover:scale-110`}>
+            {icon}
+          </div>
+        </div>
+        <h3 className={`text-2xl font-bold mb-4 ${backgroundImage ? 'text-white' : 'gradient-text'}`}>
+          {title}
+        </h3>
+        <p className={`leading-relaxed ${backgroundImage ? 'text-white/90' : 'text-gray-600'}`}>
+          {description}
+        </p>
+        {href && (
+          <div className="mt-6">
+            <span className={`font-semibold transition-colors flex items-center justify-center ${backgroundImage ? 'text-white group-hover:text-[#FF8A50]' : 'text-[#FF5000] group-hover:text-[#FF8A50]'}`}>
+              Learn More →
+            </span>
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 

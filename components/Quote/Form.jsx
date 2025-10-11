@@ -99,6 +99,19 @@ const QuoteForm = () => {
       }
 
 
+      // Prepare quote data for logging
+      const quoteDataForLogging = {
+        firstName: fname,
+        email: email,
+        phoneNumber: number,
+        location: location,
+        destination: destination,
+        moveType: moveType,
+        bedrooms: bedrooms,
+        moveDate: moveDate,
+        referrals: ref
+      };
+
       const emailResponse = await fetch("/api/sendEmail", {
         method: "POST",
         headers: {
@@ -107,7 +120,8 @@ const QuoteForm = () => {
         body: JSON.stringify({
           to: "sales@taylorea.com",
           message: userMessageContent,
-          recaptchaToken: emailToken
+          recaptchaToken: emailToken,
+          quoteData: quoteDataForLogging
         }),
       });
 

@@ -139,12 +139,22 @@ const ResidentialMoving = () => {
     "24/7 customer support"
   ]
 
+  // Coverage areas
+  const coverageAreas = [
+    { city: "Nairobi", description: "Complete residential moving services in all Nairobi neighborhoods" },
+    { city: "Mombasa", description: "Professional home moving to and from Kenya's coastal city" },
+    { city: "Kisumu", description: "Reliable residential relocations in Western Kenya" },
+    { city: "Nakuru", description: "Expert home moving services in the Rift Valley" },
+    { city: "Eldoret", description: "Trusted residential movers serving North Rift region" },
+    { city: "All Kenya", description: "Inter-county residential moves across the country" }
+  ]
+
   // Get SEO metadata
   const seoData = getPageMetadata("residential-moving", {
-    location: 'Nairobi',
+    location: 'Kenya',
     service: 'residential-moving',
-    customTitle: 'Trusted Residential Moving Services Nairobi | Taylor Movers Kenya',
-    customDescription: 'Professional residential moving services in Nairobi & across Kenya. ✓ 40,000+ successful moves ✓ Full insurance ✓ Local & long-distance. Call +254 721 410 517!',
+    customTitle: 'Residential Moving Services Kenya | Nairobi, Mombasa | Taylor Movers',
+    customDescription: 'Professional residential moving services in Kenya - Nairobi, Mombasa, Kisumu & nationwide. ✓ 40,000+ successful moves ✓ Full insurance ✓ Expert team. Call +254 721 410 517!',
     includeService: true,
     includeLocalBusiness: false
   })
@@ -196,13 +206,15 @@ const ResidentialMoving = () => {
         <div className="row items-center">
           <div className="col-md-6">
             <h1 className="text-4xl font-bold text-[#FF5000] mb-4">
-              Trusted Residential Moving Services
+              Residential Moving Services in Kenya
             </h1>
             <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-              Planning a home move in Kenya? Taylor Movers Kenya provides professional, reliable residential 
-              moving services for both local and long-distance relocations. Whether you're moving within Nairobi, 
-              across counties, or even internationally, our experienced team handles every aspect of your move 
-              from careful packing and transportation to safe unpacking and setup in your new home.
+              Taylor Movers Kenya provides professional residential moving services across Kenya, including Nairobi, 
+              Mombasa, Kisumu, Eldoret, Nakuru, and all major towns. Whether you're moving within Nairobi, relocating 
+              to Mombasa, or moving between counties, our experienced team handles every aspect of your residential 
+              move—from careful packing and secure transportation to safe unpacking and setup in your new home. 
+              With over 40,000 successful residential moves across Kenya, we're the trusted choice for homeowners 
+              and families nationwide.
             </p>
             <div className="flex items-center space-x-4 mb-4">
               <BsCheckCircle className="text-[#FF5000] text-2xl" />
@@ -342,6 +354,33 @@ const ResidentialMoving = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Coverage Areas Section */}
+      <div className="bg-gray-50 py-16">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-[#FF5000] mb-4">
+              Residential Moving Services Across Kenya
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Taylor Movers Kenya serves all major cities and towns throughout Kenya with professional residential moving services
+            </p>
+          </div>
+          <div className="row">
+            {coverageAreas.map((area, index) => (
+              <div key={index} className="col-md-6 col-lg-4 mb-6">
+                <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow h-full">
+                  <div className="flex items-center mb-3">
+                    <BsHouse className="text-[#FF5000] text-2xl mr-3" />
+                    <h3 className="font-bold text-xl text-gray-800">{area.city}</h3>
+                  </div>
+                  <p className="text-gray-600">{area.description}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

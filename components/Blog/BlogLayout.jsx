@@ -1,13 +1,23 @@
 import React, { useState } from 'react'
 import { BsFilter, BsX } from 'react-icons/bs'
+import { useBlogTheme } from '../../contexts/BlogThemeContext'
+import ThemeToggle from './ThemeToggle'
 
 const BlogLayout = ({ children, sidebar }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { theme } = useBlogTheme()
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
       {/* Spacer for existing navbar - accounts for phone bar + navbar */}
       <div className="h-[140px] md:h-[280px] bg-transparent"></div>
+
+      {/* Theme Toggle - Fixed Position */}
+      <div className="fixed top-[160px] md:top-[300px] right-6 z-40">
+        <ThemeToggle />
+      </div>
 
       {/* Main content area */}
       <div className="container mx-auto px-4 py-6">
@@ -29,13 +39,23 @@ const BlogLayout = ({ children, sidebar }) => {
               />
               
               {/* Sidebar */}
-              <aside className="fixed top-0 left-0 h-full w-80 bg-gray-900 border-r border-gray-700 z-50 lg:hidden overflow-y-auto">
+              <aside className={`fixed top-0 left-0 h-full w-80 border-r z-50 lg:hidden overflow-y-auto transition-colors ${
+                theme === 'dark' 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-lg font-semibold text-white">Filters & Categories</h2>
+                    <h2 className={`text-lg font-semibold ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>Filters & Categories</h2>
                     <button
                       onClick={() => setSidebarOpen(false)}
-                      className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+                      className={`p-2 rounded-lg transition-colors ${
+                        theme === 'dark'
+                          ? 'text-gray-400 hover:text-white hover:bg-gray-700'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      }`}
                     >
                       <BsX size={20} />
                       <span className="sr-only">Close filters</span>

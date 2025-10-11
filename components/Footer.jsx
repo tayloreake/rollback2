@@ -97,7 +97,7 @@ const Footer = ({ caseStudies = [] }) => {
               <h3 className='text-[#FF5000] font-bold text-xl mb-4'>
                 Got any queries on moving?
               </h3>
-              <div className='space-y-3'>
+              <div className='space-y-3 mb-6'>
                 <Link className="block" href='/faq'>
                   <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
                     <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
@@ -107,6 +107,22 @@ const Footer = ({ caseStudies = [] }) => {
                 <div className='flex items-center p-2'>
                   <span className='text-gray-700'>Email: </span>
                   <a href='mailto:info@taylorea.com' className='text-[#FF5000] hover:text-[#FF8A50] transition-colors duration-300 ml-2 font-semibold'>info@taylorea.com</a>
+                </div>
+              </div>
+              
+              <h3 className='text-[#FF5000] font-bold text-xl mb-4 mt-6'>
+                Associations
+              </h3>
+              <div className='bg-white rounded-lg p-4 flex justify-center items-center'>
+                <div className='text-center'>
+                  <Image
+                    src='/assets/badges/iam-trusted-badge.png'
+                    alt='IAM Trusted Moving Professional - International Association of Movers'
+                    width={150}
+                    height={180}
+                    className='mx-auto hover-scale transition-transform duration-300'
+                  />
+                  <p className='text-xs text-gray-600 mt-2'>Trusted Moving Professional</p>
                 </div>
               </div>
             </div>
@@ -147,18 +163,48 @@ const Footer = ({ caseStudies = [] }) => {
                     <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Storage Services</p>
                   </div>
                 </Link>
+                <Link className="block" href='/services/special'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Special Services</p>
+                  </div>
+                </Link>
               </div>
             </div>
             
-            {/* Case Studies */}
+            {/* About Us */}
             <div className='p-6 animate-fade-in-up' style={{animationDelay: '0.15s'}}>
               <h3 className='text-[#FF5000] font-bold text-xl mb-4'>
+                About Us
+              </h3>
+              <div className='space-y-3 mb-6'>
+                <Link className="block" href='/About'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>About Taylor Movers</p>
+                  </div>
+                </Link>
+                <Link className="block" href='/Gallery'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Gallery</p>
+                  </div>
+                </Link>
+                <Link className="block" href='/Contacts'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Contact Us</p>
+                  </div>
+                </Link>
+              </div>
+              
+              <h3 className='text-[#FF5000] font-bold text-xl mb-4 mt-6'>
                 Case Studies
               </h3>
               <div className='space-y-3'>
                 {dynamicCaseStudies.length > 0 ? (
                   <>
-                    {dynamicCaseStudies.map((study, index) => (
+                    {dynamicCaseStudies.slice(0, 3).map((study, index) => (
                       <Link key={study._id || study.slug?.current || index} className="block" href={`/Blog/${study.slug?.current}`}>
                         <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
                           <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
@@ -174,19 +220,19 @@ const Footer = ({ caseStudies = [] }) => {
                       <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group mt-4 pt-4 border-t border-gray-200'>
                         <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
                         <p className='text-gray-600 group-hover:text-[#FF5000] transition-colors duration-300 text-sm font-medium'>
-                          View All Articles
+                          View All Case Studies
                         </p>
                       </div>
                     </Link>
                   </>
                 ) : (
                   <div className='text-center py-4'>
-                    <p className='text-gray-500 text-sm mb-3'>Loading articles...</p>
+                    <p className='text-gray-500 text-sm mb-3'>Loading case studies...</p>
                     <Link href='/Blog'>
                       <div className='flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 group'>
                         <BsArrowRight size={16} className='mr-2 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
                         <p className='text-gray-600 group-hover:text-[#FF5000] transition-colors duration-300 text-sm'>
-                          Browse Blog
+                          Browse Case Studies
                         </p>
                       </div>
                     </Link>

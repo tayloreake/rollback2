@@ -29,10 +29,12 @@ function MyApp({ Component, pageProps }) {
 
   useEffect(() => {
     const handleRouteChange = (url) => {
-      console.log("Logging pageview:", url)
-      window.gtag('event', 'page_view', {
-        page_path: url,
-      })
+      // Track pageview in GTM
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'page_view', {
+          page_path: url,
+        })
+      }
     }
     router.events.on("routeChangeComplete", handleRouteChange)
     return () => {
@@ -42,12 +44,12 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <Layout>
-      {/* GA Script */}
+      {/* GA Script - Load after page is interactive for better performance */}
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
-      <Script id="ga-setup" strategy="afterInteractive">
+      <Script id="ga-setup" strategy="lazyOnload">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

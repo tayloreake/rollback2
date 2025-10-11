@@ -15,14 +15,28 @@ export default function Document() {
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
                 <link rel="manifest" href="/manifest.json" />
                 
+                {/* Resource Hints for Performance */}
+                <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+                <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+                <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                
                 {/* Canonical URL base - will be overridden by page-specific canonicals */}
                 <link rel="canonical" href="https://taylorea.com" />
 
-                {/* Google Fonts example */}
+                {/* Google Fonts with optimized loading */}
                 <link
                     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
                     rel="stylesheet"
+                    media="print"
+                    onLoad="this.media='all'"
                 />
+                <noscript>
+                    <link
+                        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+                        rel="stylesheet"
+                    />
+                </noscript>
                 
                 {/* Google Tag Manager */}
                 <script

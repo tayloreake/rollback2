@@ -4,6 +4,7 @@ import BlogCard from "../components/Blog/BlogCard"
 import BlogLayout from "../components/Blog/BlogLayout"
 import SearchBar from "../components/Blog/SearchBar"
 import CategorySidebar from "../components/Blog/CategorySidebar"
+import { BlogThemeProvider, useBlogTheme } from "../contexts/BlogThemeContext"
 import {
   getBlogs,
   getBlogsByCategory,
@@ -13,11 +14,12 @@ import {
 import getPageMetadata from "../SEO/seo"
 import Head from 'next/head'
 
-const Blog = ({ blogs, tags, categories }) => {
+const BlogContent = ({ blogs, tags, categories }) => {
   const [activeCategory, setActiveCategory] = useState("")
   const [searchTerm, setSearchTerm] = useState("")
   const [stateBlogs, setStateBlogs] = useState(blogs || [])
   const [filteredBlogs, setFilteredBlogs] = useState(blogs || [])
+  const { theme } = useBlogTheme()
 
   // Get SEO metadata
   const seoData = getPageMetadata("ourBlog")
@@ -103,16 +105,24 @@ const Blog = ({ blogs, tags, categories }) => {
         <div className="space-y-6">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">Moving Blog</h1>
-            <p className="text-gray-400">
+            <h1 className={`text-3xl font-bold mb-2 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>Moving Blog</h1>
+            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
               Expert tips, guides, and insights to make your move seamless
             </p>
           </div>
 
           {/* Search results info */}
           {(searchTerm || activeCategory) && (
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-4">
-              <p className="text-gray-300 text-sm">
+            <div className={`rounded-lg border p-4 ${
+              theme === 'dark'
+                ? 'bg-gray-800 border-gray-700'
+                : 'bg-white border-gray-200'
+            }`}>
+              <p className={`text-sm ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 {filteredBlogs.length} result{filteredBlogs.length !== 1 ? 's' : ''} 
                 {searchTerm && ` for "${searchTerm}"`}
                 {activeCategory && ` in ${activeCategory}`}
@@ -129,9 +139,17 @@ const Blog = ({ blogs, tags, categories }) => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-8">
-                <p className="text-gray-400 text-lg mb-2">No articles found</p>
-                <p className="text-gray-500 text-sm">
+              <div className={`rounded-lg border p-8 ${
+                theme === 'dark'
+                  ? 'bg-gray-800 border-gray-700'
+                  : 'bg-white border-gray-200'
+              }`}>
+                <p className={`text-lg mb-2 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                }`}>No articles found</p>
+                <p className={`text-sm ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-500'
+                }`}>
                   {searchTerm || activeCategory 
                     ? 'Try adjusting your search or category filter'
                     : 'Check back soon for new content'
@@ -156,7 +174,11 @@ const Blog = ({ blogs, tags, categories }) => {
           {/* Load more button (if you have pagination) */}
           {filteredBlogs?.length > 0 && filteredBlogs.length >= 9 && (
             <div className="text-center pt-8">
-              <button className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600 rounded-lg transition-colors">
+              <button className={`px-6 py-3 border rounded-lg transition-colors ${
+                theme === 'dark'
+                  ? 'bg-gray-800 hover:bg-gray-700 text-white border-gray-600'
+                  : 'bg-white hover:bg-gray-50 text-gray-900 border-gray-300'
+              }`}>
                 Load More Articles
               </button>
             </div>
@@ -164,6 +186,14 @@ const Blog = ({ blogs, tags, categories }) => {
         </div>
       </BlogLayout>
     </>
+  )
+}
+
+const Blog = (props) => {
+  return (
+    <BlogThemeProvider>
+      <BlogContent {...props} />
+    </BlogThemeProvider>
   )
 }
 

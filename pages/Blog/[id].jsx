@@ -12,14 +12,21 @@ import { BsCalendar, BsHeart, BsBookmark, BsShare, BsArrowLeft } from "react-ico
 import Link from "next/link"
 import Head from "next/head"
 import moment from "moment"
+import { BlogThemeProvider, useBlogTheme } from "../../contexts/BlogThemeContext"
 
-const Blog = ({ blog }) => {
+const BlogPostContent = ({ blog }) => {
+  const { theme } = useBlogTheme()
+  
   // Handle case where blog is null or undefined
   if (!blog) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <div className={`min-h-screen flex items-center justify-center ${
+        theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'
+      }`}>
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Blog post not found</h1>
+          <h1 className={`text-2xl font-bold mb-4 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-900'
+          }`}>Blog post not found</h1>
           <Link href="/Blog">
             <button className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg transition-colors">
               Back to Blog
@@ -50,8 +57,14 @@ const Blog = ({ blog }) => {
   const sidebarContent = (
     <div>
       <SearchBar onSearch={() => {}} placeholder="Search other articles..." />
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-        <h3 className="text-white font-semibold mb-4">Article Info</h3>
+      <div className={`rounded-lg border p-6 ${
+        theme === 'dark'
+          ? 'bg-gray-800 border-gray-700'
+          : 'bg-white border-gray-200 shadow-sm'
+      }`}>
+        <h3 className={`font-semibold mb-4 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>Article Info</h3>
         
         {/* Author info */}
         {blog?.author && (
@@ -68,16 +81,24 @@ const Blog = ({ blog }) => {
               </div>
             )}
             <div>
-              <p className="text-white font-medium">{blog.author.authorName}</p>
-              <p className="text-gray-400 text-sm">Author</p>
+              <p className={`font-medium ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>{blog.author.authorName}</p>
+              <p className={`text-sm ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Author</p>
             </div>
           </div>
         )}
 
         {/* Categories */}
         {blog?.blogCategories && blog.blogCategories.length > 0 && (
-          <div className="mb-4 pb-4 border-b border-gray-700">
-            <p className="text-gray-400 text-sm mb-2">Categories</p>
+          <div className={`mb-4 pb-4 border-b ${
+            theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+          }`}>
+            <p className={`text-sm mb-2 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>Categories</p>
             <div className="flex flex-wrap gap-2">
               {blog.blogCategories.map((category, idx) => (
                 <span key={idx} className="bg-orange-500/20 text-orange-400 text-xs px-2 py-1 rounded">
@@ -91,7 +112,9 @@ const Blog = ({ blog }) => {
         {/* Tags */}
         {blog?.blogTags && blog.blogTags.length > 0 && (
           <div className="mb-4">
-            <p className="text-gray-400 text-sm mb-2">Tags</p>
+            <p className={`text-sm mb-2 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>Tags</p>
             <div className="flex flex-wrap gap-2">
               {blog.blogTags.map((tag, idx) => (
                 <span key={idx} className="text-orange-400 text-xs hover:text-orange-300 cursor-pointer">
@@ -130,7 +153,11 @@ const Blog = ({ blog }) => {
           {/* Back button */}
           <div className="mb-6">
             <Link href="/Blog">
-              <button className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+              <button className={`flex items-center space-x-2 transition-colors ${
+                theme === 'dark'
+                  ? 'text-gray-400 hover:text-white'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}>
                 <BsArrowLeft size={16} />
                 <span>Back to Blog</span>
               </button>
@@ -139,11 +166,15 @@ const Blog = ({ blog }) => {
 
           {/* Article header */}
           <header className="mb-8">
-            <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
+            <h1 className={`text-4xl font-bold mb-4 leading-tight ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
               {blog?.blogTitle || 'Untitled Post'}
             </h1>
             
-            <div className="flex items-center space-x-6 text-gray-400 text-sm mb-6">
+            <div className={`flex items-center space-x-6 text-sm mb-6 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
               <div className="flex items-center space-x-2">
                 <BsCalendar size={14} />
                 <span>{blog?.date ? moment(blog.date).format("MMMM DD, YYYY") : 'No date'}</span>
@@ -163,7 +194,9 @@ const Blog = ({ blog }) => {
             </div>
             
             {blog?.blogExcerpt && (
-              <p className="text-gray-300 text-lg leading-relaxed">
+              <p className={`text-lg leading-relaxed ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 {blog.blogExcerpt}
               </p>
             )}
@@ -185,17 +218,35 @@ const Blog = ({ blog }) => {
 
           {/* Article content */}
           {blog?.blogText && (
-            <div className="text-gray-300 leading-relaxed blog-content">
+            <div className={`leading-relaxed blog-content ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+            }`}>
               <PortableText 
                 value={blog.blogText} 
                 components={{
                   ...portableTextComponents,
                   block: {
                     ...portableTextComponents?.block,
-                    normal: ({ children }) => <p className="mb-4 text-gray-300">{children}</p>,
-                    h1: ({ children }) => <h1 className="text-3xl font-bold text-white mb-6 mt-8">{children}</h1>,
-                    h2: ({ children }) => <h2 className="text-2xl font-bold text-white mb-4 mt-6">{children}</h2>,
-                    h3: ({ children }) => <h3 className="text-xl font-bold text-white mb-3 mt-5">{children}</h3>,
+                    normal: ({ children }) => (
+                      <p className={`mb-4 ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>{children}</p>
+                    ),
+                    h1: ({ children }) => (
+                      <h1 className={`text-3xl font-bold mb-6 mt-8 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{children}</h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className={`text-2xl font-bold mb-4 mt-6 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{children}</h2>
+                    ),
+                    h3: ({ children }) => (
+                      <h3 className={`text-xl font-bold mb-3 mt-5 ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>{children}</h3>
+                    ),
                   }
                 }} 
               />
@@ -238,6 +289,14 @@ export async function getServerSideProps(context) {
       },
     }
   }
+}
+
+const Blog = (props) => {
+  return (
+    <BlogThemeProvider>
+      <BlogPostContent {...props} />
+    </BlogThemeProvider>
+  )
 }
 
 export default Blog

@@ -169,13 +169,23 @@ const InternationalMoving = () => {
       icon: <BsGlobe className="text-[#FF5000] text-3xl" />
     },
     {
-      region: "North America", 
-      countries: ["USA", "Canada"],
+      region: "Canada", 
+      countries: ["Calgary", "Toronto", "Vancouver", "Montreal", "Ottawa"],
       icon: <BsGlobe className="text-[#FF5000] text-3xl" />
     },
     {
-      region: "Asia",
-      countries: ["Singapore", "Malaysia", "India", "China", "Japan"],
+      region: "United States of America", 
+      countries: ["New York", "California", "New Orleans", "Houston", "Georgia"],
+      icon: <BsGlobe className="text-[#FF5000] text-3xl" />
+    },
+    {
+      region: "South America", 
+      countries: ["Mexico", "Brazil", "Argentina", "Ecuador", "Colombia", "Chile"],
+      icon: <BsGlobe className="text-[#FF5000] text-3xl" />
+    },
+    {
+      region: "Far East",
+      countries: ["Singapore", "Malaysia", "India", "China", "Japan", "Australia", "Thailand"],
       icon: <BsGlobe className="text-[#FF5000] text-3xl" />
     },
     {
@@ -203,7 +213,7 @@ const InternationalMoving = () => {
     {
       title: "Road Transport",
       description: "Regional moves to neighboring African countries",
-      timeframe: "3-7 days",
+      timeframe: "4-10 days",
       icon: <FaTruck className="text-[#FF5000] text-4xl" />,
       features: ["Regional coverage", "Flexible timing", "Direct delivery", "Cost effective"]
     }

@@ -96,6 +96,24 @@ const ServicesIndex = () => {
       icon: <FaDollarSign className="text-3xl text-white" />,
       link: '/services/moves',
       features: ['Up to 40% Savings', 'Shared Transport', 'Professional Handling', 'Flexible Scheduling']
+    },
+    {
+      id: 'long-distance',
+      title: 'Long-Distance Moving',
+      subtitle: 'Cross-Country Relocations',
+      description: 'Reliable long-distance moving services across Kenya and neighboring countries.',
+      icon: <BsTruck className="text-3xl text-white" />,
+      link: '/services/long',
+      features: ['Inter-County Moves', 'Regional Coverage', 'Professional Drivers', 'GPS Tracking']
+    },
+    {
+      id: 'special',
+      title: 'Special Services',
+      subtitle: 'Specialized Moving Solutions',
+      description: 'Expert handling of pianos, pets, and other specialized moving needs.',
+      icon: <BsStar className="text-3xl text-white" />,
+      link: '/services/special',
+      features: ['Piano Moving', 'Pet Relocation', 'Custom Solutions', 'Expert Care']
     }
   ]
 

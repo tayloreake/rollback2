@@ -1,7 +1,10 @@
 import React from 'react'
 import { BsFolder2, BsHouse, BsBuilding, BsGlobe, BsBox, BsLightbulb, BsTruck, BsBriefcase, BsFileText } from 'react-icons/bs'
+import { useBlogTheme } from '../../contexts/BlogThemeContext'
 
 const CategorySidebar = ({ categories, blogs, activeCategory, onCategoryChange }) => {
+  const { theme } = useBlogTheme()
+  
   // Define the 8 main categories with icons and colors
   const mainCategories = [
     {
@@ -83,8 +86,14 @@ const CategorySidebar = ({ categories, blogs, activeCategory, onCategoryChange }
       {/* Search stays at the top */}
       
       {/* Categories Section */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-        <h3 className="text-white font-semibold mb-4 flex items-center">
+      <div className={`rounded-lg border p-6 ${
+        theme === 'dark'
+          ? 'bg-gray-800 border-gray-700'
+          : 'bg-white border-gray-200 shadow-sm'
+      }`}>
+        <h3 className={`font-semibold mb-4 flex items-center ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>
           <BsFolder2 className="mr-2 text-orange-400" size={18} />
           Categories
         </h3>
@@ -96,14 +105,20 @@ const CategorySidebar = ({ categories, blogs, activeCategory, onCategoryChange }
             className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
               activeCategory === '' 
                 ? 'bg-orange-500/20 border border-orange-500/30 text-orange-400' 
-                : 'hover:bg-gray-700 text-gray-300'
+                : theme === 'dark'
+                  ? 'hover:bg-gray-700 text-gray-300'
+                  : 'hover:bg-gray-100 text-gray-700'
             }`}
           >
             <div className="flex items-center">
-              <BsFileText className="mr-3" size={16} />
+              <BsFileText className={`mr-3 ${
+                activeCategory === '' ? 'text-orange-400' : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`} size={16} />
               <span>All Posts</span>
             </div>
-            <span className="text-sm text-gray-400">{totalPosts}</span>
+            <span className={`text-sm ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`}>{totalPosts}</span>
           </button>
 
           {/* Main Categories */}
@@ -119,14 +134,24 @@ const CategorySidebar = ({ categories, blogs, activeCategory, onCategoryChange }
                 className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
                   isActive 
                     ? `${category.bgColor} border ${category.borderColor} ${category.color}` 
-                    : `hover:bg-gray-700 text-gray-300`
+                    : theme === 'dark'
+                      ? 'hover:bg-gray-700 text-gray-300'
+                      : 'hover:bg-gray-100 text-gray-700'
                 }`}
               >
                 <div className="flex items-center">
-                  <IconComponent className={`mr-3 ${isActive ? category.color : 'text-gray-400'}`} size={16} />
+                  <IconComponent className={`mr-3 ${
+                    isActive 
+                      ? category.color 
+                      : theme === 'dark' 
+                        ? 'text-gray-400' 
+                        : 'text-gray-500'
+                  }`} size={16} />
                   <span className="text-sm">{category.name}</span>
                 </div>
-                <span className="text-sm text-gray-400">{count}</span>
+                <span className={`text-sm ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>{count}</span>
               </button>
             )
           })}
@@ -134,12 +159,20 @@ const CategorySidebar = ({ categories, blogs, activeCategory, onCategoryChange }
       </div>
 
       {/* Case Studies Section */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-        <h3 className="text-white font-semibold mb-4 flex items-center">
+      <div className={`rounded-lg border p-6 ${
+        theme === 'dark'
+          ? 'bg-gray-800 border-gray-700'
+          : 'bg-white border-gray-200 shadow-sm'
+      }`}>
+        <h3 className={`font-semibold mb-4 flex items-center ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>
           <BsFileText className="mr-2 text-green-400" size={18} />
           Case Studies
         </h3>
-        <p className="text-gray-400 text-sm mb-4">
+        <p className={`text-sm mb-4 ${
+          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+        }`}>
           Explore real-world moving scenarios and solutions.
         </p>
         <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors">
@@ -148,15 +181,23 @@ const CategorySidebar = ({ categories, blogs, activeCategory, onCategoryChange }
       </div>
 
       {/* Daily Experience Counter */}
-      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-lg border border-orange-500/30 p-6">
-        <h3 className="text-white font-semibold mb-2">Daily Development</h3>
+      <div className={`bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-lg border border-orange-500/30 p-6 ${
+        theme === 'light' ? 'bg-opacity-50' : ''
+      }`}>
+        <h3 className={`font-semibold mb-2 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-900'
+        }`}>Daily Development</h3>
         <div className="text-2xl font-bold text-orange-400 mb-1">
           {totalPosts}
         </div>
-        <p className="text-gray-400 text-sm">
+        <p className={`text-sm ${
+          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+        }`}>
           Articles published documenting our moving experience and expertise
         </p>
-        <div className="mt-4 bg-gray-800 rounded-full h-2">
+        <div className={`mt-4 rounded-full h-2 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'
+        }`}>
           <div 
             className="bg-gradient-to-r from-orange-400 to-red-400 h-2 rounded-full transition-all duration-300"
             style={{ width: `${Math.min((totalPosts / 100) * 100, 100)}%` }}

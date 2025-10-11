@@ -10,7 +10,7 @@ export const PageTransition = ({ children, className = '' }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{
-        duration: 0.6,
+        duration: 0.2, // Reduced from 0.6 for snappier navigation
         ease: [0.4, 0.0, 0.2, 1]
       }}
       className={`min-h-screen ${className}`}
@@ -27,7 +27,7 @@ export const FadeTransition = ({ children, delay = 0 }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.6, delay }}
+      transition={{ duration: 0.3, delay }} // Reduced from 0.6
     >
       {children}
     </motion.div>
@@ -48,7 +48,7 @@ export const SlideTransition = ({ children, direction = 'up', delay = 0 }) => {
       initial={{ opacity: 0, ...directions[direction] }}
       animate={{ opacity: 1, x: 0, y: 0 }}
       exit={{ opacity: 0, ...directions[direction] }}
-      transition={{ duration: 0.6, delay, ease: "easeOut" }}
+      transition={{ duration: 0.3, delay, ease: "easeOut" }} // Reduced from 0.6
     >
       {children}
     </motion.div>
@@ -62,7 +62,7 @@ export const ScaleTransition = ({ children, delay = 0 }) => {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      transition={{ duration: 0.2, delay, ease: "easeOut" }} // Reduced from 0.5
     >
       {children}
     </motion.div>
@@ -180,11 +180,11 @@ export const RouteTransition = ({ children, router }) => {
     <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
       <motion.div
         key={router?.asPath || 'page'}
-        initial={{ opacity: 0, x: 300 }}
+        initial={{ opacity: 0, x: 100 }} // Reduced from 300 for less dramatic effect
         animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -300 }}
+        exit={{ opacity: 0, x: -100 }} // Reduced from -300
         transition={{
-          duration: 0.6,
+          duration: 0.2, // Reduced from 0.6 for instant feel
           ease: [0.4, 0.0, 0.2, 1]
         }}
       >

@@ -207,12 +207,17 @@ export async function createQuote(
   moveType,
   bedrooms,
   moveDate,
-  referrals
+  referrals,
+  ipAddress = null,
+  ipDetails = null,
+  geolocation = null,
+  recaptchaScore = null,
+  emailSent = false,
+  smsSent = false
 ) {
   try {
-    return createClient(clientConfig).create({
+    const quoteData = {
       _type: "quote",
-
       firstName,
       email,
       phoneNumber,
@@ -221,10 +226,30 @@ export async function createQuote(
       moveType,
       bedrooms,
       moveDate,
-      referrals
-    })
+      refferals: referrals,
+      submittedAt: new Date().toISOString(),
+      submissionStatus: "pending",
+      emailSent,
+      smsSent,
+    };
+
+    // Add IP tracking data if provided
+    if (ipAddress) {
+      quoteData.ipAddress = ipAddress;
+    }
+    if (ipDetails) {
+      quoteData.ipDetails = ipDetails;
+    }
+    if (geolocation) {
+      quoteData.geolocation = geolocation;
+    }
+    if (recaptchaScore !== null) {
+      quoteData.recaptchaScore = recaptchaScore;
+    }
+
+    return createClient(clientConfig).create(quoteData);
   } catch (error) {
-    console.log(error)
+    console.error("Error creating quote in Sanity:", error);
     throw new Error("Failed to create quote");
   }
 }
