@@ -12,6 +12,7 @@ import Layout from '../components/Layout'
 import WebVitals from '../components/SEO/WebVitals'
 import { ToastContainer } from 'react-toastify'
 import Script from 'next/script'
+import Head from 'next/head'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useGTM, useScrollTracking } from '../hooks/useGTM'
@@ -42,13 +43,31 @@ function MyApp({ Component, pageProps }) {
     }
   }, [router.events])
 
+  // Check if current route is admin page - if so, render without Layout
+  const isAdminRoute = router.pathname.startsWith('/admin')
+  
+  if (isAdminRoute) {
+    return (
+      <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
+        <Component {...pageProps} />
+      </>
+    )
+  }
+
   return (
-    <Layout>
-      {/* GA Script - Load after page is interactive for better performance */}
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy="lazyOnload"
-      />
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <Layout>
+        {/* GA Script - Load after page is interactive for better performance */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="lazyOnload"
+        />
       <Script id="ga-setup" strategy="lazyOnload">
         {`
           window.dataLayer = window.dataLayer || [];
@@ -73,6 +92,7 @@ function MyApp({ Component, pageProps }) {
       <ToastContainer position="top-center" />
       <Component {...pageProps} />
     </Layout>
+    </>
   )
 }
 
