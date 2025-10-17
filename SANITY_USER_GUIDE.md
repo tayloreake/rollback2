@@ -17,7 +17,7 @@ Sanity is the **Content Management System** (CMS) that powers your Taylor Movers
 ## 🚀 How to Access Sanity Studio
 
 ### Method 1: Via Your Website (Recommended)
-1. Go to your website: `https://yourdomain.com/admin`
+1. Go to your website: `https://taylorea.com/admin`
 2. Log in with your Sanity credentials
 
 ### Method 2: Run Locally (For Development)
@@ -456,4 +456,4 @@ After getting Sanity access:
 
 **Last Updated**: 2025-10-11  
 **For**: Taylor Movers Website Management  
-**Sanity Studio**: yourdomain.com/admin
+**Sanity Studio**: taylorea.com/admin
