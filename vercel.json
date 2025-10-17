@@ -1,14 +1,7 @@
 {
   "version": 2,
   "alias": ["taylorea.com", "www.taylorea.com"],
-  "build": {
-    "env": {
-      "NODE_VERSION": "20.x"
-    }
-  },
-  "builds": [
-    { "src": "next.config.js", "use": "@vercel/next" }
-  ],
+  "buildCommand": "npm run build",
   "env": {
     "NEXT_PUBLIC_SITE_URL": "https://taylorea.com"
   },

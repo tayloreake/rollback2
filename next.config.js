@@ -20,6 +20,8 @@ const nextConfig = {
     esmExternals: "loose",
   },
   
+  transpilePackages: ['react-refractor'],
+  
   async headers() {
     return [
       {
@@ -90,11 +92,22 @@ const nextConfig = {
     ]
   },
   
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.module.rules.push({
       test: /\.c?js$/,
       resolve: { fullySpecified: false },
     });
+    
+    // Handle ES modules better
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false,
+      };
+    }
+    
     return config;
   },
   

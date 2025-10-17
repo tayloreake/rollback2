@@ -46,3 +46,10 @@ export default function StudioPage() {
 
   return <NextStudio config={config} />
 }
+
+// Disable static generation for this page
+export const getServerSideProps = async () => {
+  return {
+    props: {}
+  }
+}
