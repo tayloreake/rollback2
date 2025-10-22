@@ -284,11 +284,12 @@ const Quote = () => {
             your message as promptly as possible.
           </p>
         </div>
-        <div className='flwe flex-col w-full px-4 mb-4'>
+        <div className='flex flex-col w-full px-4 mb-4'>
           {/* <h3 className='text-lg mb-4'>Contact Us</h3> */}
-          <form
-            onSubmit={handleSubmit}
-            className='w-full flex flex-col items-center justify-center'>
+          <div className="quote-form-scroll-container" style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
+            <form
+              onSubmit={handleSubmit}
+              className='w-full flex flex-col items-center justify-center quote-form-container'>
             <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
               <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
                 <input
@@ -297,6 +298,13 @@ const Quote = () => {
                   required
                   onChange={(e) => setFname(e.target.value)}
                   className='px-4 py-2 w-full rounded-xl'
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    WebkitUserSelect: 'text',
+                    userSelect: 'text',
+                    color: '#374151 !important',
+                    backgroundColor: '#ffffff !important'
+                  }}
                 />
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                   First Name
@@ -316,6 +324,13 @@ const Quote = () => {
                   onChange={(e) => setNumber(e.target.value)}
                   className='px-4 py-2 w-full rounded-xl'
                   placeholder="0700000000"
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    WebkitUserSelect: 'text',
+                    userSelect: 'text',
+                    color: '#374151 !important',
+                    backgroundColor: '#ffffff !important'
+                  }}
                 />
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                   Phone Number
@@ -329,6 +344,13 @@ const Quote = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className='px-4 py-2 w-full rounded-xl'
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    WebkitUserSelect: 'text',
+                    userSelect: 'text',
+                    color: '#374151 !important',
+                    backgroundColor: '#ffffff !important'
+                  }}
                 />
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                   Email
@@ -340,6 +362,13 @@ const Quote = () => {
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className='px-4 py-2 w-full rounded-xl'
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    WebkitUserSelect: 'text',
+                    userSelect: 'text',
+                    color: '#374151 !important',
+                    backgroundColor: '#ffffff !important'
+                  }}
                 />
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                   Current Location
@@ -353,6 +382,13 @@ const Quote = () => {
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                   className='px-4 py-2 w-full rounded-xl'
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    WebkitUserSelect: 'text',
+                    userSelect: 'text',
+                    color: '#374151 !important',
+                    backgroundColor: '#ffffff !important'
+                  }}
                 />
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                   Destination Location
@@ -362,7 +398,12 @@ const Quote = () => {
                 <select
                   onChange={(e) => setMoveType(e.target.value)}
                   value={moveType}
-                  className='px-4 py-2 w-full rounded-xl'>
+                  className='px-4 py-2 w-full rounded-xl'
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    color: '#374151 !important',
+                    backgroundColor: '#ffffff !important'
+                  }}>
                   <option onClick={() => setMoveType("Local House Move")}>
                     {" "}
                     Local House Move{" "}
@@ -388,7 +429,12 @@ const Quote = () => {
                 <select
                   onChange={(e) => setBedrooms(e.target.value)}
                   value={bedrooms}
-                  className='px-4 py-2 w-full rounded-xl'>
+                  className='px-4 py-2 w-full rounded-xl'
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    color: '#374151 !important',
+                    backgroundColor: '#ffffff !important'
+                  }}>
                   <option onClick={() => setBedrooms("1br")}> 1br </option>
                   <option onClick={() => setBedrooms("2br")}> 2br </option>
                   <option onClick={() => setBedrooms("3br")}> 3br </option>
@@ -412,6 +458,11 @@ const Quote = () => {
                   value={moveDate}
                   onChange={handleDateChange}
                   className='px-4 py-2 w-full rounded-xl'
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    color: '#374151 !important',
+                    backgroundColor: '#ffffff !important'
+                  }}
                 />
                 <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
                   Move Date
@@ -423,7 +474,12 @@ const Quote = () => {
                 <select
                   onChange={(e) => setRef(e.target.value)}
                   value={ref}
-                  className='px-4 py-2 w-full rounded-xl'>
+                  className='px-4 py-2 w-full rounded-xl'
+                  style={{ 
+                    WebkitAppearance: 'none',
+                    color: '#374151 !important',
+                    backgroundColor: '#ffffff !important'
+                  }}>
                   <option onClick={() => setRef("Referals")}> Referals </option>
                   <option onClick={() => setRef("Social Media Pages")}>
                     {" "}
@@ -467,7 +523,8 @@ const Quote = () => {
               className='bg-[#DB421B] text-white px-6 py-3 rounded-xl hover:bg-[#c13817] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
               {isSubmitting ? 'Submitting...' : 'Submit Quote Request'}
             </button>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>

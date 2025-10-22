@@ -149,53 +149,43 @@ export async function getBlacklistedIps() {
   )
 }
 
-// Function to get case study blog posts (matching any blogs that could be case studies)
+// Function to get case study blog posts (simplified for better performance)
 export async function getCaseStudyBlogs(limit = 5) {
-  return createClient(clientConfig).fetch(
-    groq`*[_type == "blogs" && (
-      blogTitle match "*case study*" ||
-      blogTitle match "*Case Study*" ||
-      blogTitle match "*move*" ||
-      blogTitle match "*Move*" ||
-      blogTitle match "*relocation*" ||
-      blogTitle match "*Relocation*" ||
-      blogTitle match "*to*" ||
-      "case study" in blogCategories[]->category ||
-      "Case Study" in blogCategories[]->category ||
-      "case studies" in blogCategories[]->category ||
-      "Case Studies" in blogCategories[]->category ||
-      "moving case study" in blogCategories[]->category ||
-      "international move" in blogCategories[]->category ||
-      "relocation" in blogCategories[]->category ||
-      "moving" in blogCategories[]->category ||
-      "international" in blogCategories[]->category
-    )] | order(date desc) [0...${limit}] {
-      _id,
-      blogTitle,
-      slug,
-      blogExcerpt,
-      date,
-      blogCategories[]->{
-        category
-      }
-    }`
-  )
+  try {
+    return createClient(clientConfig).fetch(
+      groq`*[_type == "blogs" && defined(blogTitle)] | order(date desc) [0...${limit}] {
+        _id,
+        blogTitle,
+        slug,
+        blogExcerpt,
+        date,
+        blogCategories[]->{
+          category
+        }
+      }`
+    )
+  } catch (error) {
+    console.error('Error fetching case study blogs:', error);
+    return [];
+  }
 }
 
 // Fallback function to get recent blog posts if no case studies found
 export async function getRecentBlogs(limit = 5) {
-  return createClient(clientConfig).fetch(
-    groq`*[_type == "blogs"] | order(date desc) [0...${limit}] {
-      _id,
-      blogTitle,
-      slug,
-      blogExcerpt,
-      date,
-      blogCategories[]->{
-        category
-      }
-    }`
-  )
+  try {
+    return createClient(clientConfig).fetch(
+      groq`*[_type == "blogs" && defined(blogTitle)] | order(date desc) [0...${limit}] {
+        _id,
+        blogTitle,
+        slug,
+        blogExcerpt,
+        date
+      }`
+    )
+  } catch (error) {
+    console.error('Error fetching recent blogs:', error);
+    return [];
+  }
 }
 
 export async function createQuote(

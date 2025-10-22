@@ -23,31 +23,35 @@ const Footer = ({ caseStudies = [] }) => {
 
   useEffect(() => {
     const handleManualStorageChange = () => {
-      const logos = localStorage.getItem("siteLogos");
-      setLogoImage(JSON.parse(logos)[0]?.footerLogo);
+      try {
+        const logos = localStorage.getItem("siteLogos");
+        if (logos) {
+          const parsedLogos = JSON.parse(logos);
+          setLogoImage(parsedLogos[0]?.footerLogo);
+        }
+      } catch (error) {
+        console.error('Error parsing site logos from localStorage:', error);
+      }
     };
+    
     window.addEventListener("site-logos", handleManualStorageChange);
 
-    // Fetch case studies if none provided
+    // Fetch case studies if none provided - with timeout and error handling
     if (caseStudies.length === 0) {
       const fetchCaseStudies = async () => {
         try {
-          // First try to get case study specific posts
-          let studies = await getCaseStudyBlogs(5);
+          // Use Promise.race with timeout to prevent hanging
+          const fetchPromise = (async () => {
+            let studies = await getRecentBlogs(3); // Reduced to 3 items for better performance
+            return studies || [];
+          })();
           
-          // If no case studies found, get recent blog posts
-          if (!studies || studies.length === 0) {
-            console.log('No specific case studies found, fetching recent blogs');
-            studies = await getRecentBlogs(5);
-          }
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Fetch timeout')), 5000); // 5 second timeout
+          });
           
-          // If we have posts, use them
-          if (studies && studies.length > 0) {
-            setDynamicCaseStudies(studies);
-          } else {
-            // Final fallback to placeholder text indicating no blogs
-            setDynamicCaseStudies([]);
-          }
+          const studies = await Promise.race([fetchPromise, timeoutPromise]);
+          setDynamicCaseStudies(studies);
         } catch (error) {
           console.error('Error fetching blog posts for case studies:', error);
           // Set empty array so we show "no case studies" message
@@ -55,8 +59,20 @@ const Footer = ({ caseStudies = [] }) => {
         }
       };
       
-      fetchCaseStudies();
+      // Use setTimeout to defer the fetch and not block the render
+      const timeoutId = setTimeout(() => {
+        fetchCaseStudies();
+      }, 1000); // 1 second delay to ensure UI loads first
+      
+      return () => {
+        clearTimeout(timeoutId);
+        window.removeEventListener("site-logos", handleManualStorageChange);
+      };
     }
+    
+    return () => {
+      window.removeEventListener("site-logos", handleManualStorageChange);
+    };
   }, [caseStudies])
 
   return (
@@ -202,7 +218,7 @@ const Footer = ({ caseStudies = [] }) => {
                 Case Studies
               </h3>
               <div className='space-y-3'>
-                {dynamicCaseStudies.length > 0 ? (
+                {dynamicCaseStudies && dynamicCaseStudies.length > 0 ? (
                   <>
                     {dynamicCaseStudies.slice(0, 3).map((study, index) => (
                       <Link key={study._id || study.slug?.current || index} className="block" href={`/Blog/${study.slug?.current}`}>
@@ -227,7 +243,6 @@ const Footer = ({ caseStudies = [] }) => {
                   </>
                 ) : (
                   <div className='text-center py-4'>
-                    <p className='text-gray-500 text-sm mb-3'>Loading case studies...</p>
                     <Link href='/Blog'>
                       <div className='flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 group'>
                         <BsArrowRight size={16} className='mr-2 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />

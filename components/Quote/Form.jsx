@@ -1,23 +1,66 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { toast } from "react-toastify"
 // import { createQuote } from "../sanity/sanity-utils"
 import ReCAPTCHA from "react-google-recaptcha"
 import { createQuote } from "../../sanity/sanity-utils"
+import useFormPersistence from "../../hooks/useFormPersistence"
+
+// Helper function to get current date
+function getCurrentDate() {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Initial form data structure - defined outside component to prevent re-creation
+const getInitialFormData = () => ({
+  fname: "",
+  email: "",
+  location: "",
+  destination: "",
+  number: "",
+  moveType: "Local House Move",
+  bedrooms: "1br",
+  moveDate: getCurrentDate(),
+  ref: "Referal"
+});
 
 const QuoteForm = () => {
-  const [fname, setFname] = useState("")
-  const [email, setEmail] = useState("")
-  const [location, setLocation] = useState("")
-  const [destination, setDestination] = useState("")
-  const [number, setNumber] = useState("")
-  const [moveType, setMoveType] = useState("Local House Move")
-  const [bedrooms, setBedrooms] = useState("1br")
-  const [moveDate, setMoveDate] = useState(getCurrentDate())
-  const [ref, setRef] = useState("Referal")
+  // Memoize initial data to prevent re-creation
+  const initialFormData = useMemo(() => getInitialFormData(), []);
+
+  // Use form persistence hook with stable initial data
+  const { 
+    formData, 
+    updateFormData, 
+    clearFormData, 
+    hasPersistedData 
+  } = useFormPersistence('main-quote-form', initialFormData, 300);
+  
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [lastSubmissionTime, setLastSubmissionTime] = useState(0)
+  const [showPersistedDataNotice, setShowPersistedDataNotice] = useState(false)
   const recaptchaRef = useRef(null)
+  const formRef = useRef(null)
+
+  // Show notice if persisted data was loaded
+  useEffect(() => {
+    if (hasPersistedData) {
+      setShowPersistedDataNotice(true)
+      toast.info("Your previous form data has been restored. You can continue where you left off!", {
+        autoClose: 5000,
+        position: "top-center"
+      })
+      // Hide notice after 8 seconds
+      const timer = setTimeout(() => {
+        setShowPersistedDataNotice(false)
+      }, 8000)
+      return () => clearTimeout(timer)
+    }
+  }, [hasPersistedData])
 
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -26,6 +69,7 @@ const QuoteForm = () => {
   const isValidPhoneNumber = (phoneNumber) => {
     return /^\0\d{9}$/.test(phoneNumber)
   }
+
   useEffect(() => {
     if (formSubmitted) {
       window.dispatchEvent(new CustomEvent("tayloreaFormSubmitted", {
@@ -33,9 +77,7 @@ const QuoteForm = () => {
       }));
 
       window.location.href = "/ThankYou";
-
     }
-
   }, [formSubmitted]);
 
   const isValidName = (name) => {
@@ -50,7 +92,6 @@ const QuoteForm = () => {
     const tayloreaMessageContent = formatMessageContent('taylorea');
     const userMessageContent = formatMessageContent('user');
 
-
     try {
       // Check for rapid submissions (2 minutes cooldown)
       const now = Date.now()
@@ -62,25 +103,36 @@ const QuoteForm = () => {
 
       setIsSubmitting(true);
 
-      // First send SMS
-      const smsToken = await recaptchaRef.current.executeAsync();
+      // Create timeout promise for all operations
+      const createTimeoutPromise = (ms) => new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Operation timeout')), ms)
+      );
+
+      // First send SMS with timeout
+      const smsToken = await Promise.race([
+        recaptchaRef.current.executeAsync(),
+        createTimeoutPromise(10000) // 10 second timeout
+      ]);
+      
       if (!smsToken) {
         throw new Error('Failed to verify reCAPTCHA for SMS');
       }
 
-      // the default phone number
-      // 254743505069
-      const smsResponse = await fetch("/api/sendSms", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: ["+254721410517"],
-          message: tayloreaMessageContent,
-          recaptchaToken: smsToken
+      // SMS API call with timeout
+      const smsResponse = await Promise.race([
+        fetch("/api/sendSms", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: ["+254721410517"],
+            message: tayloreaMessageContent,
+            recaptchaToken: smsToken
+          }),
         }),
-      });
+        createTimeoutPromise(15000) // 15 second timeout
+      ]);
 
       if (!smsResponse.ok) {
         const errorData = await smsResponse.json();
@@ -88,62 +140,65 @@ const QuoteForm = () => {
       }
 
       // Reset reCAPTCHA for email
-      // Reset reCAPTCHA for email
       recaptchaRef.current.reset();
       await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for reset
 
-      // Then send email
-      const emailToken = await recaptchaRef.current.executeAsync();
+      // Then send email with timeout
+      const emailToken = await Promise.race([
+        recaptchaRef.current.executeAsync(),
+        createTimeoutPromise(10000) // 10 second timeout
+      ]);
+      
       if (!emailToken) {
         throw new Error('Failed to verify reCAPTCHA for email');
       }
 
-
       // Prepare quote data for logging
       const quoteDataForLogging = {
-        firstName: fname,
-        email: email,
-        phoneNumber: number,
-        location: location,
-        destination: destination,
-        moveType: moveType,
-        bedrooms: bedrooms,
-        moveDate: moveDate,
-        referrals: ref
+        firstName: formData.fname,
+        email: formData.email,
+        phoneNumber: formData.number,
+        location: formData.location,
+        destination: formData.destination,
+        moveType: formData.moveType,
+        bedrooms: formData.bedrooms,
+        moveDate: formData.moveDate,
+        referrals: formData.ref
       };
 
-      const emailResponse = await fetch("/api/sendEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: "sales@taylorea.com",
-          message: userMessageContent,
-          recaptchaToken: emailToken,
-          quoteData: quoteDataForLogging
+      const emailResponse = await Promise.race([
+        fetch("/api/sendEmail", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: "sales@taylorea.com",
+            message: userMessageContent,
+            recaptchaToken: emailToken,
+            quoteData: quoteDataForLogging
+          }),
         }),
-      });
+        createTimeoutPromise(15000) // 15 second timeout
+      ]);
 
       if (!emailResponse.ok) {
         const errorData = await emailResponse.json();
         throw new Error(errorData.message || 'Failed to send email');
       }
 
-
-
       // Save Skip to Sanity
       // try {
       //   await createQuote(
-      //     fname,
-      //     email,
-      //     number,
-      //     location,
-      //     destination,
-      //     moveType,
-      //     bedrooms,
-      //     moveDate,
-      //     ref
+      //     formData.fname,
+      //     formData.email,
+      //     formData.number,
+      //     formData.location,
+      //     formData.destination,
+      //     formData.moveType,
+      //     formData.bedrooms,
+      //     formData.moveDate,
+      //     formData.ref
       //   );
       // } catch (error) {
       //   console.error("Error saving quote to Sanity did not submit..:", error);
@@ -152,14 +207,9 @@ const QuoteForm = () => {
       setLastSubmissionTime(now);
       toast.success("Quote request submitted successfully! We'll contact you soon.");
 
-      // Reset form
-      setFname("");
-      setEmail("");
-      setLocation("");
-      setDestination("");
-      setNumber("");
+      // Clear form data and persisted storage
+      clearFormData();
       setFormSubmitted(true);
-      setMoveType("Local House Move");
 
     } catch (error) {
       console.error("Error:", error);
@@ -174,70 +224,64 @@ const QuoteForm = () => {
   const formatMessageContent = (to) => {
     const message = `
       New Move Request:
-      ${to == 'user' ? 'dear ' + fname + '\n' + 'This is a confirmation email that you have made a new move request with the following details:' : ''}
-      Name: ${fname}
-      Email: ${email}
-      Phone Number: ${number}
-      Move Type: ${moveType}
-      Bedrooms: ${bedrooms}
-      Move Date: ${moveDate}
-      From: ${location}
-      To: ${destination}
-      How did you hear about us: ${ref}
+      ${to == 'user' ? 'dear ' + formData.fname + '\n' + 'This is a confirmation email that you have made a new move request with the following details:' : ''}
+      Name: ${formData.fname}
+      Email: ${formData.email}
+      Phone Number: ${formData.number}
+      Move Type: ${formData.moveType}
+      Bedrooms: ${formData.bedrooms}
+      Move Date: ${formData.moveDate}
+      From: ${formData.location}
+      To: ${formData.destination}
+      How did you hear about us: ${formData.ref}
     `;
     return message;
   }
 
-  function getCurrentDate() {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDate.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
+
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
     const currentDate = new Date().toISOString().split('T')[0];
 
     if (selectedDate >= currentDate) {
-      setMoveDate(selectedDate);
+      updateFormData('moveDate', selectedDate);
     } else {
       toast.error('Please select a date from today onwards');
     }
   };
 
   function validateFields() {
-    if (!fname || !isValidName(fname)) {
+    if (!formData.fname || !isValidName(formData.fname)) {
       toast.error("Please enter a valid name (letters and spaces only)");
       return false;
     }
 
-    if (!email || !isValidEmail(email)) {
+    if (!formData.email || !isValidEmail(formData.email)) {
       toast.error("Please enter a valid email address");
       return false;
     }
-    if (isValidPhoneNumber(number)) {
-      toast.error(`Please enter a valid phone number (07/01XXXXXXXX), ${number + " " + isValidPhoneNumber(number)}`);
+    if (isValidPhoneNumber(formData.number)) {
+      toast.error(`Please enter a valid phone number (07/01XXXXXXXX), ${formData.number + " " + isValidPhoneNumber(formData.number)}`);
       return false;
     }
 
-    if (!isValidLocation(location)) {
+    if (!isValidLocation(formData.location)) {
       toast.error("Please enter a valid current location (at least 3 characters)");
       return false;
     }
 
-    if (!isValidLocation(destination)) {
+    if (!isValidLocation(formData.destination)) {
       toast.error("Please enter a valid destination (at least 3 characters)");
       return false;
     }
 
-    if (!moveDate) {
+    if (!formData.moveDate) {
       toast.error("Please select a move date");
       return false;
     }
 
-    const selectedDate = new Date(moveDate);
+    const selectedDate = new Date(formData.moveDate);
     const currentDate = new Date();
     selectedDate.setHours(0, 0, 0, 0);
     currentDate.setHours(0, 0, 0, 0);
@@ -276,210 +320,296 @@ const QuoteForm = () => {
   }
 
   return (
-    <div className='w-full max-w-[360px] mx-auto'>
+    <div className='w-full max-w-[400px] mx-auto quote-form-container'>
       {/* Header Section */}
       <div className='py-4 px-4 mb-4 bg-gradient-to-r from-[#FF5000] to-[#FF6B35] rounded-t-xl'>
-        <h1 className="font-bold text-xl text-white mb-1">Request a Quote</h1>
-        <p className='text-white text-sm opacity-90'>Get your free moving estimate</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="font-bold text-xl text-white mb-1">Request a Quote</h1>
+            <p className='text-white text-sm opacity-90'>Get your free moving estimate</p>
+          </div>
+          {showPersistedDataNotice && (
+            <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+              <span className="text-xs text-white font-medium">📝 Data restored</span>
+            </div>
+          )}
+        </div>
+        {hasPersistedData && (
+          <div className="mt-3 p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+            <div className="flex items-center justify-between">
+              <span className="text-white text-xs font-medium">Continue from where you left off</span>
+              <button
+                type="button"
+                onClick={clearFormData}
+                className="text-white/70 hover:text-white text-xs underline"
+              >
+                Start fresh
+              </button>
+            </div>
+          </div>
+        )}
       </div>
       
-      {/* Form Container */}
-      <div className='px-4 pb-4'>
-        {/* <h3 className='text-lg mb-4'>Contact Us</h3> */}
+      {/* Form Container - Scrollable fields */}
+      <div className='px-4 pb-4 quote-form-scroll-container' style={{ maxHeight: 'calc(90vh - 240px)', overflowY: 'auto', overflowX: 'hidden' }}>
         <form
+          ref={formRef}
           onSubmit={handleSubmit}
-          className='w-full flex flex-col items-center justify-center'>
-          <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
-              <input
-                type='text'
-                value={fname}
-                required
-                placeholder="John Doe"
-                onChange={(e) => setFname(e.target.value)}
-                className='border border-slate-300 px-2 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Full Name
-              </label>
-            </div>
-            <div className='relative w-full max-w-[351px] mb-3 md:mr-2'>
-              {/* <PhoneInput
-                  country={"ke"}
-                  value={number}
-                  onChange={(number) => setNumber(number)}
-                  className='px-4 py-2 w-full rounded-xl'
-                /> */}
-              <input
-                type='text'
-                value={number}
-                required
-                onChange={(e) => setNumber(e.target.value)}
-                className='border border-slate-300 rounded-xl py-2 px-2 w-full rounded-xl'
-                placeholder="0700000000"
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Mobile
-              </label>
-            </div>
-          </div>
-          <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
-              <input
-                type='email'
-                value={email}
-                placeholder="john@gmail.com"
-                onChange={(e) => setEmail(e.target.value)}
-                className='px-4 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Email
-              </label>
-            </div>
-
-          </div>
-          <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
-              <input
-                type='text'
-                value={location}
-                placeholder=""
-                onChange={(e) => setLocation(e.target.value)}
-                className='px-4 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Current Location
-              </label>
-            </div>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
-
-              <input
-                type='text'
-                value={destination}
-                placeholder="Nairobi CBD"
-                onChange={(e) => setDestination(e.target.value)}
-                className='px-4 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Destination Location
-              </label>
-            </div>
-
-          </div>
-          <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
-              <select
-                onChange={(e) => setMoveType(e.target.value)}
-                value={moveType}
-                className='px-4 py-2 w-full rounded-xl'>
-                <option onClick={() => setMoveType("Local House Move")}>
-                  {" "}
-                  Local House Move{" "}
-                </option>
-                <option onClick={() => setMoveType("International Move")}>
-                  {" "}
-                  International Move{" "}
-                </option>
-                <option onClick={() => setMoveType("Business Move")}>
-                  {" "}
-                  Business Move{" "}
-                </option>
-                <option onClick={() => setMoveType("Other")}> Other </option>
-              </select>
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Move Type
-              </label>
-            </div>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
-              {/* <input type='text' value={email} onChange={() => setEmail(email)} className='px-4 py-2 rounded-xl' /> */}
-              <select
-                onChange={(e) => setBedrooms(e.target.value)}
-                value={bedrooms}
-                className='px-4 py-2 w-full rounded-xl'>
-                <option onClick={() => setBedrooms("1br")}> 1br </option>
-                <option onClick={() => setBedrooms("2br")}> 2br </option>
-                <option onClick={() => setBedrooms("3br")}> 3br </option>
-                <option onClick={() => setBedrooms("4br")}> 4br </option>
-                <option onClick={() => setBedrooms("5br")}> 5br </option>
-                <option onClick={() => setBedrooms("6br")}> 6br </option>
-                <option onClick={() => setBedrooms("More than 6br")}>
-                  {" "}
-                  More than 6br{" "}
-                </option>
-                <option onClick={() => setBedrooms("studio")}> Studio Apartment</option>
-
-              </select>
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Number of bedrooms
-              </label>
-            </div>
-
-          </div>
-          <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
-              <input
-                type='date'
-                value={moveDate}
-                onChange={handleDateChange}
-                className='px-4 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Move Date
-              </label>
-            </div>
+          className='w-full flex flex-col items-center justify-center space-y-4'>
+          {/* Prevent form re-rendering by removing unstable keys */}
+          
+          {/* Full Name */}
+          <div className='relative w-full'>
+            <input
+              type='text'
+              value={formData.fname}
+              required
+              placeholder="John Doe"
+              onChange={(e) => updateFormData('fname', e.target.value)}
+              onBlur={(e) => {
+                // Prevent clearing on blur by ensuring value stays
+                if (e.target.value !== formData.fname) {
+                  updateFormData('fname', e.target.value);
+                }
+              }}
+              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
+              style={{ 
+                WebkitAppearance: 'none',
+                WebkitUserSelect: 'text',
+                userSelect: 'text',
+                color: '#374151 !important',
+                backgroundColor: '#ffffff !important'
+              }}
+            />
+            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
+              Full Name
+            </label>
           </div>
 
-          <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
-
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-3 md:mr-2'>
-              <select
-                onChange={(e) => setRef(e.target.value)}
-                value={ref}
-                className='px-4 py-2 w-full rounded-xl'>
-                <option onClick={() => setRef("Referals")}> Referals </option>
-                <option onClick={() => setRef("Social Media Pages")}>
-                  {" "}
-                  Social Media Pages{" "}
-                </option>
-                <option onClick={() => setRef("Internet Search")}>
-                  {" "}
-                  Internet Search{" "}
-                </option>
-                <option onClick={() => setRef("Door To Door Marketing")}>
-                  {" "}
-                  Door To Door Marketing{" "}
-                </option>
-                <option onClick={() => setRef("Taylor Mover Trucks")}>
-                  {" "}
-                  Taylor Mover Trucks{" "}
-                </option>
-                <option onClick={() => setRef("Previous Interactions")}>
-                  {" "}
-                  Previous Interactions{" "}
-                </option>
-              </select>
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                How you found us
-              </label>
-            </div>
+          {/* Mobile Number */}
+          <div className='relative w-full'>
+            <input
+              type='text'
+              value={formData.number}
+              required
+              onChange={(e) => updateFormData('number', e.target.value)}
+              onBlur={(e) => {
+                if (e.target.value !== formData.number) {
+                  updateFormData('number', e.target.value);
+                }
+              }}
+              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
+              placeholder="0700000000"
+              style={{ 
+                WebkitAppearance: 'none',
+                WebkitUserSelect: 'text',
+                userSelect: 'text',
+                color: '#374151 !important',
+                backgroundColor: '#ffffff !important'
+              }}
+            />
+            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
+              Mobile Number
+            </label>
           </div>
 
-          {/* <textarea value={message} onChange={() => setMessage(message)} cols="30" rows="10" className='my-4 border border-grey-500 rounded-xl w-full max-w-[351px] md:max-w-[800px]'/> */}
+          {/* Email */}
+          <div className='relative w-full'>
+            <input
+              type='email'
+              value={formData.email}
+              placeholder="john@gmail.com"
+              onChange={(e) => updateFormData('email', e.target.value)}
+              onBlur={(e) => {
+                if (e.target.value !== formData.email) {
+                  updateFormData('email', e.target.value);
+                }
+              }}
+              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
+              style={{ 
+                WebkitAppearance: 'none',
+                WebkitUserSelect: 'text',
+                userSelect: 'text',
+                color: '#374151 !important',
+                backgroundColor: '#ffffff !important'
+              }}
+            />
+            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
+              Email Address
+            </label>
+          </div>
 
-          <div className="mb-6">
+          {/* Current Location */}
+          <div className='relative w-full'>
+            <input
+              type='text'
+              value={formData.location}
+              placeholder="Westlands, Nairobi"
+              onChange={(e) => updateFormData('location', e.target.value)}
+              onBlur={(e) => {
+                if (e.target.value !== formData.location) {
+                  updateFormData('location', e.target.value);
+                }
+              }}
+              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
+              style={{ 
+                WebkitAppearance: 'none',
+                WebkitUserSelect: 'text',
+                userSelect: 'text',
+                color: '#374151 !important',
+                backgroundColor: '#ffffff !important'
+              }}
+            />
+            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
+              Current Location
+            </label>
+          </div>
+
+          {/* Destination */}
+          <div className='relative w-full'>
+            <input
+              type='text'
+              value={formData.destination}
+              placeholder="Nairobi CBD"
+              onChange={(e) => updateFormData('destination', e.target.value)}
+              onBlur={(e) => {
+                if (e.target.value !== formData.destination) {
+                  updateFormData('destination', e.target.value);
+                }
+              }}
+              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
+              style={{ 
+                WebkitAppearance: 'none',
+                WebkitUserSelect: 'text',
+                userSelect: 'text',
+                color: '#374151 !important',
+                backgroundColor: '#ffffff !important'
+              }}
+            />
+            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
+              Destination Location
+            </label>
+          </div>
+
+          {/* Move Type */}
+          <div className='relative w-full'>
+            <select
+              onChange={(e) => updateFormData('moveType', e.target.value)}
+              value={formData.moveType}
+              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white appearance-none cursor-pointer'
+              style={{ 
+                WebkitAppearance: 'none',
+                color: '#374151 !important',
+                backgroundColor: '#ffffff !important'
+              }}>
+              <option value="Local House Move">Local House Move</option>
+              <option value="International Move">International Move</option>
+              <option value="Business Move">Business Move</option>
+              <option value="Other">Other</option>
+            </select>
+            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
+              Move Type
+            </label>
+          </div>
+
+          {/* Number of Bedrooms */}
+          <div className='relative w-full'>
+            <select
+              onChange={(e) => updateFormData('bedrooms', e.target.value)}
+              value={formData.bedrooms}
+              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white appearance-none cursor-pointer'
+              style={{ 
+                WebkitAppearance: 'none',
+                color: '#374151 !important',
+                backgroundColor: '#ffffff !important'
+              }}>
+              <option value="1br">1 Bedroom</option>
+              <option value="2br">2 Bedrooms</option>
+              <option value="3br">3 Bedrooms</option>
+              <option value="4br">4 Bedrooms</option>
+              <option value="5br">5 Bedrooms</option>
+              <option value="6br">6 Bedrooms</option>
+              <option value="More than 6br">More than 6 Bedrooms</option>
+              <option value="studio">Studio Apartment</option>
+            </select>
+            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
+              Number of Bedrooms
+            </label>
+          </div>
+
+          {/* Move Date */}
+          <div className='relative w-full'>
+            <input
+              type='date'
+              value={formData.moveDate}
+              onChange={handleDateChange}
+              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
+              style={{ 
+                WebkitAppearance: 'none',
+                color: '#374151 !important',
+                backgroundColor: '#ffffff !important'
+              }}
+            />
+            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
+              Preferred Move Date
+            </label>
+          </div>
+
+          {/* How did you find us */}
+          <div className='relative w-full'>
+            <select
+              onChange={(e) => updateFormData('ref', e.target.value)}
+              value={formData.ref}
+              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white appearance-none cursor-pointer'
+              style={{ 
+                WebkitAppearance: 'none',
+                color: '#374151 !important',
+                backgroundColor: '#ffffff !important'
+              }}>
+              <option value="Referals">Referrals</option>
+              <option value="Social Media Pages">Social Media Pages</option>
+              <option value="Internet Search">Internet Search</option>
+              <option value="Door To Door Marketing">Door To Door Marketing</option>
+              <option value="Taylor Mover Trucks">Taylor Mover Trucks</option>
+              <option value="Previous Interactions">Previous Interactions</option>
+            </select>
+            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
+              How did you find us?
+            </label>
+          </div>
+
+          {/* reCAPTCHA */}
+          <div className="w-full">
             <ReCAPTCHA
               ref={recaptchaRef}
               size="invisible"
               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
             />
           </div>
-          <button
-            type='submit'
-            disabled={isSubmitting}
-            className='bg-[#DB421B] text-white px-6 py-3 rounded-xl hover:bg-[#c13817] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
-            {isSubmitting ? 'Submitting...' : 'Submit Quote Request'}
-          </button>
         </form>
+      </div>
+
+      {/* Submit Button - Fixed at bottom, always visible */}
+      <div className='px-4 pb-6 pt-4 bg-white border-t border-gray-200'>
+        <button
+          type='submit'
+          onClick={(e) => {
+            e.preventDefault();
+            if (formRef.current) {
+              formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
+          }}
+          disabled={isSubmitting}
+          className='w-full bg-[#FF5000] text-white px-6 py-4 rounded-xl hover:bg-[#e04400] transition-all duration-200 font-semibold text-base sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] shadow-lg'>
+          {isSubmitting ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <span className="text-sm sm:text-base">Submitting...</span>
+            </div>
+          ) : (
+            <span className="text-sm sm:text-base">Submit Quote Request</span>
+          )}
+        </button>
       </div>
     </div>
   )

@@ -195,6 +195,75 @@ pre {
   padding: 0 !important;
 }
 
+/* Enhanced Quote Form Scrolling */
+.quote-form-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
+  position: relative;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb {
+  background: #FF5000;
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #e04400;
+}
+
+/* Quote Form Container Improvements */
+.quote-form-container {
+  padding-bottom: 20px;
+}
+
+/* Ensure form inputs are always visible and properly styled */
+.quote-form-container input,
+.quote-form-container select {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  font-size: 16px !important; /* Prevents zoom on iOS */
+}
+
+.quote-form-container input:focus,
+.quote-form-container select:focus {
+  outline: none !important;
+  border-color: #FF5000 !important;
+  box-shadow: 0 0 0 3px rgba(255, 80, 0, 0.1) !important;
+}
+
+.quote-form-container input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+/* Prevent form clearing issues */
+.quote-form-container form {
+  isolation: isolate;
+}
+
+.quote-form-container input,
+.quote-form-container select,
+.quote-form-container textarea {
+  will-change: auto;
+  transform: translateZ(0);
+}
+
 /* Internal scroll container to ensure touch scroll stays inside modal */
 .no-pad-modal .quote-scroll-container {
   max-height: 82vh;
@@ -215,6 +284,93 @@ pre {
 .quote-modal-enhanced .ant-modal-body {
   max-height: 85vh !important;
   padding: 0 !important;
+}
+
+/* Enhanced Quote Form Scroll Container */
+.quote-form-scroll-container {
+  max-height: calc(95vh - 60px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #FF5000, #FF6B35);
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #e04400, #FF5000);
+}
+
+/* Quote Form Container Improvements */
+.quote-form-container {
+  padding-bottom: 20px;
+  min-height: auto;
+}
+
+/* Ensure form inputs are always visible and accessible */
+.quote-form-container input,
+.quote-form-container select,
+.quote-form-container textarea {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  position: relative;
+  z-index: 1;
+}
+
+.quote-form-container input:focus,
+.quote-form-container select:focus,
+.quote-form-container textarea:focus {
+  outline: none !important;
+  border-color: #FF5000 !important;
+  box-shadow: 0 0 0 3px rgba(255, 80, 0, 0.1) !important;
+  background-color: #ffffff !important;
+  color: #374151 !important;
+}
+
+/* Prevent form clearing on blur/focus */
+.quote-form-container input:not(:focus):valid,
+.quote-form-container select:not(:focus):valid {
+  background-color: #ffffff !important;
+  color: #374151 !important;
+}
+
+/* Enhanced label visibility */
+.quote-form-container label {
+  background-color: #ffffff !important;
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+  z-index: 2;
+  position: relative;
+}
+
+/* Modal backdrop improvements */
+.modal-backdrop-enhanced {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden !important;
+  padding-right: 0 !important;
+  position: fixed;
+  width: 100%;
 }
 
 /* Custom scrollbar for webkit browsers */
@@ -970,4 +1126,208 @@ a, button, [role="button"], .btn, .quote-modal-trigger {
 /* Smooth Transitions for Theme Changes */
 * {
   @apply transition-colors duration-200;
+}
+
+/* Additional Quote Modal Fixes */
+.quote-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.quote-modal-content {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.quote-modal-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Force scrolling on mobile devices */
+@media (max-width: 768px) {
+  .quote-modal-scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: scroll !important;
+    height: auto;
+    max-height: calc(90vh - 60px);
+  }
+  
+  .quote-form-container {
+    padding-bottom: 40px !important;
+  }
+}
+
+/* Prevent form input clearing issues */
+.quote-form-container input,
+.quote-form-container select {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* Ensure proper focus behavior */
+.quote-form-container input:focus,
+.quote-form-container select:focus {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Prevent iOS zoom on input focus */
+@media screen and (max-width: 768px) {
+  .quote-form-container input,
+  .quote-form-container select {
+    font-size: 16px !important;
+    transform: translateZ(0);
+    -webkit-appearance: none;
+  }
+  
+  /* Ensure modal scrolling on mobile */
+  .quote-modal-scroll {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: scroll !important;
+    height: auto !important;
+    max-height: calc(90vh - 60px) !important;
+  }
+}
+
+/* Force input visibility across all browsers */
+.quote-form-container input:not([type="hidden"]),
+.quote-form-container select,
+.quote-form-container textarea {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #374151 !important;
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  box-shadow: 0 0 0px 1000px white inset !important;
+  caret-color: #374151 !important;
+}
+
+/* Focus states for better visibility */
+.quote-form-container input:focus:not([type="hidden"]),
+.quote-form-container select:focus,
+.quote-form-container textarea:focus {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #374151 !important;
+  -webkit-box-shadow: 0 0 0px 1000px white inset, 0 0 0 3px rgba(255, 80, 0, 0.1) !important;
+  box-shadow: 0 0 0px 1000px white inset, 0 0 0 3px rgba(255, 80, 0, 0.1) !important;
+  caret-color: #374151 !important;
+  border-color: #FF5000 !important;
+}
+
+/* Placeholder text visibility */
+.quote-form-container input::placeholder,
+.quote-form-container textarea::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #9ca3af !important;
+}
+
+/* Override any conflicting styles */
+.quote-form-container input[type="text"],
+.quote-form-container input[type="email"],
+.quote-form-container input[type="tel"],
+.quote-form-container input[type="date"],
+.quote-form-container select,
+.quote-form-container textarea {
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  border: 1px solid #d1d5db !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: block !important;
+}
+
+/* Enhanced scrollbar for quote forms */
+.quote-form-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #FF5000, #FF6B35);
+  border-radius: 4px;
+  border: 1px solid #f1f1f1;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #e04400, #FF5000);
+}
+
+/* Ensure form containers have proper dimensions */
+.quote-form-container {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: 95vh;
+}
+
+/* Ensure scrollable area takes available space */
+.quote-form-scroll-container {
+  flex: 1 1 auto;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+}
+
+/* Mobile optimization for quote form */
+@media screen and (max-width: 640px) {
+  .quote-form-container {
+    max-height: 100vh;
+  }
+  
+  .quote-form-scroll-container {
+    max-height: calc(100vh - 280px) !important;
+  }
+  
+  /* Ensure button container is always visible on mobile */
+  .quote-form-container > div:last-child {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    z-index: 10;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  }
 }
