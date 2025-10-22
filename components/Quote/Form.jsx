@@ -90,7 +90,6 @@ const QuoteForm = () => {
 
   const handleSendMessage = async () => {
     const tayloreaMessageContent = formatMessageContent('taylorea');
-    const userMessageContent = formatMessageContent('user');
 
     try {
       // Check for rapid submissions (2 minutes cooldown)
@@ -186,33 +185,6 @@ const QuoteForm = () => {
       if (!emailResponse.ok) {
         const errorData = await emailResponse.json();
         throw new Error(errorData.message || 'Failed to send email to company');
-      }
-
-      // Send confirmation email to customer
-      try {
-        const customerEmailResponse = await Promise.race([
-          fetch("/api/sendEmail", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              to: formData.email,
-              message: userMessageContent,
-              recaptchaToken: emailToken,
-              quoteData: null // Don't log twice to Sanity
-            }),
-          }),
-          createTimeoutPromise(15000)
-        ]);
-        
-        if (!customerEmailResponse.ok) {
-          console.warn('Failed to send confirmation email to customer');
-          // Don't throw error - customer not getting email shouldn't block submission
-        }
-      } catch (customerEmailError) {
-        console.warn('Error sending customer confirmation:', customerEmailError);
-        // Continue even if customer email fails
       }
 
       // Save Skip to Sanity
