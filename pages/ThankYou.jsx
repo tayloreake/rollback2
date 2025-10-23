@@ -12,6 +12,14 @@ import Script from 'next/script'
 const ThankYou = ({ thankYou }) => {
     const [data, setData] = useState(thankYou)
 
+    // Fallback content if Sanity data is not available
+    const fallbackData = {
+        message: "Thank You for Your Quote Request!",
+        subMessage: "We have received your moving quote request and will contact you within 24 hours with a detailed estimate. Our team is excited to help make your move smooth and stress-free."
+    }
+
+    const displayData = data || fallbackData;
+
     return (
         <>
             {/* Google Ads gtag.js */}
@@ -48,7 +56,7 @@ const ThankYou = ({ thankYou }) => {
                                 transition={{ delay: 0.3 }}
                                 className="text-3xl font-semibold mb-3"
                             >
-                                {thankYou?.message}
+                                {displayData?.message}
                             </motion.h1>
 
                             <motion.p
@@ -57,7 +65,7 @@ const ThankYou = ({ thankYou }) => {
                                 transition={{ delay: 0.5 }}
                                 className="text-gray-600 max-w-md"
                             >
-                                {thankYou?.subMessage}
+                                {displayData?.subMessage}
                             </motion.p>
                         </div>
                     </div>
@@ -71,13 +79,25 @@ const ThankYou = ({ thankYou }) => {
 
 export default ThankYou
 export async function getStaticProps() {
-    const thankYou = await getThankYouMessageData()
-
-    return {
-        props: {
-            thankYou
-        },
-        revalidate: 60, // Revalidate every 60 seconds
+    try {
+        const thankYou = await getThankYouMessageData()
+        
+        return {
+            props: {
+                thankYou: thankYou || null
+            },
+            revalidate: 60, // Revalidate every 60 seconds
+        }
+    } catch (error) {
+        console.error('Error fetching thank you data:', error)
+        
+        // Return fallback props if Sanity fetch fails
+        return {
+            props: {
+                thankYou: null
+            },
+            revalidate: 60,
+        }
     }
 }
 
