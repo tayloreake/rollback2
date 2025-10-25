@@ -71,13 +71,13 @@ export default async function handler(req, res) {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.NEXT_PUBLIC_GMAIL_USERNAME,
-        pass: process.env.NEXT_PUBLIC_GMAIL_APP_PASSWORD,
+        user: process.env.GMAIL_USERNAME,
+        pass: process.env.GMAIL_APP_PASSWORD,
       },
     });
 
     const mailOptions = {
-      from: process.env.NEXT_PUBLIC_GMAIL_USERNAME,
+      from: process.env.GMAIL_USERNAME,
       to,
       subject: "Taylor Movers Quote Request",
       text: message,
@@ -87,8 +87,13 @@ export default async function handler(req, res) {
     try {
       await transporter.sendMail(mailOptions);
       emailSent = true;
+      console.log("Email sent successfully to:", to);
     } catch (error) {
       console.error("Nodemailer sendMail error:", error);
+      console.error("Email config check:", {
+        username: process.env.GMAIL_USERNAME ? "SET" : "NOT SET",
+        password: process.env.GMAIL_APP_PASSWORD ? "SET" : "NOT SET"
+      });
       // Don't return here - we still want to log to Sanity
     }
 

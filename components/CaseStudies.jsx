@@ -24,92 +24,26 @@ const CaseStudies = ({
         setLoading(true);
         const blogs = await getBlogs();
         
-        // Filter for long-distance and international move case studies
-        const relevantBlogs = blogs?.filter(blog => {
+        // Filter blogs by "Case Studies" category
+        const caseStudyBlogs = blogs?.filter(blog => {
           if (!blog) return false;
           
-          const title = (blog.blogTitle || '').toLowerCase();
-          const excerpt = (blog.blogExcerpt || '').toLowerCase();
           const categories = blog.blogCategories || [];
-          const tags = blog.blogTags || [];
           
-          // Keywords to look for
-          const longDistanceKeywords = [
-            'long distance', 'long-distance', 'interstate', 'inter-county', 
-            'cross-country', 'nairobi to mombasa', 'nairobi to kisumu', 
-            'county to county', 'across kenya'
-          ];
-          
-          const internationalKeywords = [
-            'international', 'overseas', 'global', 'cross-border', 
-            'diplomatic', 'embassy', 'expat', 'expatriate', 'relocation abroad',
-            'kenya to', 'moving to', 'from kenya', 'international relocation'
-          ];
-          
-          const caseStudyKeywords = [
-            'case study', 'success story', 'customer story', 'client story',
-            'testimonial', 'experience', 'journey', 'project', 'move story'
-          ];
-          
-          // Check title and excerpt
-          const hasLongDistance = longDistanceKeywords.some(keyword => 
-            title.includes(keyword) || excerpt.includes(keyword)
-          );
-          
-          const hasInternational = internationalKeywords.some(keyword => 
-            title.includes(keyword) || excerpt.includes(keyword)
-          );
-          
-          const hasCaseStudyIndicator = caseStudyKeywords.some(keyword => 
-            title.includes(keyword) || excerpt.includes(keyword)
-          );
-          
-          // Check categories
-          const hasRelevantCategory = categories.some(cat => {
+          // Check if blog has "Case Studies" category
+          return categories.some(cat => {
             const categoryName = (cat.category || '').toLowerCase();
-            return longDistanceKeywords.some(keyword => categoryName.includes(keyword)) ||
-                   internationalKeywords.some(keyword => categoryName.includes(keyword)) ||
-                   categoryName.includes('case stud') ||
-                   categoryName.includes('success') ||
-                   categoryName.includes('story');
+            return categoryName.includes('case stud');
           });
-          
-          // Check tags
-          const hasRelevantTag = tags.some(tag => {
-            const tagName = (tag.tag || '').toLowerCase();
-            return longDistanceKeywords.some(keyword => tagName.includes(keyword)) ||
-                   internationalKeywords.some(keyword => tagName.includes(keyword)) ||
-                   tagName.includes('case stud') ||
-                   tagName.includes('success') ||
-                   tagName.includes('story');
-          });
-          
-          return (hasLongDistance || hasInternational) && 
-                 (hasCaseStudyIndicator || hasRelevantCategory || hasRelevantTag);
         });
         
-        // Fallback: if no specific case studies found, get recent blog posts with moving-related content
-        let finalCaseStudies = relevantBlogs;
+        // Sort by date (newest first) if date exists
+        const sortedBlogs = caseStudyBlogs.sort((a, b) => {
+          if (!a.date || !b.date) return 0;
+          return new Date(b.date) - new Date(a.date);
+        });
         
-        if (!relevantBlogs || relevantBlogs.length === 0) {
-          const movingBlogs = blogs?.filter(blog => {
-            const title = (blog.blogTitle || '').toLowerCase();
-            const excerpt = (blog.blogExcerpt || '').toLowerCase();
-            
-            const movingKeywords = [
-              'moving', 'relocation', 'transport', 'logistics', 'packing',
-              'taylor movers', 'move', 'relocated', 'shipping'
-            ];
-            
-            return movingKeywords.some(keyword => 
-              title.includes(keyword) || excerpt.includes(keyword)
-            );
-          }).slice(0, showAll ? 6 : 3);
-          
-          finalCaseStudies = movingBlogs;
-        }
-        
-        setCaseStudies(finalCaseStudies?.slice(0, showAll ? 6 : 3) || []);
+        setCaseStudies(sortedBlogs?.slice(0, showAll ? 6 : 3) || []);
       } catch (error) {
         console.error('Error fetching case studies:', error);
         setCaseStudies([]);

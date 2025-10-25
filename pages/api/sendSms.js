@@ -72,7 +72,7 @@ export default async function handler(req, res) {
       response = await sms.send({
         to: ['+254721410517'], 
         message: messageWithIp, 
-        from: process.env.AT_USER_ID || 'TaylorMover'
+        from: process.env.NEXT_PUBLIC_AT_USER_ID || 'TaylorMover'
       });
       console.log(`SMS sent successfully from IP: ${ipAddress}`);
     } catch (error) {

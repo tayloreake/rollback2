@@ -1,7 +1,12 @@
 {
   "version": 2,
-  "alias": ["taylorea.com", "www.taylorea.com"],
+  "alias": [
+    "taylorea.com",
+    "www.taylorea.com"
+  ],
   "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
   "env": {
     "NEXT_PUBLIC_SITE_URL": "https://taylorea.com"
   },
@@ -80,6 +85,18 @@
       ]
     }
   ],
-  "redirects": [],
+  "redirects": [
+    {
+      "source": "/Services",
+      "destination": "/ServicesPage",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
   "trailingSlash": false
 }

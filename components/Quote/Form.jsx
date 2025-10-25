@@ -76,6 +76,7 @@ const QuoteForm = () => {
         detail: { status: "success", timestamp: Date.now() }
       }));
 
+      // Use Next.js router for better navigation
       window.location.href = "/ThankYou";
     }
   }, [formSubmitted]);

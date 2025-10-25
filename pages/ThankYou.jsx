@@ -91,7 +91,7 @@ export async function getStaticProps() {
     } catch (error) {
         console.error('Error fetching thank you data:', error)
         
-        // Return fallback props if Sanity fetch fails
+        // Return fallback props if Sanity fetch fails - don't fail the build
         return {
             props: {
                 thankYou: null

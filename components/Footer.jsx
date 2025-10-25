@@ -42,7 +42,7 @@ const Footer = ({ caseStudies = [] }) => {
         try {
           // Use Promise.race with timeout to prevent hanging
           const fetchPromise = (async () => {
-            let studies = await getRecentBlogs(3); // Reduced to 3 items for better performance
+            let studies = await getCaseStudyBlogs(3); // Fetch blogs with "Case Studies" category
             return studies || [];
           })();
           
