@@ -10,15 +10,23 @@ import client from '../sanity/config/client-config';
 const CaseStudies = ({ 
   title = "Success Stories", 
   subtitle = "Real case studies of our long-distance and international moves",
-  showAll = false 
+  showAll = false,
+  initialCaseStudies = [] 
 }) => {
-  const [caseStudies, setCaseStudies] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [caseStudies, setCaseStudies] = useState(initialCaseStudies);
+  const [loading, setLoading] = useState(!initialCaseStudies || initialCaseStudies.length === 0);
 
   const builder = imageUrlBuilder(client);
   const urlFor = (source) => builder.image(source);
 
   useEffect(() => {
+    // Only fetch if no initial data was provided
+    if (initialCaseStudies && initialCaseStudies.length > 0) {
+      setCaseStudies(initialCaseStudies);
+      setLoading(false);
+      return;
+    }
+
     const fetchCaseStudies = async () => {
       try {
         setLoading(true);
@@ -53,7 +61,7 @@ const CaseStudies = ({
     };
 
     fetchCaseStudies();
-  }, [showAll]);
+  }, [showAll, initialCaseStudies]);
 
   if (loading) {
     return (

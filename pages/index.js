@@ -1,5 +1,5 @@
 import React from 'react';
-import { getClientCategories, getClientLogos, getClientReviews, getLandingAbout, getLandingPageData, getLandingServices, getSiteLogos } from "../sanity/sanity-utils"
+import { getClientCategories, getClientLogos, getClientReviews, getLandingAbout, getLandingPageData, getLandingServices, getSiteLogos, getCaseStudyBlogs } from "../sanity/sanity-utils"
 import imageUrlBuilder from "@sanity/image-url"
 import client from "../sanity/config/client-config"
 import getPageMetadata from "../SEO/seo"
@@ -63,7 +63,7 @@ import {
   StaggerItem 
 } from '../components/modern/PageTransitions';
 
-export default function Home({ landingPage, reviews, clients, clientCategories, siteLogos, landingAbout, landingServices }) {
+export default function Home({ landingPage, reviews, clients, clientCategories, siteLogos, landingAbout, landingServices, caseStudies }) {
   const builder = imageUrlBuilder(client)
   const [reviewsData, setReviewsData] = useState(reviews || [])
   const clientReviews = reviews || []
@@ -367,6 +367,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
           title="Success Stories"
           subtitle="Real case studies of our long-distance and international moves across Kenya and beyond"
           showAll={false}
+          initialCaseStudies={caseStudies}
         />
       </div>
 
@@ -428,7 +429,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
 export async function getStaticProps() {
   try {
     // Parallel data fetching - much faster than sequential
-    const [landingPage, reviews, clients, siteLogos, landingServices, landingAbout, clientCategories] = 
+    const [landingPage, reviews, clients, siteLogos, landingServices, landingAbout, clientCategories, caseStudies] = 
       await Promise.all([
         getLandingPageData(),
         getClientReviews(),
@@ -436,7 +437,8 @@ export async function getStaticProps() {
         getSiteLogos(),
         getLandingServices(),
         getLandingAbout(),
-        getClientCategories()
+        getClientCategories(),
+        getCaseStudyBlogs(3)
       ]);
 
     return {
@@ -447,7 +449,8 @@ export async function getStaticProps() {
         clientCategories: clientCategories || [],
         siteLogos: siteLogos || [],
         landingAbout: landingAbout || [],
-        landingServices: landingServices || []
+        landingServices: landingServices || [],
+        caseStudies: caseStudies || []
       },
       // Revalidate every hour (3600 seconds) instead of 10 seconds
       // This dramatically reduces database load and improves performance
@@ -464,7 +467,8 @@ export async function getStaticProps() {
         clientCategories: [],
         siteLogos: [],
         landingAbout: [],
-        landingServices: []
+        landingServices: [],
+        caseStudies: []
       },
       revalidate: 60 // Retry in 1 minute on error
     }
