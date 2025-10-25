@@ -167,12 +167,17 @@ export async function getBlacklistedIps() {
 export async function getCaseStudyBlogs(limit = 5) {
   try {
     const allBlogs = await createClient(clientConfig).fetch(
-      groq`*[_type == "blogs" && defined(blogTitle)] | order(date desc) {
+      groq`*[_type == "blogs" && defined(blogTitle) && !(_id in path('drafts.**'))] | order(date desc) {
         _id,
         blogTitle,
         slug,
         blogExcerpt,
+        blogImage,
         date,
+        author->{
+          authorName,
+          authorImage
+        },
         blogCategories[]->{
           category
         }
