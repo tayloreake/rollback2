@@ -62,7 +62,7 @@ function MyApp({ Component, pageProps }) {
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <Layout>
+      <Layout caseStudies={pageProps.caseStudies || []}>
         {/* Google Tag Manager */}
         <Script id="gtm-setup" strategy="afterInteractive">
           {`
