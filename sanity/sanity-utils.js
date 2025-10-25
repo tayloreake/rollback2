@@ -26,9 +26,23 @@ export async function getServicesPageData() {
 
 export async function getBlogs() {
   return createClient(clientConfig).fetch(
-    groq`*[_type == "blogs"]{
-        ...,
-        title,
+    groq`*[_type == "blogs" && !(_id in path('drafts.**')) && defined(slug.current)]{
+        _id,
+        blogTitle,
+        blogExcerpt,
+        blogImage,
+        date,
+        slug,
+        author->{
+          authorName,
+          authorImage
+        },
+        blogCategories[]->{
+          category
+        },
+        blogTags[]->{
+          tag
+        },
         content[]{
           ...,
           _type == "image" => {
@@ -39,7 +53,7 @@ export async function getBlogs() {
             }
           }
         }
-      }`
+      } | order(date desc)`
   )
 }
 export async function getBlog(slug) {
@@ -149,11 +163,11 @@ export async function getBlacklistedIps() {
   )
 }
 
-// Function to get case study blog posts (simplified for better performance)
+// Function to get case study blog posts filtered by "Case Studies" category
 export async function getCaseStudyBlogs(limit = 5) {
   try {
-    return createClient(clientConfig).fetch(
-      groq`*[_type == "blogs" && defined(blogTitle)] | order(date desc) [0...${limit}] {
+    const allBlogs = await createClient(clientConfig).fetch(
+      groq`*[_type == "blogs" && defined(blogTitle)] | order(date desc) {
         _id,
         blogTitle,
         slug,
@@ -163,7 +177,16 @@ export async function getCaseStudyBlogs(limit = 5) {
           category
         }
       }`
-    )
+    );
+    
+    // Filter blogs that have "Case Studies" category
+    const caseStudyBlogs = allBlogs.filter(blog => {
+      return blog.blogCategories?.some(cat => 
+        cat.category?.toLowerCase().includes('case stud')
+      );
+    });
+    
+    return caseStudyBlogs.slice(0, limit);
   } catch (error) {
     console.error('Error fetching case study blogs:', error);
     return [];

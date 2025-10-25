@@ -22,6 +22,8 @@ const BlogCard = ({ blog }) => {
     e.preventDefault()
     e.stopPropagation()
     
+    if (!blog.slug?.current) return
+    
     if (navigator.share) {
       try {
         await navigator.share({
@@ -51,6 +53,11 @@ const BlogCard = ({ blog }) => {
     setIsLiked(!isLiked)
   }
 
+  // If blog has no slug, don't render it
+  if (!blog.slug?.current) {
+    return null
+  }
+
   return (
     <div className={`rounded-lg border overflow-hidden transition-all duration-200 group ${
       theme === 'dark' 
@@ -60,26 +67,39 @@ const BlogCard = ({ blog }) => {
       <Link href={`/Blog/${blog.slug.current}`}>
         <div className="cursor-pointer">
           {/* Image */}
-          <div className="relative overflow-hidden">
-            <Image
-              src={urlFor(blog.blogImage).url()}
-              alt={blog.blogTitle}
-              width={350}
-              height={200}
-              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
-            />
+          {blog.blogImage && (
+            <div className="relative overflow-hidden">
+              <Image
+                src={urlFor(blog.blogImage).url()}
+                alt={blog.blogTitle}
+                width={350}
+                height={200}
+                className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
+              />
             
-            {/* Category tags overlay */}
-            {blog.blogCategories && blog.blogCategories.length > 0 && (
-              <div className="absolute top-3 left-3">
-                {blog.blogCategories.slice(0, 2).map((category, idx) => (
-                  <span key={idx} className="inline-block bg-orange-500 text-white text-xs px-2 py-1 rounded mr-2 mb-1">
-                    {category.category || 'Category'}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
+              {/* Category tags overlay */}
+              {blog.blogCategories && blog.blogCategories.length > 0 && (
+                <div className="absolute top-3 left-3">
+                  {blog.blogCategories.slice(0, 2).map((category, idx) => (
+                    <span key={idx} className="inline-block bg-orange-500 text-white text-xs px-2 py-1 rounded mr-2 mb-1">
+                      {category.category || 'Category'}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Placeholder if no image */}
+          {!blog.blogImage && (
+            <div className={`w-full h-48 flex items-center justify-center ${
+              theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
+            }`}>
+              <span className={`text-sm ${
+                theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+              }`}>No image available</span>
+            </div>
+          )}
 
           {/* Content */}
           <div className="p-4">
@@ -103,10 +123,12 @@ const BlogCard = ({ blog }) => {
                   <span>{blog.author.authorName}</span>
                 </div>
               )}
-              <div className="flex items-center">
-                <BsCalendar size={14} className="mr-1" />
-                <span>{moment(blog.date).format("MMM DD, YYYY")}</span>
-              </div>
+              {blog.date && (
+                <div className="flex items-center">
+                  <BsCalendar size={14} className="mr-1" />
+                  <span>{moment(blog.date).format("MMM DD, YYYY")}</span>
+                </div>
+              )}
             </div>
 
             {/* Title */}

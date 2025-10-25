@@ -4,6 +4,7 @@ import BlogCard from "../components/Blog/BlogCard"
 import BlogLayout from "../components/Blog/BlogLayout"
 import SearchBar from "../components/Blog/SearchBar"
 import CategorySidebar from "../components/Blog/CategorySidebar"
+import ErrorBoundary from "../components/Blog/ErrorBoundary"
 import { BlogThemeProvider, useBlogTheme } from "../contexts/BlogThemeContext"
 import {
   getBlogs,
@@ -191,9 +192,11 @@ const BlogContent = ({ blogs, tags, categories }) => {
 
 const Blog = (props) => {
   return (
-    <BlogThemeProvider>
-      <BlogContent {...props} />
-    </BlogThemeProvider>
+    <ErrorBoundary>
+      <BlogThemeProvider>
+        <BlogContent {...props} />
+      </BlogThemeProvider>
+    </ErrorBoundary>
   )
 }
 

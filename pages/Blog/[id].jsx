@@ -8,6 +8,7 @@ import BlogLayout from "../../components/Blog/BlogLayout"
 import CommentSection from "../../components/Blog/CommentSection"
 import CategorySidebar from "../../components/Blog/CategorySidebar"
 import SearchBar from "../../components/Blog/SearchBar"
+import ErrorBoundary from "../../components/Blog/ErrorBoundary"
 import { BsCalendar, BsHeart, BsBookmark, BsShare, BsArrowLeft } from "react-icons/bs"
 import Link from "next/link"
 import Head from "next/head"
@@ -68,7 +69,9 @@ const BlogPostContent = ({ blog }) => {
         
         {/* Author info */}
         {blog?.author && (
-          <div className="flex items-center mb-4 pb-4 border-b border-gray-700">
+          <div className={`flex items-center mb-4 pb-4 border-b ${
+            theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+          }`}>
             {blog.author.authorImage && (
               <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
                 <Image
@@ -144,7 +147,9 @@ const BlogPostContent = ({ blog }) => {
         <meta name="description" content={blog?.blogExcerpt || ''} />
         <meta property="og:title" content={blog?.blogTitle || 'Blog Post'} />
         <meta property="og:description" content={blog?.blogExcerpt || ''} />
-        {blog?.blogImage && <meta property="og:image" content={urlFor(blog.blogImage).url()} />}
+        {blog?.blogImage && (
+          <meta property="og:image" content={urlFor(blog.blogImage).url()} />
+        )}
         <meta property="og:type" content="article" />
       </Head>
 
@@ -293,9 +298,11 @@ export async function getServerSideProps(context) {
 
 const Blog = (props) => {
   return (
-    <BlogThemeProvider>
-      <BlogPostContent {...props} />
-    </BlogThemeProvider>
+    <ErrorBoundary>
+      <BlogThemeProvider>
+        <BlogPostContent {...props} />
+      </BlogThemeProvider>
+    </ErrorBoundary>
   )
 }
 
