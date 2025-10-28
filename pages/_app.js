@@ -63,6 +63,13 @@ function MyApp({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <Layout caseStudies={pageProps.caseStudies || []}>
+        {/* Zoho PageSense Tracking */}
+        <Script
+          src="https://cdn.pagesense.io/js/taylorsolutions/9c8c7528274e4f4b978c2486a52f8634.js"
+          strategy="afterInteractive"
+          id="pagesense-tracking"
+        />
+
         {/* Google Tag Manager */}
         <Script id="gtm-setup" strategy="afterInteractive">
           {`

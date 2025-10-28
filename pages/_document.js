@@ -17,8 +17,10 @@ export default function Document() {
                 {/* Resource Hints for Performance */}
                 <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
                 <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+                <link rel="dns-prefetch" href="https://cdn.pagesense.io" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="preconnect" href="https://cdn.pagesense.io" crossOrigin="anonymous" />
                 
                 {/* Canonical URL base - will be overridden by page-specific canonicals */}
                 <link rel="canonical" href="https://taylorea.com" />
