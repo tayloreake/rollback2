@@ -205,7 +205,7 @@ Sea Freight: This is the most cost-effective option for a full household move. O
       </Head>
 
       <Jumbotron 
-        image={'taylor-movers-kenya-faq-banner.png'} 
+        image={'taylor-movers-kenya-professional-team.png'} 
         title="Frequently Asked Questions"
         subtitle="Get instant answers to all your moving questions. We're here to help make your relocation smooth and stress-free."
         alt={"Frequently Asked Questions about Taylor Movers Kenya moving services"} 

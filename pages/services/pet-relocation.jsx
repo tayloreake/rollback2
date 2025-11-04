@@ -3,8 +3,9 @@ import Image from 'next/image'
 import getPageMetadata from '../../SEO/seo'
 import Head from 'next/head'
 import Jumbotron from '../../components/jumbotron'
-import QuoteModal from '../../components/Quote/QuoteModal'
-import NewsletterSection from '../../components/NewsletterSection'
+import dynamic from 'next/dynamic'
+const QuoteModal = dynamic(() => import('../../components/Quote/QuoteModal'), { ssr: false, loading: () => null })
+const NewsletterSection = dynamic(() => import('../../components/NewsletterSection'), { ssr: false, loading: () => null })
 import { BsCheckCircle, BsShield, BsTruck, BsClock, BsGlobe } from 'react-icons/bs'
 import { FaPaw, FaPlane, FaFileAlt } from 'react-icons/fa'
 

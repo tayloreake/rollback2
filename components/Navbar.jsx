@@ -79,6 +79,19 @@ const Navbar = () => {
         }
     }, [servicesDropdownOpen, isClient])
 
+    // Aggressively prefetch top routes for instant navigation
+    useEffect(() => {
+        if (!router?.prefetch) return
+        const routesToPrefetch = [
+            '/', '/About', '/Gallery', '/Blog', '/faq', '/Contacts', '/Feedback', '/Jobs', '/services',
+            '/services/home', '/services/office', '/services/corporate', '/services/intl', '/services/storage', '/services/long', '/services/moves', '/services/special',
+            '/services/piano-moving', '/services/pet-relocation'
+        ]
+        routesToPrefetch.forEach((r) => {
+            try { router.prefetch(r) } catch (e) {}
+        })
+    }, [router])
+
 
     // Quote Component
     const ShowQuote = () => {
@@ -225,6 +238,13 @@ const Navbar = () => {
         setIsEnhancedHomePage(true)
     }, [router?.asPath])
 
+    // Ensure dropdowns/drawers close on route change to avoid overlaying new pages
+    useEffect(() => {
+        setOpen(false)
+        setServicesDropdownOpen(false)
+        setMobileServicesOpen(false)
+    }, [router?.asPath])
+
     return (
         <div className="w-full">
             {/* Phone number bar - always at top */}
@@ -365,6 +385,16 @@ const Navbar = () => {
                         <Link href='/Contacts' className='nav-link-modern'>
                             <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
                                 Contact Us
+                            </div>
+                        </Link>
+                        <Link href='/Feedback' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                Feedback
+                            </div>
+                        </Link>
+                        <Link href='/Jobs' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                Jobs
                             </div>
                         </Link>
                     </nav>
@@ -521,6 +551,18 @@ const Navbar = () => {
                                 <Link href='/Contacts' onClick={() => setOpen(false)} className='block'>
                                     <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
                                         Contact Us
+                                    </div>
+                                </Link>
+                                
+                                <Link href='/Feedback' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        Feedback
+                                    </div>
+                                </Link>
+                                
+                                <Link href='/Jobs' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        Jobs
                                     </div>
                                 </Link>
                             </div>

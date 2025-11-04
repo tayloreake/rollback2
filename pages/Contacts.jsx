@@ -128,13 +128,15 @@ const Contacts = () => {
         </div>
       </div>
 
+
+
       {/* Map or Additional Info Section */}
       <div className="bg-gradient-to-r from-[#FF5000] to-[#FF8A50] py-12">
         <div className="container">
           <div className="text-center text-white">
             <h2 className="text-3xl font-bold mb-4">Ready to Move?</h2>
             <p className="text-xl mb-6">Get your free, no-obligation quote today!</p>
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-4 flex-wrap">
               <a 
                 href="tel:+254721410517" 
                 className="px-8 py-4 bg-white text-[#FF5000] font-bold rounded-full hover:shadow-2xl transition-all"
@@ -147,6 +149,12 @@ const Contacts = () => {
                 className="px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:shadow-2xl transition-all"
               >
                 WhatsApp Us
+              </a>
+              <a 
+                href="/Feedback" 
+                className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-[#FF5000] transition-all"
+              >
+                Share Feedback
               </a>
             </div>
           </div>

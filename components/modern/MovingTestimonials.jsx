@@ -13,7 +13,7 @@ const defaultReviews = [
     title: "Resident of Karen",
     rating: 5,
     review: "Taylor Movers made our family's relocation to Karen seamless. Their team was professional, punctual, and handled our furniture with exceptional care. Highly recommend their services!",
-    avatar: "/assets/Reviews/avatar-1.jpg",
+    avatar: "/assets/Reviews/review1.png",
     date: "2024-11-15",
     platform: "Google My Business"
   },
@@ -22,7 +22,7 @@ const defaultReviews = [
     title: "Business Owner",
     rating: 5,
     review: "Exceptional service from Taylor Movers! They relocated our entire office from Westlands to Upper Hill with zero downtime. Professional team, fair pricing, and excellent customer service.",
-    avatar: "/assets/Reviews/avatar-2.jpg",
+    avatar: "/assets/Reviews/review1.png",
     date: "2024-11-10",
     platform: "Google My Business"
   },
@@ -31,7 +31,7 @@ const defaultReviews = [
     title: "UN Employee",
     rating: 5,
     review: "International relocation can be stressful, but Taylor Movers handled everything perfectly. From packing in Nairobi to delivery in Geneva - outstanding service throughout the entire process!",
-    avatar: "/assets/Reviews/avatar-3.jpg",
+    avatar: "/assets/Reviews/review1.png",
     date: "2024-11-05",
     platform: "Google My Business"
   },
@@ -40,7 +40,7 @@ const defaultReviews = [
     title: "Resident of Kilimani",
     rating: 5,
     review: "Best moving company in Kenya! They helped us relocate from Mombasa to Nairobi. Every item arrived safely and on time. Will definitely use their services again.",
-    avatar: "/assets/Reviews/avatar-4.jpg",
+    avatar: "/assets/Reviews/review1.png",
     date: "2024-10-28",
     platform: "Google My Business"
   },
@@ -49,7 +49,7 @@ const defaultReviews = [
     title: "Marketing Manager",
     rating: 5,
     review: "Taylor Movers Kenya exceeded our expectations. Their warehousing solutions saved us during our office renovation. Professional, reliable, and trustworthy team!",
-    avatar: "/assets/Reviews/avatar-5.jpg",
+    avatar: "/assets/Reviews/review1.png",
     date: "2024-10-20",
     platform: "Google My Business"
   },
@@ -58,7 +58,7 @@ const defaultReviews = [
     title: "Embassy Staff",
     rating: 5,
     review: "Fantastic experience with Taylor Movers! They handled our diplomatic move with utmost professionalism. Every detail was managed perfectly. 5 stars well deserved!",
-    avatar: "/assets/Reviews/avatar-6.jpg",
+    avatar: "/assets/Reviews/review1.png",
     date: "2024-10-15",
     platform: "Google My Business"
   }
@@ -92,7 +92,7 @@ const MovingTestimonials = ({
               title: review.title || "Taylor Movers Client",
               rating: review.rating || 5,
               review: review.review || review.testimonial || "Great service!",
-              avatar: review.logo ? urlFor(review.logo).url() : `/assets/Reviews/avatar-${(index % 6) + 1}.jpg`,
+              avatar: review.logo ? urlFor(review.logo).url() : `/assets/Reviews/review1.png`,
               date: review.createdAt || new Date().toISOString().split('T')[0],
               platform: "Google My Business"
             }));
@@ -241,13 +241,13 @@ const MovingTestimonials = ({
                     >
                       <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-[#FF5000] shadow-lg">
                         <Image
-                          src={reviews[currentIndex]?.avatar || `/assets/Reviews/avatar-${(currentIndex % 6) + 1}.jpg`}
+                          src={reviews[currentIndex]?.avatar || `/assets/Reviews/review1.png`}
                           alt={reviews[currentIndex]?.name}
                           width={160}
                           height={160}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            e.target.src = `/assets/Reviews/avatar-${(currentIndex % 6) + 1}.jpg`;
+                            e.target.src = `/assets/Reviews/review1.png`;
                           }}
                         />
                       </div>

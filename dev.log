@@ -1,22 +1,42 @@
-nohup: ignoring input
 
 > my-app@0.1.0 dev
 > next dev -p 3002
 
-- error Failed to start server
-Error: listen EADDRINUSE: address already in use :::3002
-    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
-    at listenInCluster (node:net:1965:12)
-    at Server.listen (node:net:2067:7)
-    at /home/ace/rollback2/node_modules/next/dist/server/lib/start-server.js:149:16
-    at new Promise (<anonymous>)
-    at startServer (/home/ace/rollback2/node_modules/next/dist/server/lib/start-server.js:134:11)
-    at setupFork (/home/ace/rollback2/node_modules/next/dist/cli/next-dev.js:352:75)
-    at runDevServer (/home/ace/rollback2/node_modules/next/dist/cli/next-dev.js:361:23)
-    at async nextDev (/home/ace/rollback2/node_modules/next/dist/cli/next-dev.js:470:9) {
-  code: 'EADDRINUSE',
-  errno: -98,
-  syscall: 'listen',
-  address: '::',
-  port: 3002
-}
+- ready started server on 0.0.0.0:3002, url: http://localhost:3002
+- [36minfo[39m Loaded env from /home/ace/rollback2/.env
+- [33mwarn[39m [1mYou have enabled experimental feature (esmExternals) in next.config.js.[22m
+- [33mwarn[39m Experimental features are not covered by semver, and may cause unexpected or broken application behavior. Use at your own risk.
+
+- [35mevent[39m compiled client and server successfully in 58.5s (3515 modules)
+- [36mwait[39m compiling...
+- [35mevent[39m compiled successfully in 2.9s (3419 modules)
+- [36mwait[39m compiling...
+- [36mwait[39m compiling / (client and server)...
+- [35mevent[39m compiled client and server successfully in 13s (3936 modules)
+Since you haven't set a value for `useCdn`, we will deliver content using our global, edge-cached API-CDN. If you wish to have content delivered faster, set `useCdn: false` to use the Live API. Note: You may incur higher costs using the live API.
+Warning: React does not recognize the `fetchPriority` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `fetchpriority` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+    at img
+    at eval (webpack-internal:///./node_modules/next/dist/client/image.js:233:11)
+    at eval (webpack-internal:///./node_modules/next/dist/client/image.js:306:11)
+    at a
+    at LinkComponent (webpack-internal:///./node_modules/next/dist/client/link.js:104:19)
+    at div
+    at div
+    at div
+    at Navbar (webpack-internal:///./components/Navbar.jsx:42:76)
+    at Layout (webpack-internal:///./components/Layout.js:30:19)
+    at MyApp (webpack-internal:///./pages/_app.js:55:18)
+    at StyleRegistry (/home/ace/rollback2/node_modules/styled-jsx/dist/index/index.js:449:36)
+    at PathnameContextProviderAdapter (/home/ace/rollback2/node_modules/next/dist/shared/lib/router/adapters.js:78:11)
+    at AppContainer (/home/ace/rollback2/node_modules/next/dist/server/render.js:337:29)
+    at AppContainerWithIsomorphicFiberStructure (/home/ace/rollback2/node_modules/next/dist/server/render.js:373:57)
+    at div
+    at Body (/home/ace/rollback2/node_modules/next/dist/server/render.js:673:21)
+- [36mwait[39m compiling /404 (client and server)...
+- [35mevent[39m compiled client and server successfully in 2.2s (3939 modules)
+- [36mwait[39m compiling /About...
+- [35mevent[39m compiled client and server successfully in 15.3s (4268 modules)
+- [36mwait[39m compiling /services/storage...
+- [35mevent[39m compiled client and server successfully in 13.3s (4273 modules)
+- [36mwait[39m compiling...
+- [35mevent[39m compiled client and server successfully in 23.2s (4260 modules)

@@ -212,6 +212,12 @@ const Footer = ({ caseStudies = [] }) => {
                     <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Contact Us</p>
                   </div>
                 </Link>
+                <Link className="block" href='/Jobs'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Jobs</p>
+                  </div>
+                </Link>
               </div>
               
               <h3 className='text-[#FF5000] font-bold text-xl mb-4 mt-6'>
