@@ -6,6 +6,9 @@ import { FaStar, FaRegStar, FaQuoteLeft, FaChevronLeft, FaChevronRight } from 'r
 import imageUrlBuilder from '@sanity/image-url';
 import client from '../../sanity/config/client-config';
 
+// Initialize builder at module level to prevent re-creation on every render
+const builder = imageUrlBuilder(client);
+
 // Google My Business style reviews as fallback
 const defaultReviews = [
   {
@@ -64,21 +67,22 @@ const defaultReviews = [
   }
 ];
 
-const MovingTestimonials = ({ 
+const MovingTestimonials = ({
   title = "What Our Clients Say",
   subtitle = "Real experiences from our satisfied customers across Kenya and beyond",
   autoPlay = true,
-  interval = 5000 
+  interval = 5000
 }) => {
   const [reviews, setReviews] = useState(defaultReviews);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const intervalRef = useRef(null);
 
-  const builder = imageUrlBuilder(client);
-  const urlFor = useCallback((source) => builder.image(source), [builder]);
+  // Use the module-level builder
+  const urlFor = useCallback((source) => builder.image(source), []);
 
   // Load reviews from localStorage (from Sanity CMS)
+  // This only needs to run once on mount, so dependencies array is empty
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -103,7 +107,7 @@ const MovingTestimonials = ({
         console.log('Error loading reviews from localStorage:', error);
       }
     }
-  }, [urlFor]);
+  }, []); // Empty dependencies - only run once on mount
 
   // Auto-play functionality
   useEffect(() => {
@@ -146,28 +150,28 @@ const MovingTestimonials = ({
     <section className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 opacity-5">
-        <motion.div 
+        <motion.div
           className="absolute top-10 left-10 w-32 h-32 bg-[#FF5000] rounded-full"
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 1],
-            rotate: [0, 180, 360] 
+            rotate: [0, 180, 360]
           }}
-          transition={{ 
-            duration: 15, 
-            repeat: Infinity, 
-            ease: "linear" 
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "linear"
           }}
         />
-        <motion.div 
+        <motion.div
           className="absolute bottom-10 right-10 w-24 h-24 bg-[#FF8A50] rounded-full"
-          animate={{ 
+          animate={{
             scale: [1.2, 1, 1.2],
-            y: [-20, 20, -20] 
+            y: [-20, 20, -20]
           }}
-          transition={{ 
-            duration: 10, 
-            repeat: Infinity, 
-            ease: "easeInOut" 
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
           }}
         />
       </div>
@@ -207,7 +211,7 @@ const MovingTestimonials = ({
                     <blockquote className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
                       "{reviews[currentIndex]?.review}"
                     </blockquote>
-                    
+
                     {/* Rating */}
                     <div className="flex items-center mb-4">
                       <div className="flex mr-3">
@@ -290,9 +294,8 @@ const MovingTestimonials = ({
               <motion.button
                 key={index}
                 onClick={() => goToReview(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentIndex % 6 ? 'bg-[#FF5000] scale-125' : 'bg-gray-300'
-                }`}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex % 6 ? 'bg-[#FF5000] scale-125' : 'bg-gray-300'
+                  }`}
                 whileHover={{ scale: 1.2 }}
                 whileTap={{ scale: 0.9 }}
               />
