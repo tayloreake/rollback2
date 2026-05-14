@@ -114,21 +114,14 @@ function MyApp({ Component, pageProps }) {
                   var p=document.createElement('script');
                   p.src='https://cdn.pagesense.io/js/taylorsolutions/9c8c7528274e4f4b978c2486a52f8634.js';
                   p.async=true; document.head.appendChild(p);
+
+                  
+                  // Zoho PageSense
+                  var p=document.createElement('script');
+                  p.src='https://salesiq.zohopublic.com/widget?wc=siq45906fdec817e7bc305045159438b409c7d9d2a0921da2ee29bafbbf82da3c75';
+                  p.async=true; document.head.appendChild(p);
                                     
-                  // Zoho SalesIQ
-                  window.$zoho = window.$zoho || {};
-                  window.$zoho.salesiq = window.$zoho.salesiq || {
-                    widgetcode: "siq45906fdec817e7bc305045159438b409c7d9d2a0921da2ee29bafbbf82da3c75",
-                    values: {},
-                    ready: function() {}
-                  };
-                  console.log('zoho object:', window.$zoho)
-console.log('salesiq:', window.$zoho?.salesiq)
-document.querySelectorAll('script[src*="salesiq"], script[src*="zoho"]').forEach(s => console.log(s.src))
-                  var s=document.createElement('script');
-                  s.id='zsiqscript';
-                  s.src='https://salesiq.zohopublic.com/widget?wc=siq45906fdec817e7bc305045159438b409c7d9d2a0921da2ee29bafbbf82da3c75';
-                  s.async=true; document.head.appendChild(s);
+                  
                 } catch(e) { /* no-op */ }
               }
               function onIdle(cb){
