@@ -122,6 +122,9 @@ function MyApp({ Component, pageProps }) {
                     values: {},
                     ready: function() {}
                   };
+                  console.log('zoho object:', window.$zoho)
+console.log('salesiq:', window.$zoho?.salesiq)
+document.querySelectorAll('script[src*="salesiq"], script[src*="zoho"]').forEach(s => console.log(s.src))
                   var s=document.createElement('script');
                   s.id='zsiqscript';
                   s.src='https://salesiq.zohopublic.com/widget?wc=siq45906fdec817e7bc305045159438b409c7d9d2a0921da2ee29bafbbf82da3c75';
