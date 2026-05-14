@@ -64,19 +64,6 @@ export default function Document() {
                 
                 <Main />
                 <NextScript />
-                        
-                {/* Zoho SalesIQ */}
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `window.$zoho=window.$zoho || {};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`,
-                    }}
-                />
-                <script
-                    id="zsiqscript"
-                    src="https://salesiq.zohopublic.com/widget?wc=siq45906fdec817e7bc305045159438b409c7d9d2a0921da2ee29bafbbf82da3c75"
-                    defer
-                />
-                <NextScript />
             </body>
         </Html>
     );
