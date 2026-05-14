@@ -115,11 +115,15 @@ function MyApp({ Component, pageProps }) {
                   p.src='https://cdn.pagesense.io/js/taylorsolutions/9c8c7528274e4f4b978c2486a52f8634.js';
                   p.async=true; document.head.appendChild(p);
 
-                  
-                  // Zoho PageSense
-                  var p=document.createElement('script');
-                  p.src='https://salesiq.zohopublic.com/widget?wc=siq45906fdec817e7bc305045159438b409c7d9d2a0921da2ee29bafbbf82da3c75';
-                  p.async=true; document.head.appendChild(p);
+                  window.$zoho = window.$zoho || {};
+                  $zoho.salesiq = $zoho.salesiq || { ready: function() {} };
+              
+                  // Zoho SalesIQ Widget Script
+                  var s = document.createElement('script');
+                  s.id = 'zsiqscript';
+                  s.src = 'https://salesiq.zohopublic.com/widget?wc=siq45906fdec817e7bc305045159438b409c7d9d2a0921da2ee29bafbbf82da3c75';
+                  s.defer = true;
+                  document.body.appendChild(s);
                                     
                   
                 } catch(e) { /* no-op */ }
