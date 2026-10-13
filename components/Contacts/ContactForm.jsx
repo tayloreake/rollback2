@@ -12,7 +12,8 @@ const ContactForm = () => {
     const recaptchaRef = useRef(null)
 
     const isValidPhoneNumber = (phoneNumber) => {
-        return /0\d{9}$/.test(phoneNumber)
+        if (!phoneNumber) return false
+        return /^\+?\d[\d\s-]{7,15}$/.test(phoneNumber.trim())
     }
 
     const handleSendSMS = async () => {
@@ -39,9 +40,16 @@ const ContactForm = () => {
                 throw new Error('Failed to verify reCAPTCHA for email');
             }
             const emailOptions = {
-                to: email,
                 message: messageContent,
                 recaptchaToken: emailToken,
+                confirmTo: email,
+                inquiry: {
+                  name: `${fname} ${lname}`.trim(),
+                  email: email,
+                  phone: number,
+                  source: "Contact Form",
+                  notes: `Contact via website | From: ${fname} ${lname} | ${message.slice(0, 150)}`,
+                },
             }
             const smsResponse = await fetch("/api/sendSms", {
                 method: "POST",

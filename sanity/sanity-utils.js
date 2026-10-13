@@ -1,5 +1,15 @@
 import { createClient, groq } from "next-sanity"
+import imageUrlBuilder from "@sanity/image-url"
 import clientConfig from "./config/client-config"
+import serverConfig from "./config/server-client"
+
+// Reads use the public tokenless client.
+// Writes (createQuote/createReview) must use the server token when available.
+const getWriteClient = () => {
+  const token = process.env.SANITY_API_TOKEN || process.env.NEXT_SANITY_API_TOKEN
+  if (token && !token.startsWith("REVOKED")) return createClient({ ...serverConfig, token })
+  return createClient(clientConfig)
+}
 
 export async function getLandingPageData() {
   return createClient(clientConfig).fetch(
@@ -95,7 +105,7 @@ export async function getClientLogos() {
 
 export async function getClientReviews() {
   return createClient(clientConfig).fetch(
-    groq`*[_type == "newreview"]{
+    groq`*[_type == "newreview" && (!defined(approved) || approved == true)]{
         ...,
         
       }`
@@ -141,6 +151,45 @@ export async function getAboutData() {
   )
 }
 
+// CMS SEO override for a service page (Sanity `service` doc metaTitle /
+// metaDescription / ogImage, falling back to hardcoded values when empty).
+// Matches the doc whose slug equals the page's service key, with aliases for
+// legacy slug differences (e.g. office-relocation → office-moves).
+// Also returns the doc's rich-text `content` for CMS-driven body sections.
+const SERVICE_SLUG_ALIASES = {
+  "office-relocation": "office-moves",
+  "residential-moving": "residential-moves",
+  "international-moving": "international-moves",
+  "storage-services": "warehousing-and-storage",
+}
+
+export async function getServiceSEO(serviceKey) {
+  try {
+    const all = await getServicesData()
+    const slugs = [serviceKey, SERVICE_SLUG_ALIASES[serviceKey]].filter(Boolean)
+    const match = (all || []).find((s) => s?.slug?.current && slugs.includes(s.slug.current))
+    if (!match) return null
+    let ogImageUrl = null
+    try {
+      const src = match.ogImage || match.image
+      if (src) ogImageUrl = imageUrlBuilder(clientConfig).image(src).url()
+    } catch {}
+    const content = match.local || match.international || match.others ? {
+      overview: match.local || null,
+      whyChooseUs: match.international || null,
+      process: [...(match.others || []), ...(match.presurvey || [])] || null,
+      name: match.name || null,
+    } : null
+    if (!match.metaTitle && !match.metaDescription && !ogImageUrl && !content) return null
+    return {
+      metaTitle: match.metaTitle || null,
+      metaDescription: match.metaDescription || null,
+      ogImageUrl,
+      content,
+    }
+  } catch { return null }
+}
+
 export async function getThankYouMessageData() {
   return createClient(clientConfig).fetch(
     groq`*[_type == "thankYouMessage"][0]{
@@ -161,6 +210,31 @@ export async function getBlacklistedIps() {
         ...,
       }`
   )
+}
+
+// CMS-managed content (non-PII — safe on the public dataset)
+export async function getFaqs() {
+  try {
+    return createClient(clientConfig).fetch(
+      groq`*[_type == "faq"] | order(order asc) { _id, question, answer }`
+    )
+  } catch { return [] }
+}
+
+export async function getJobs() {
+  try {
+    return createClient(clientConfig).fetch(
+      groq`*[_type == "job" && isOpen != false] | order(order asc) { _id, title, department, location, type, description, requirements }`
+    )
+  } catch { return [] }
+}
+
+export async function getAnnouncement() {
+  try {
+    return createClient(clientConfig).fetch(
+      groq`*[_type == "announcement" && isActive == true][0] { message, link }`
+    )
+  } catch { return null }
 }
 
 // Function to get case study blog posts filtered by "Case Studies" category
@@ -233,6 +307,13 @@ export async function createQuote(
   emailSent = false,
   smsSent = false
 ) {
+  // Sanity Security §2: production quote writes are DISABLED by default.
+  // Set QUOTE_SANITY_WRITE_ENABLED=true only as a temporary fallback, and
+  // NEVER to the public production dataset (use a private dataset instead).
+  if (process.env.QUOTE_SANITY_WRITE_ENABLED !== "true") {
+    console.warn("createQuote blocked: production quote writes are disabled (see Sanity Security §2)")
+    return null
+  }
   try {
     const quoteData = {
       _type: "quote",
@@ -265,7 +346,7 @@ export async function createQuote(
       quoteData.recaptchaScore = recaptchaScore;
     }
 
-    return createClient(clientConfig).create(quoteData);
+    return getWriteClient().create(quoteData);
   } catch (error) {
     console.error("Error creating quote in Sanity:", error);
     throw new Error("Failed to create quote");
@@ -273,7 +354,7 @@ export async function createQuote(
 }
 
 export async function createReview(sentiment, review, name, email) {
-  const client = createClient(clientConfig)
+  const client = getWriteClient()
 
   return client.create({
     _type: "review",

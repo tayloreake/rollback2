@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import getPageMetadata from '../../SEO/seo'
+import { getServiceSEO } from '../../sanity/sanity-utils'
 import Head from 'next/head'
 import Jumbotron from '../../components/jumbotron'
 import dynamic from 'next/dynamic'
@@ -39,7 +40,7 @@ import {
 import { MdSecurity, MdSupport, MdSpeed, MdInventory, MdGroupWork, MdMonetizationOn } from 'react-icons/md'
 import { RiShieldCheckFill, RiCustomerService2Fill, RiTruckFill } from 'react-icons/ri'
 
-const LongDistanceMoving = () => {
+const LongDistanceMoving = ({ serviceSEO }) => {
 
   const whyChooseConsolidated = [
     {
@@ -205,12 +206,20 @@ const LongDistanceMoving = () => {
   return (
     <div className="w-full">
       <Head>
-        <title>{seoData.title}</title>
-        <meta name="description" content={seoData.description} />
+        <title>{serviceSEO?.metaTitle || seoData.title}</title>
+        <meta name="description" content={serviceSEO?.metaDescription || seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
-        <meta property="og:title" content={seoData.openGraph.title} />
-        <meta property="og:description" content={seoData.openGraph.description} />
+        <link rel="canonical" href={seoData.canonical} />
+        <meta property="og:title" content={serviceSEO?.metaTitle || seoData.openGraph.title} />
+        <meta property="og:description" content={serviceSEO?.metaDescription || seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />
+        {serviceSEO?.ogImageUrl && (<meta property="og:image" content={serviceSEO.ogImageUrl} />)}
+        {seoData.structuredData && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(seoData.structuredData) }}
+          />
+        )}
       </Head>
 
       <Jumbotron 
@@ -466,3 +475,12 @@ const LongDistanceMoving = () => {
 }
 
 export default LongDistanceMoving
+
+export async function getStaticProps() {
+  try {
+    const serviceSEO = await getServiceSEO('long-distance-moving')
+    return { props: { serviceSEO: serviceSEO || null }, revalidate: 60 }
+  } catch {
+    return { props: { serviceSEO: null }, revalidate: 60 }
+  }
+}

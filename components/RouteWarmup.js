@@ -2,20 +2,7 @@ import React, { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 const knownRoutes = [
-  '/', '/About', '/Gallery', '/Blog', '/faq', '/Contacts', '/Feedback', '/Jobs', '/services',
-  '/services/home', '/services/office', '/services/corporate', '/services/intl', '/services/storage', '/services/long', '/services/moves', '/services/special',
-  '/services/piano-moving', '/services/pet-relocation'
-]
-
-const heroImages = [
-  '/assets/jumbotron/taylor-movers-services-hero.png',
-  '/assets/jumbotron/specialized-services-kenya.png',
-  '/assets/jumbotron/storage-services-kenya.png',
-  '/assets/jumbotron/internationalmovers.jpeg',
-  '/assets/jumbotron/consolidated-moves-nairobi.png',
-  '/assets/jumbotron/taylor-movers-kenya-professional-team.png',
-  '/assets/jumbotron/taylor-movers-kenya-packing-boxes.png',
-  '/assets/jumbotron/piano-moving-professionals.png'
+  '/', '/about', '/services', '/quote', '/contact', '/blog'
 ]
 
 const requestIdle = (cb) => {
@@ -30,26 +17,11 @@ const RouteWarmup = () => {
   const router = useRouter()
 
   useEffect(() => {
-    // Prefetch all known routes during idle time
+    // Prefetch key routes only during idle (audit §2: 19 routes + 8 hero
+    // images prefetched on home wasted ~MBs on 4G and double-downloaded heroes)
     requestIdle(() => {
       knownRoutes.forEach((r) => {
         try { router.prefetch(r) } catch (e) {}
-      })
-    })
-
-    // Preload hero images so first paint on route is instant
-    requestIdle(() => {
-      heroImages.forEach((src) => {
-        try {
-          const link = document.createElement('link')
-          link.rel = 'prefetch'
-          link.as = 'image'
-          link.href = src
-          document.head.appendChild(link)
-
-          const img = new Image()
-          img.src = src
-        } catch (e) {}
       })
     })
   }, [router])

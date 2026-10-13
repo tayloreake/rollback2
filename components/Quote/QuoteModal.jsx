@@ -155,13 +155,10 @@ const QuoteModal = ({ quotebtn }) => {
               
               {/* Scrollable Content Area */}
               <div 
-                className="flex-1 overflow-hidden quote-modal-scroll"
+                className="flex-1 overflow-y-auto overscroll-contain quote-modal-scroll"
                 style={{
                   WebkitOverflowScrolling: 'touch',
                   scrollBehavior: 'smooth',
-                  overscrollBehavior: 'contain',
-                  display: 'flex',
-                  flexDirection: 'column',
                   minHeight: 0
                 }}
               >

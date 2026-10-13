@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react"
 import PageTitle from "../components/PageTitle"
 import Image from "next/image"
+import Head from "next/head"
 import getPageMetadata from "../SEO/seo";
-import Tab from 'react-bootstrap/Tab';
-import Tabs from 'react-bootstrap/Tabs';
+import { getGalleryPhotos } from "../utils/zohoGallery";
+
+
 import { isMobile } from "react-device-detect";
 
-const Gallery = () => {
+const Gallery = ({ zohoPhotos = [] }) => {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState({});
   const [fetchedImages, setFetchedImages] = useState([]);
@@ -65,11 +67,38 @@ const Gallery = () => {
 
 
 
+  const seoData = getPageMetadata("gallery", {
+    customTitle: 'Moving Gallery | Taylor Movers Nairobi',
+    customDescription: 'See Taylor Movers Kenya in action — professional crews, packing and moves across Nairobi since 2008.',
+  })
+
   return (
+    <>
+      <Head>
+        <title>{seoData.title}</title>
+        <meta name="description" content={seoData.description} />
+        <link rel="canonical" href={seoData.canonical} />
+      </Head>
     <div className='w-full h-full bg-[#EDEDED] pt-8 pb-6'>
       <section className="container">
-        <h2 className="text-[#F05423] text-3xl font-[600] text-center">We would love to hear from you</h2>
+        <h1 className="text-[#F05423] text-3xl font-[600] text-center">Our Moving Gallery</h1>
       </section>
+      {zohoPhotos.length > 0 && (
+        <section className="container">
+          <h2 className="text-xl font-semibold text-gray-800 mt-6 mb-3">Latest from our team</h2>
+          <div className="md:columns-5 gap-1">
+            {zohoPhotos.map((p) => (
+              <img
+                key={`zoho-${p.id}`}
+                alt={p.title}
+                src={`/api/gallery-photo?record=${p.id}`}
+                loading="lazy"
+                className="break-inside-avoid inline-block mb-2 w-full md:w-[250px] h-auto object-cover rounded-lg"
+              />
+            ))}
+          </div>
+        </section>
+      )}
       <section className="container">
         <div className="my-4">
           {categories?.map((category, idx) => (
@@ -100,7 +129,17 @@ const Gallery = () => {
       </section>
 
     </div>
+    </>
   )
 }
 
 export default Gallery
+
+export async function getStaticProps() {
+  try {
+    const zohoPhotos = await getGalleryPhotos()
+    return { props: { zohoPhotos }, revalidate: 300 }
+  } catch {
+    return { props: { zohoPhotos: [] }, revalidate: 300 }
+  }
+}

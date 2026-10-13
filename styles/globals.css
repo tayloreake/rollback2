@@ -2,24 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,400;0,600;0,700;1,300&display=swap");
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('../fonts/Montserrat-Light.ttf');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('../fonts/Montserrat-Regular.otf');
-  font-weight: normal;
-  font-style: normal;
-}
+/* Fonts are loaded via next/font/google (Montserrat, WOFF2, display:swap)
+   in pages/_app.js — no @font-face or external font <link> tags (audit §2 P1). */
 
 html {
   scroll-behavior: smooth;
@@ -35,22 +19,8 @@ html {
   }
 }
 
-@font-face {
-  font-family: 'Montserrat';
-  src: url('../fonts/Montserrat-Bold.otf');
-  font-weight: bold;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('../fonts/Montserrat-Italic.otf');
-  font-weight: normal;
-  font-style: italic;
-}
-
 body {
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 .rootClassName {
@@ -330,6 +300,21 @@ pre {
 .quote-form-container {
   padding-bottom: 20px;
   min-height: auto;
+}
+
+/* Responsive navbar quote dropdown — always fits the viewport height
+   (vh fallback first for older browsers, dvh override where supported),
+   leaving room for the fixed navbar above + bottom safe margin. */
+.nav-quote-dropdown {
+  width: min(440px, calc(100vw - 2rem));
+  max-height: calc(100vh - 170px);
+  max-height: calc(100dvh - 170px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Ensure form inputs are always visible and accessible */
@@ -1302,13 +1287,14 @@ a, button, [role="button"], .btn, .quote-modal-trigger {
   background: linear-gradient(135deg, #e04400, #FF5000);
 }
 
-/* Ensure form containers have proper dimensions */
+/* Form root flows naturally — the surrounding context scrolls
+   (navbar dropdown panel, modal, or page). Do NOT cap its height here,
+   or content below the fold (incl. submit) becomes unreachable. */
 .quote-form-container {
   width: 100%;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  max-height: 95vh;
+  display: block;
+  max-height: none;
 }
 
 /* Ensure scrollable area takes available space */
@@ -1352,6 +1338,14 @@ body.page-transitioning #__next > div:not(.fixed) {
   filter: blur(1px);
   opacity: 0.95;
   transition: filter 0.2s ease-out, opacity 0.2s ease-out;
+  /* IMPORTANT: Don't block pointer events during transition */
+  pointer-events: none;
+}
+
+/* Keep navigation clickable during transitions */
+body.page-transitioning nav,
+body.page-transitioning header {
+  pointer-events: auto;
 }
 
 /* Smooth fade-in for new pages */
@@ -1378,4 +1372,28 @@ main {
   50% {
     opacity: 0.7;
   }
+}
+
+/* Sticky mobile bar offset — keep footer content reachable above it (audit §3 P2) */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 60px;
+  }
+}
+
+/* Respect reduced motion (audit §5 P2) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Single-banner policy: ConsentBanner is the only cookie banner.
+   Zoho PageSense/SalesIQ load only after consent (see _app.js), so their own
+   banner should never appear — hide it as a backstop. */
+#zcb-banner {
+  display: none !important;
 }

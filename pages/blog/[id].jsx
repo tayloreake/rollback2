@@ -12,7 +12,7 @@ import ErrorBoundary from "../../components/Blog/ErrorBoundary"
 import { BsCalendar, BsHeart, BsBookmark, BsShare, BsArrowLeft } from "react-icons/bs"
 import Link from "next/link"
 import Head from "next/head"
-import moment from "moment"
+import { formatDate } from "../../utils/formatDate"
 import { BlogThemeProvider, useBlogTheme } from "../../contexts/BlogThemeContext"
 
 const BlogPostContent = ({ blog }) => {
@@ -28,7 +28,7 @@ const BlogPostContent = ({ blog }) => {
           <h1 className={`text-2xl font-bold mb-4 ${
             theme === 'dark' ? 'text-white' : 'text-gray-900'
           }`}>Blog post not found</h1>
-          <Link href="/Blog">
+          <Link href="/blog">
             <button className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg transition-colors">
               Back to Blog
             </button>
@@ -143,21 +143,45 @@ const BlogPostContent = ({ blog }) => {
   return (
     <>
       <Head>
-        <title>{blog?.blogTitle || 'Blog Post'}</title>
-        <meta name="description" content={blog?.blogExcerpt || ''} />
-        <meta property="og:title" content={blog?.blogTitle || 'Blog Post'} />
-        <meta property="og:description" content={blog?.blogExcerpt || ''} />
+        <title>{blog?.metaTitle || blog?.blogTitle || 'Blog Post'}</title>
+        <meta name="description" content={blog?.metaDescription || blog?.blogExcerpt || ''} />
+        <link rel="canonical" href={`https://taylorea.com/blog/${blog?.slug?.current || ''}`} />
+        <meta property="og:title" content={blog?.metaTitle || blog?.blogTitle || 'Blog Post'} />
+        <meta property="og:description" content={blog?.metaDescription || blog?.blogExcerpt || ''} />
         {blog?.blogImage && (
           <meta property="og:image" content={urlFor(blog.blogImage).url()} />
         )}
         <meta property="og:type" content="article" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: blog?.blogTitle,
+            description: blog?.blogExcerpt,
+            datePublished: blog?.date,
+            author: blog?.author?.authorName ? { '@type': 'Person', name: blog.author.authorName } : undefined,
+          }) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://taylorea.com/' },
+              { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://taylorea.com/blog' },
+              { '@type': 'ListItem', position: 3, name: blog?.blogTitle },
+            ],
+          }) }}
+        />
       </Head>
 
       <BlogLayout sidebar={sidebarContent}>
         <article className="prose prose-invert max-w-none">
           {/* Back button */}
           <div className="mb-6">
-            <Link href="/Blog">
+            <Link href="/blog">
               <button className={`flex items-center space-x-2 transition-colors ${
                 theme === 'dark'
                   ? 'text-gray-400 hover:text-white'
@@ -182,7 +206,7 @@ const BlogPostContent = ({ blog }) => {
             }`}>
               <div className="flex items-center space-x-2">
                 <BsCalendar size={14} />
-                <span>{blog?.date ? moment(blog.date).format("MMMM DD, YYYY") : 'No date'}</span>
+                <span>{blog?.date ? formatDate(blog.date, "MMMM DD, YYYY") : 'No date'}</span>
               </div>
               
               <div className="flex items-center space-x-4">

@@ -1,11 +1,13 @@
 import { createClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
 
+// Tokenless public client — urlFor() builds image URLs and needs no token.
+// NEVER put an API token in this file: it ships in the browser bundle
+// (audit: Sanity Security §7 — a write token lived here).
 export const client = createClient({
     projectId: "bsg3746e",
     dataset: "production",
     apiVersion: "2023-06-19",
-    token: "skC2QdihnYiqC9m3Qh4svOYs2goDI6AHx4jKFhrD1AVIs2XXOK3kXEl1VPaseRf3GvV6GQB24KFhCCOY2jhCXIvttKh7rqxqmLdHqO7iFSvYsK45d4L7wZbzZkPvWrQFrxIcHJJIweSdIiDo5W78DTIl90Rm4AKCGN25ozRDg2WNbkGsMK0Q",
     useCdn: true, // Use CDN for faster content delivery
     perspective: 'published', // Only fetch published content
 })

@@ -9,7 +9,17 @@ module.exports = {
     '/api/**',
     '/_next/**',
     '/404',
-    '/500'
+    '/500',
+    '/ThankYou',
+    '/test',
+    '/hero-demo',
+    '/enhanced-home',
+    '/enhanced-home-backup',
+    '/index-old-backup',
+    '/Quotes',
+    '/ServicesPage',
+    '/services/legacy-service',
+    '/services/corporate-staff-relocation-simple',
   ],
 
   // Additional paths to include
@@ -52,10 +62,10 @@ module.exports = {
     } else if (path.startsWith('/services/')) {
       priority = 0.9
       changefreq = 'monthly'
-    } else if (path.startsWith('/Blog/')) {
+    } else if (path.startsWith('/blog/')) {
       priority = 0.8
       changefreq = 'weekly'
-    } else if (path === '/About' || path === '/Contacts') {
+    } else if (path === '/about' || path === '/contact') {
       priority = 0.8
       changefreq = 'monthly'
     }

@@ -1,5 +1,5 @@
-import { createReview } from "../../sanity/sanity-utils"
 import { rateLimiter } from "./middleware/rateLimiter"
+import { syncInquiryToZoho } from "../../utils/zoho"
 
 const limiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -45,20 +45,28 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Invalid email address' });
     }
 
-    // Verify reCAPTCHA
-    const isHuman = true //await verifyRecaptcha(recaptchaToken);
+    // Verify reCAPTCHA (previously disabled — re-enabled: this endpoint
+    // writes visitor PII and must not be an open spam pipe)
+    const isHuman = await verifyRecaptcha(recaptchaToken);
     if (!isHuman) {
       return res.status(400).json({ message: 'reCAPTCHA verification failed' });
     }
     
-    const result = await createReview(sentiment, review, name, email);
-    
+    // Reviews go to Zoho Website Inquiries (Lead_Source "Review") — never to
+    // public Sanity (same exposure class as quotes). Display stays gated by
+    // the CMS `approved` flag.
+    const zoho = await syncInquiryToZoho({
+      name,
+      email,
+      phone: "",
+      source: "Review",
+      notes: `[${sentiment}] ${review}`.slice(0, 255),
+    });
 
-
-    return res.status(200).json({ 
-      success: true, 
+    return res.status(200).json({
+      success: true,
       message: 'Review submitted successfully',
-      data: result
+      data: { zoho: zoho?.ok ? "synced" : "pending" }
     });
   } catch (error) {
     console.error('Error submitting review:', error);

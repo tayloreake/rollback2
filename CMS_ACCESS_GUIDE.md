@@ -133,7 +133,7 @@ Ensure these are set in Vercel (Project Settings → Environment Variables):
 ```bash
 NEXT_PUBLIC_SANITY_PROJECT_ID=bsg3746e
 NEXT_PUBLIC_SANITY_DATASET=production
-NEXT_SANITY_API_TOKEN=skOIZWPqgTE6cFwT6u3RQ3r9f1eHfJ7CC1l29wlRsK0YyO21iUCuiZNuezGwIfNv7SHWq1vIxuYidCJJ06Xm140oeKv4Cp5zPaWc5ybkvJVczRsFH4mISePmqhDNqqiuOb3qhIRstZOeWfp2VVD7bg7xQlIovICLVHEKNNFoBQxEBM3u5fDH
+NEXT_SANITY_API_TOKEN=REVOKED_REPLACE_WITH_SERVER_ONLY_TOKEN
 ```
 
 These should already be configured based on your `.env` file.

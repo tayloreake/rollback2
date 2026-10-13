@@ -2,22 +2,13 @@ import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { isMobile } from "react-device-detect";
-import Slider from "react-slick";
+import SnapSlider from "../ui/SnapSlider";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../sanity/config/client-config"
 import Link from "next/link";
 
 
 const ServiceCard = dynamic(() => import("./ServiceCard"))
-const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-};
 
 const HomeServices = ({ services }) => {
     // load from url
@@ -76,14 +67,14 @@ const HomeServices = ({ services }) => {
 
                         ))
                         :
-                        <Slider {...settings}>
+                        <SnapSlider>
                             {services?.map((service, idx) => (
                                 <div key={`service-${idx}`} className="col-12">
                                     <ServiceCard service={service} />
                                 </div>
 
                             ))}
-                        </Slider>
+                        </SnapSlider>
                     }
                 </div>
                 <div className="col-12 text-center mt-6">

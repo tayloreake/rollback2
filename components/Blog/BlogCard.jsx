@@ -5,7 +5,7 @@ import React, { useState } from "react"
 import Link from "next/link"
 import imageUrlBuilder from "@sanity/image-url"
 import client from "../../sanity/config/client-config"
-import moment from "moment"
+import { formatDate } from "../../utils/formatDate"
 import { useBlogTheme } from '../../contexts/BlogThemeContext'
 
 const BlogCard = ({ blog }) => {
@@ -126,7 +126,7 @@ const BlogCard = ({ blog }) => {
               {blog.date && (
                 <div className="flex items-center">
                   <BsCalendar size={14} className="mr-1" />
-                  <span>{moment(blog.date).format("MMM DD, YYYY")}</span>
+                  <span>{formatDate(blog.date)}</span>
                 </div>
               )}
             </div>

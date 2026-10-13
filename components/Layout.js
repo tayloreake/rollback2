@@ -1,5 +1,6 @@
 import React from "react"
 import Navbar from './Navbar'
+import AnnouncementBar from './AnnouncementBar'
 import Footer from './Footer'
 import dynamic from "next/dynamic"
 
@@ -11,9 +12,10 @@ const Layout = ({ children, caseStudies = [] }) => {
   return (
     <>
       <Navbar />
+      <AnnouncementBar />
       <RouteWarmup />
       <PerformanceOptimizer />
-      {children}
+      <main>{children}</main>
       <Footer caseStudies={caseStudies} />
     </>
   )

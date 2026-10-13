@@ -12,10 +12,17 @@ const NewsletterSection = ({
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     try {
-      setNewsletterStatus({ type: 'success', message: "Thanks for subscribing! You'll hear from us soon." })
+      const r = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.message || 'Subscription failed');
+      setNewsletterStatus({ type: 'success', message: j.message || "Thanks for subscribing! You'll hear from us soon." })
       setNewsletterEmail('')
     } catch (err) {
-      setNewsletterStatus({ type: 'error', message: 'Something went wrong. Please try again.' })
+      setNewsletterStatus({ type: 'error', message: err.message || 'Something went wrong. Please try again.' })
     }
   };
 
@@ -30,10 +37,11 @@ const NewsletterSection = ({
         <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
           {subtitle}
         </p>
-        <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
+        <form method="post" onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
           <input
             type="email"
             required
+            name="email"
             value={newsletterEmail}
             onChange={handleNewsletterEmailChange}
             placeholder="Enter your email"

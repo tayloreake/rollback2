@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "regions": ["cpt1"],
   "alias": [
     "taylorea.com",
     "www.taylorea.com"
@@ -85,13 +86,7 @@
       ]
     }
   ],
-  "redirects": [
-    {
-      "source": "/Services",
-      "destination": "/ServicesPage",
-      "permanent": false
-    }
-  ],
+  "redirects": [],
   "rewrites": [
     {
       "source": "/api/:path*",

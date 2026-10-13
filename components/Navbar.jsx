@@ -3,7 +3,6 @@ import Image from 'next/image'
 import { useState, useEffect, useRef } from 'react'
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai'
 import { FaTwitter, FaFacebook, FaLinkedin, FaChevronDown } from 'react-icons/fa'
-import { Drawer } from 'antd'
 import { useRouter } from 'next/router'
 import client from '../sanity/config/client-config'
 import QuoteForm from './Quote/Form'
@@ -79,13 +78,11 @@ const Navbar = () => {
         }
     }, [servicesDropdownOpen, isClient])
 
-    // Aggressively prefetch top routes for instant navigation
+    // Prefetch key routes during idle (audit §2 P2: trimmed from 19)
     useEffect(() => {
         if (!router?.prefetch) return
         const routesToPrefetch = [
-            '/', '/About', '/Gallery', '/Blog', '/faq', '/Contacts', '/Feedback', '/Jobs', '/services',
-            '/services/home', '/services/office', '/services/corporate', '/services/intl', '/services/storage', '/services/long', '/services/moves', '/services/special',
-            '/services/piano-moving', '/services/pet-relocation'
+            '/', '/about', '/services', '/quote', '/contact'
         ]
         routesToPrefetch.forEach((r) => {
             try { router.prefetch(r) } catch (e) {}
@@ -93,48 +90,65 @@ const Navbar = () => {
     }, [router])
 
 
-    // Quote Component
+    // Quote dropdown panel anchored under the button (responsive, no page overlay)
     const ShowQuote = () => {
         const [quoteOpen, setQuoteOpen] = useState(false)
         const menuRef = useRef(null)
 
         useEffect(() => {
             if (!isClient) return
-            
             const handleClickOutside = (e) => {
-                if (menuRef.current && !menuRef.current.contains(e.target)) {
-                    setQuoteOpen(false)
-                }
+                if (menuRef.current && !menuRef.current.contains(e.target)) setQuoteOpen(false)
             }
-
             const handleFormSubmit = () => setQuoteOpen(false)
-
+            const handleEscape = (e) => { if (e.key === 'Escape') setQuoteOpen(false) }
             document.addEventListener('mousedown', handleClickOutside)
+            document.addEventListener('keydown', handleEscape)
             window.addEventListener("tayloreaFormSubmitted", handleFormSubmit)
-
             return () => {
                 document.removeEventListener('mousedown', handleClickOutside)
+                document.removeEventListener('keydown', handleEscape)
                 window.removeEventListener('tayloreaFormSubmitted', handleFormSubmit)
             }
         }, [])
 
         return (
             <div ref={menuRef} className='relative inline-block mb-2'>
-                <div
+                <button
+                    type='button'
                     onClick={() => setQuoteOpen(!quoteOpen)}
-                    className='cursor-pointer rounded-lg shadow-sm px-3 py-2 bg-[#FF5000] hover:bg-[#e04400] transition-colors duration-200'
+                    aria-expanded={quoteOpen}
+                    aria-haspopup='dialog'
+                    className='cursor-pointer rounded-lg shadow-sm px-4 py-2.5 bg-[#FF5000] hover:bg-[#e04400] transition-colors duration-200 min-h-[44px]'
                 >
-                    <span className='font-medium text-sm text-white'>Get Quote</span>
-                </div>
+                    <span className='font-semibold text-sm text-white whitespace-nowrap'>Get Quote</span>
+                </button>
 
                 {isClient && quoteOpen && (
-                    <div className="absolute right-0 mt-2 bg-white rounded-md shadow-lg z-[80]">
-                        <span 
-                            className='close-toggle-quote-form' 
-                            onClick={() => setQuoteOpen(false)}
-                        >
-                            X
-                        </span>
+                    <div
+                        className='fixed left-4 right-4 top-[118px] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] z-[80] nav-quote-dropdown bg-white rounded-2xl shadow-2xl border border-slate-100 sm:origin-top-right'
+                        style={{
+                          width: 'min(440px, calc(100vw - 2rem))',
+                          maxWidth: 'calc(100vw - 2rem)',
+                          maxHeight: 'calc(100vh - 170px)',
+                          margin: '0 auto',
+                          overflowY: 'auto',
+                          overflowX: 'hidden',
+                          WebkitOverflowScrolling: 'touch',
+                          overscrollBehavior: 'contain',
+                          touchAction: 'pan-y',
+                        }}
+                    >
+                        <div className='sticky top-0 z-10 flex justify-end bg-white/95 backdrop-blur px-2 pt-2 pb-1'>
+                            <button
+                                type='button'
+                                onClick={() => setQuoteOpen(false)}
+                                aria-label='Close quote form'
+                                className='w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-[#0B1B33]/90 text-white text-xl hover:bg-black transition-colors'
+                            >
+                                ×
+                            </button>
+                        </div>
                         <QuoteForm />
                     </div>
                 )}
@@ -168,7 +182,15 @@ const Navbar = () => {
                 
                 {servicesDropdownOpen && (
                     <div 
-                        className="absolute top-full left-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-100 z-[70] animate-fade-in-down"
+                        className="absolute top-full left-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-100 z-[70] animate-fade-in-down overflow-y-auto overscroll-contain"
+                        style={{
+                          maxHeight: 'calc(100vh - 250px)',
+                          overflowY: 'auto',
+                          overflowX: 'hidden',
+                          WebkitOverflowScrolling: 'touch',
+                          overscrollBehavior: 'contain',
+                          touchAction: 'pan-y',
+                        }}
                         onMouseLeave={() => setServicesDropdownOpen(false)}
                     >
                         <div className="py-2">
@@ -261,7 +283,7 @@ const Navbar = () => {
                         className={`flex flex-row justify-end font-bold hover-glow rounded-lg px-3 py-1 transition-all duration-300 ${
                             isEnhancedHomePage ? 'text-white' : 'text-[#FF5000]'
                         }`}>
-                        <span className="mr-2 text-sm text-[#FF5000]">Call: </span>
+                        <span className="mr-2 text-sm text-[#C73E00] font-semibold">Call: </span>
                         <span className={`text-sm ${
                             isEnhancedHomePage ? 'text-[#FF5000] font-bold' : 'gradient-text'
                         }`}>+254 721410517</span>
@@ -283,7 +305,7 @@ const Navbar = () => {
                         className={`flex flex-row justify-center font-bold hover-glow rounded-lg px-3 py-1 transition-all duration-300 ${
                             isEnhancedHomePage ? 'text-white' : 'text-[#FF5000]'
                         }`}>
-                        <span className="mr-2 text-sm text-[#FF5000]">Call: </span>
+                        <span className="mr-2 text-sm text-[#C73E00] font-semibold">Call: </span>
                         <span className={`text-sm ${
                             isEnhancedHomePage ? 'text-[#FF5000] font-bold' : 'gradient-text'
                         }`}>+254 721410517</span>
@@ -361,18 +383,18 @@ const Navbar = () => {
                                 Home
                             </div>
                         </Link>
-                        <Link href='/About' className='nav-link-modern'>
+                        <Link href='/about' className='nav-link-modern'>
                             <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
                                 About us
                             </div>
                         </Link>
-                        <Link href='/Gallery' className='nav-link-modern'>
+                        <Link href='/gallery' className='nav-link-modern'>
                             <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
                                 Gallery
                             </div>
                         </Link>
                         <ServicesDropdown />
-                        <Link href='/Blog' className='nav-link-modern'>
+                        <Link href='/blog' className='nav-link-modern'>
                             <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
                                 Blog
                             </div>
@@ -382,17 +404,17 @@ const Navbar = () => {
                                 FAQ
                             </div>
                         </Link>
-                        <Link href='/Contacts' className='nav-link-modern'>
+                        <Link href='/contact' className='nav-link-modern'>
                             <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
                                 Contact Us
                             </div>
                         </Link>
-                        <Link href='/Feedback' className='nav-link-modern'>
+                        <Link href='/feedback' className='nav-link-modern'>
                             <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
                                 Feedback
                             </div>
                         </Link>
-                        <Link href='/Jobs' className='nav-link-modern'>
+                        <Link href='/jobs' className='nav-link-modern'>
                             <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
                                 Jobs
                             </div>
@@ -407,23 +429,15 @@ const Navbar = () => {
                 isEnhancedHomePage ? 'h-[100px]' : ''
             }`}></div>
 
-            {/* Mobile drawer */}
-            {isClient && (
-                <Drawer 
-                    closeIcon={false} 
-                    placement="left" 
-                    onClose={() => setOpen(false)} 
-                    open={open}
-                    className='modern-drawer'
-                    width={320}
-                    styles={{
-                        body: {
-                            background: '#ffffff',
-                            padding: 0
-                        }
-                    }}
-                >
-                    <div className='flex flex-col w-full h-full'>
+            {/* Mobile drawer (custom — replaces Ant Design Drawer) */}
+            {isClient && open && (
+                <div className="fixed inset-0 z-[9995]" role="dialog" aria-modal="true" aria-label="Menu">
+                    <div
+                        className="absolute inset-0 bg-black/50"
+                        onClick={() => setOpen(false)}
+                    />
+                    <div className="absolute left-0 top-0 bottom-0 w-[320px] max-w-[85vw] bg-white shadow-2xl overflow-y-auto overscroll-contain">
+                <div className='flex flex-col w-full h-full'>
                         {/* Header */}
                         <div className='flex items-center justify-between p-6 border-b border-gray-200 bg-white'>
                             <Link href='/' onClick={() => setOpen(false)} className='transition-transform duration-200 hover:scale-105'>
@@ -452,13 +466,13 @@ const Navbar = () => {
                                     </div>
                                 </Link>
                                 
-                                <Link href='/About' onClick={() => setOpen(false)} className='block'>
+                                <Link href='/about' onClick={() => setOpen(false)} className='block'>
                                     <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
                                         About us
                                     </div>
                                 </Link>
                                 
-                                <Link href='/Gallery' onClick={() => setOpen(false)} className='block'>
+                                <Link href='/gallery' onClick={() => setOpen(false)} className='block'>
                                     <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
                                         Gallery
                                     </div>
@@ -536,7 +550,7 @@ const Navbar = () => {
                                     )}
                                 </div>
                                 
-                                <Link href='/Blog' onClick={() => setOpen(false)} className='block'>
+                                <Link href='/blog' onClick={() => setOpen(false)} className='block'>
                                     <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
                                         Blog
                                     </div>
@@ -548,19 +562,19 @@ const Navbar = () => {
                                     </div>
                                 </Link>
                                 
-                                <Link href='/Contacts' onClick={() => setOpen(false)} className='block'>
+                                <Link href='/contact' onClick={() => setOpen(false)} className='block'>
                                     <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
                                         Contact Us
                                     </div>
                                 </Link>
                                 
-                                <Link href='/Feedback' onClick={() => setOpen(false)} className='block'>
+                                <Link href='/feedback' onClick={() => setOpen(false)} className='block'>
                                     <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
                                         Feedback
                                     </div>
                                 </Link>
                                 
-                                <Link href='/Jobs' onClick={() => setOpen(false)} className='block'>
+                                <Link href='/jobs' onClick={() => setOpen(false)} className='block'>
                                     <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
                                         Jobs
                                     </div>
@@ -583,7 +597,7 @@ const Navbar = () => {
                                             <FaTwitter size={16} className='text-gray-600 group-hover:text-white transition-colors duration-200' />
                                         </div>
                                     </Link>
-                                    <Link href='https://web.facebook.com/taylormoversea'>
+                                    <Link href='https://www.facebook.com/taylormoversea'>
                                         <div className='w-10 h-10 rounded-full bg-gray-100 hover:bg-[#FF5000] flex items-center justify-center transition-all duration-200 group'>
                                             <FaFacebook size={16} className='text-gray-600 group-hover:text-white transition-colors duration-200' />
                                         </div>
@@ -592,7 +606,8 @@ const Navbar = () => {
                             </div>
                         </div>
                     </div>
-                </Drawer>
+                </div>
+                </div>
             )}
         </div>
     )

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import getPageMetadata from '../../SEO/seo'
+import { getServiceSEO } from '../../sanity/sanity-utils'
+import ServiceCmsSections from '../../components/Services/ServiceCmsSections'
 import Head from 'next/head'
 import Jumbotron from '../../components/jumbotron'
 import dynamic from 'next/dynamic'
@@ -37,7 +39,7 @@ import {
 import { MdSecurity, MdBusinessCenter, MdSpeed, MdPrecisionManufacturing } from 'react-icons/md'
 import { RiTeamFill, RiShieldCheckFill, RiTimeFill } from 'react-icons/ri'
 
-const OfficeRelocation = () => {
+const OfficeRelocation = ({ serviceSEO }) => {
 
   const whyChooseUs = [
     {
@@ -190,12 +192,20 @@ const OfficeRelocation = () => {
   return (
     <div className="w-full">
       <Head>
-        <title>{seoData.title}</title>
-        <meta name="description" content={seoData.description} />
+        <title>{serviceSEO?.metaTitle || seoData.title}</title>
+        <meta name="description" content={serviceSEO?.metaDescription || seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
-        <meta property="og:title" content={seoData.openGraph.title} />
-        <meta property="og:description" content={seoData.openGraph.description} />
+        <link rel="canonical" href={seoData.canonical} />
+        <meta property="og:title" content={serviceSEO?.metaTitle || seoData.openGraph.title} />
+        <meta property="og:description" content={serviceSEO?.metaDescription || seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />
+        {serviceSEO?.ogImageUrl && (<meta property="og:image" content={serviceSEO.ogImageUrl} />)}
+        {seoData.structuredData && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(seoData.structuredData) }}
+          />
+        )}
       </Head>
       
       {/* Spacer for fixed navbar */}
@@ -403,9 +413,18 @@ const OfficeRelocation = () => {
       </div>
 
       {/* Newsletter Section */}
+      <ServiceCmsSections content={serviceSEO?.content} />
       <NewsletterSection />
     </div>
   )
 }
 
 export default OfficeRelocation
+export async function getStaticProps() {
+  try {
+    const serviceSEO = await getServiceSEO('office-relocation')
+    return { props: { serviceSEO: serviceSEO || null }, revalidate: 60 }
+  } catch {
+    return { props: { serviceSEO: null }, revalidate: 60 }
+  }
+}

@@ -19,8 +19,11 @@ const getPageMetadata = (pageName, options = {}) => {
   ]
   
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://taylorea.com'
-  const currentPath = service ? `/services/${service}` : (pageName === 'home' ? '/' : `/${pageName}`)
-  const canonicalUrl = `${siteUrl}${currentPath}`
+  // canonicalPath override lets list pages (e.g. /blog) declare their real URL
+  // instead of the pageName-derived guess (audit §4 P0: no 404 canonicals).
+  const currentPath = options.canonicalPath
+    || (service ? `/services/${service}` : (pageName === 'home' ? '/' : `/${pageName}`))
+  const canonicalUrl = currentPath.startsWith('http') ? currentPath : `${siteUrl}${currentPath}`
 
   return {
     title,
@@ -67,10 +70,27 @@ const generateLocalBusinessData = () => {
     telephone: '+254721410517',
     email: 'info@taylorea.com',
     priceRange: '$$',
-    serviceArea: {
-      '@type': 'Country',
-      name: 'Kenya'
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: -1.3197,
+      longitude: 36.8632
     },
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      opens: '07:00',
+      closes: '19:00'
+    },
+    sameAs: [
+      'https://www.facebook.com/taylormoversea',
+      'https://www.instagram.com/taylormoverske',
+      'https://twitter.com/taylormoverske',
+      'https://www.linkedin.com/company/taylor-movers-ea'
+    ],
+    areaServed: [
+      { '@type': 'Country', name: 'Kenya' },
+      { '@type': 'City', name: 'Nairobi' }
+    ],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: 'Moving Services',
@@ -138,7 +158,7 @@ const generateServiceData = (service, location) => {
 // Base metadata generator function
 export const generateBaseMetadata = (title, description, path = '', options = {}) => {
   const siteName = 'Taylor Movers';
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://taylormovers.co.ke';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://taylorea.com';
   const fullUrl = `${baseUrl}${path}`;
 
   return {

@@ -453,11 +453,15 @@ const EnhancedHeroSection: React.FC<EnhancedHeroSectionProps> = ({
         }
 
         .indicator {
+          min-width: 24px;
+          min-height: 24px;
           width: 12px;
           height: 12px;
+          padding: 6px;
+          background-clip: content-box;
           border-radius: 50%;
           border: 2px solid rgba(255, 255, 255, 0.5);
-          background: transparent;
+          background-color: transparent;
           cursor: pointer;
           transition: all 0.3s ease;
         }

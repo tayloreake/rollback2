@@ -95,7 +95,7 @@ const ServicesIndex = () => {
       subtitle: 'Cost-Effective Solutions',
       description: 'Share transport space and save up to 40% on moving costs.',
       icon: <FaDollarSign className="text-3xl text-white" />,
-      link: '/services/moves',
+      link: '/services/long',
       features: ['Up to 40% Savings', 'Shared Transport', 'Professional Handling', 'Flexible Scheduling']
     },
     {
@@ -121,7 +121,7 @@ const ServicesIndex = () => {
   // Get SEO metadata
   const seoData = getPageMetadata("services", {
     location: 'Nairobi',
-    customTitle: 'Professional Moving Services Nairobi Kenya | Taylor Movers 2025',
+    customTitle: 'Professional Moving Services Nairobi Kenya | Taylor Movers',
     customDescription: 'Complete moving services in Nairobi & Kenya. ✓ Residential ✓ Office ✓ International ✓ Storage ✓ Specialized services. 40,000+ successful moves. Call +254 721 410 517!',
     includeLocalBusiness: true,
     includeService: false
@@ -135,9 +135,16 @@ const ServicesIndex = () => {
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
+        <link rel="canonical" href={seoData.canonical} />
         <meta property="og:title" content={seoData.openGraph.title} />
         <meta property="og:description" content={seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />
+        {seoData.structuredData && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(seoData.structuredData) }}
+          />
+        )}
       </Head>
       
       {/* Spacer for fixed navbar */}

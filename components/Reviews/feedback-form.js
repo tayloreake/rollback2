@@ -1,8 +1,7 @@
-import { Modal, notification } from "antd";
+import { toast } from "react-toastify";
 import Image from "next/image";
 import React, { useState, useRef } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
-import Feedback from "../../pages/Feedback";
 
 
 const FeedbackForm = () => {
@@ -54,11 +53,7 @@ const FeedbackForm = () => {
             setError("");
             setIsModalOpen(false);
 
-            notification.success({
-                message: "Thank you for your feedback!",
-                description: "We appreciate you sharing your experience with us.",
-                placement: "topRight",
-            });
+            toast.success("Thank you for your feedback! We appreciate you sharing your experience with us.");
         } catch (err) {
             setError("Something went wrong. Please try again.");
         } finally {

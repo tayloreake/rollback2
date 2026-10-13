@@ -23,7 +23,10 @@ const BlogContent = ({ blogs, tags, categories }) => {
   const { theme } = useBlogTheme()
 
   // Get SEO metadata
-  const seoData = getPageMetadata("ourBlog")
+  const seoData = getPageMetadata("blog", {
+    customTitle: 'Moving Blog | Taylor Movers Nairobi',
+    customDescription: 'Expert moving tips, guides and company news from Taylor Movers Kenya — Nairobi’s trusted movers since 2008.',
+  })
 
   // Filter blogs based on category and search term
   useEffect(() => {
@@ -96,6 +99,7 @@ const BlogContent = ({ blogs, tags, categories }) => {
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
+        <link rel="canonical" href={seoData.canonical} />
         <meta property="og:title" content={seoData.openGraph.title} />
         <meta property="og:description" content={seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />

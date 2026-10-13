@@ -1,0 +1,49 @@
+{
+  "mcpServers": {
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp",
+        "--api-key",
+        "ctx7sk-ec5c2e4e-f3d1-408c-9736-2e8a4700528a"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest"
+      ],
+      "env": {
+        "PUPPETEER_HEADLESS": "true",
+        "CHROME_HEADLESS": "true"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "list_pages",
+        "take_snapshot",
+        "list_console_messages",
+        "list_network_requests",
+        "navigate_page"
+      ]
+    }
+  }
+}

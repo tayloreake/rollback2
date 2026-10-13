@@ -210,7 +210,7 @@ const CaseStudies = ({
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <Link href="/Blog" className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-[#FF5000] to-[#FF8A50] text-white font-semibold rounded-2xl hover:shadow-lg transition-all duration-300">
+            <Link href="/blog" className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-[#FF5000] to-[#FF8A50] text-white font-semibold rounded-2xl hover:shadow-lg transition-all duration-300">
               <span>View All Stories</span>
               <FaArrowRight />
             </Link>

@@ -1,10 +1,10 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { BiChevronRight } from "react-icons/bi";
-import Accordion from 'react-bootstrap/Accordion';
+import Accordion from '../ui/Accordion';
 import Reviews from "../Reviews/reviews";
 import { isMobile } from "react-device-detect";
-import { Tab, Tabs } from "react-bootstrap";
+import Tabs, { Tab } from "../ui/Tabs";
 import imageUrlBuilder from "@sanity/image-url";
 import client from "../../sanity/config/client-config"
 

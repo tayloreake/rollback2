@@ -1,35 +1,13 @@
-import config from "../../africastalking.config"
-import AfricaTalking from "africastalking"
+// Plain SMS sender (contact form + legacy callers).
+// Quote intake now goes through /api/submitQuote (ledger → SMS/email → Zoho).
 import { rateLimiter } from "./middleware/rateLimiter"
 import { getClientIp, getDetailedIpInfo } from "../../utils/getClientIp";
-
-const africastalking = AfricaTalking(config)
+import { verifyRecaptcha, sendLeadSms } from "../../utils/leadNotify"
 
 const limiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5 // limit each IP to 5 requests per windowMs
 });
-
-async function verifyRecaptcha(token) {
-  try {
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
-    });
-
-    const data = await response.json();
-    return {
-      success: data.success,
-      score: data.score || null,
-    };
-  } catch (error) {
-    console.error('reCAPTCHA verification error:', error);
-    return { success: false, score: null };
-  }
-}
 
 export default async function handler(req, res) {
 
@@ -45,7 +23,7 @@ export default async function handler(req, res) {
     // Apply rate limiting
     await limiter(req);
 
-    const { to, message, recaptchaToken } = req.body;
+    const { message, recaptchaToken } = req.body;
 
     if (!recaptchaToken) {
       return res.status(400).json({ success: false, message: 'reCAPTCHA token is required' });
@@ -62,25 +40,16 @@ export default async function handler(req, res) {
       console.warn(`Low reCAPTCHA score in SMS: ${recaptchaResult.score} from IP: ${ipAddress}`);
     }
 
-    const sms = africastalking.SMS;
-    
-    // Append IP address to message for tracking
-    const messageWithIp = `${message}\n\n[Submitted from IP: ${ipAddress}]`;
-    
-    let response;
-    try {
-      response = await sms.send({
-        to: ['+254721410517'], 
-        message: messageWithIp, 
-        from: process.env.NEXT_PUBLIC_AT_USER_ID || 'TaylorMover'
-      });
-      console.log(`SMS sent successfully from IP: ${ipAddress}`);
-    } catch (error) {
-      console.error(`SMS send failed from IP: ${ipAddress}`, error);
+    if (!message) {
+      return res.status(400).json({ success: false, message: "'message' field is required" });
+    }
+
+    const result = await sendLeadSms(message, ipAddress);
+    if (!result.ok) {
       return res.status(500).json({
         success: false,
         message: "Failed to send SMS via AfricaTalking",
-        error: error?.message || error || "Unknown error during SMS send"
+        error: result.error || "Unknown error during SMS send"
       });
     }
 
@@ -88,7 +57,6 @@ export default async function handler(req, res) {
       success: true,
       message: "SMS sent successfully",
       ipAddress: ipAddress,
-      data: response
     });
   } catch (error) {
     if (error.message === 'Too many requests') {

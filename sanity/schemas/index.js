@@ -10,6 +10,10 @@ import landingAbout from "./landing-about-schema"
 import landingService from "./landing-services-schema"
 import siteLogos from "./site-logos-schema"
 import service from "./services-schema"
+import lead from "./lead-schema"
+import faq from "./faq-schema"
+import job from "./job-schema"
+import announcement from "./announcement-schema"
 
 const schemas = [
   landingPage,
@@ -23,7 +27,11 @@ const schemas = [
   landingAbout,
   landingService,
   siteLogos,
-  service
+  service,
+  lead,
+  faq,
+  job,
+  announcement
 ]
 
 export default schemas

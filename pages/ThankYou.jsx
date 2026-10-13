@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { GetStaticProps } from 'next';
+import Head from 'next/head'
 import getPageMetadata from "../SEO/seo"
 import { getThankYouMessageData } from "../sanity/sanity-utils"
 import { portableTextComponents } from "../components/portable-text"
@@ -22,6 +23,11 @@ const ThankYou = ({ thankYou }) => {
 
     return (
         <>
+            <Head>
+              {/* P0: Thank-you must not count as organic conversion — noindex + excluded from sitemap */}
+              <meta name="robots" content="noindex, nofollow" />
+              <link rel="canonical" href="https://taylorea.com/ThankYou" />
+            </Head>
             {/* Google Ads gtag.js */}
             <Script
                 strategy="afterInteractive"

@@ -6,7 +6,7 @@ import { BsCheckCircle, BsPeople, BsClock, BsGeoAlt } from "react-icons/bs"
 import { FaTruck, FaBoxes, FaUsers, FaHeadset } from "react-icons/fa"
 import ReCAPTCHA from "react-google-recaptcha"
 
-const Jobs = () => {
+const Jobs = ({ jobs }) => {
   // Get SEO metadata
   const seoData = getPageMetadata("jobs", {
     customTitle: 'Jobs at Taylor Movers Kenya | Join Our Moving Team',
@@ -112,6 +112,18 @@ const Jobs = () => {
     }
   ]
 
+  // CMS-managed openings (Sanity `job` type) with the static list as fallback.
+  // CMS docs lack icons/responsibilities, so cycle house icons and default to [].
+  const JOB_ICONS = [
+    <FaTruck key="t" className="text-[#FF5000]" size={24} />,
+    <FaBoxes key="b" className="text-[#FF5000]" size={24} />,
+    <FaHeadset key="h" className="text-[#FF5000]" size={24} />,
+    <FaUsers key="u" className="text-[#FF5000]" size={24} />,
+  ]
+  const listings = jobs?.length
+    ? jobs.map((j, i) => ({ ...j, id: j._id || j.title, icon: JOB_ICONS[i % JOB_ICONS.length], responsibilities: j.responsibilities || [] }))
+    : jobOpenings
+
   const benefits = [
     "Competitive salary packages",
     "Health insurance coverage",
@@ -129,7 +141,7 @@ const Jobs = () => {
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
-        <link rel="canonical" href={seoData.canonical} />
+        <link rel="canonical" href="https://taylorea.com/jobs" />
         
         {/* Open Graph */}
         <meta property="og:title" content={seoData.openGraph.title} />
@@ -194,7 +206,7 @@ const Jobs = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {jobOpenings.map((job) => (
+            {listings.map((job) => (
               <div key={job.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow">
                 <div className="flex items-start space-x-4 mb-4">
                   <div className="p-3 bg-gray-50 rounded-lg">
@@ -407,7 +419,14 @@ reCAPTCHA: ${recaptchaToken ? 'verified' : 'not provided'}
           to: 'hradmin@taylorea.com',
           subject: `Job Application - ${formData.position} - ${formData.fullName}`,
           message: message,
-          recaptchaToken: recaptchaToken
+          recaptchaToken: recaptchaToken,
+          inquiry: {
+            name: formData.fullName,
+            email: formData.email,
+            phone: formData.phone,
+            source: 'Job Application',
+            notes: `${formData.position} | ${formData.experience} yrs exp`,
+          },
         })
       })
 
@@ -566,3 +585,12 @@ reCAPTCHA: ${recaptchaToken ? 'verified' : 'not provided'}
 }
 
 export default React.memo(Jobs)
+
+export async function getStaticProps() {
+  try {
+    const jobs = await getJobs()
+    return { props: { jobs: jobs || [] }, revalidate: 60 }
+  } catch {
+    return { props: { jobs: [] }, revalidate: 60 }
+  }
+}

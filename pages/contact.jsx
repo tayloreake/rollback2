@@ -29,7 +29,7 @@ const Contacts = () => {
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
-        <link rel="canonical" href={seoData.canonical} />
+        <link rel="canonical" href="https://taylorea.com/contact" />
         
         {/* Open Graph */}
         <meta property="og:title" content={seoData.openGraph.title} />
@@ -151,7 +151,7 @@ const Contacts = () => {
                 WhatsApp Us
               </a>
               <a 
-                href="/Feedback" 
+                href="/feedback" 
                 className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-[#FF5000] transition-all"
               >
                 Share Feedback

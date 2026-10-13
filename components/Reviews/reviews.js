@@ -1,9 +1,8 @@
-import { Modal } from "antd"
 import Image from "next/image"
 import React, { useState, useRef, useEffect } from "react"
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import SnapSlider from "../ui/SnapSlider";
+
+
 import imageUrlBuilder from "@sanity/image-url"
 import client from "../../sanity/config/client-config"
 import { getClientReviews } from "../../sanity/sanity-utils";
@@ -28,22 +27,13 @@ const Reviews = () => {
   const showModal = () => {
     setIsModalOpen(true);
   }
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 3000,
-  };
 
 
 
   return (
     <div className='bg-[#0000000D] rounded-2xl px-3 py-4'>
 
-      <Slider {...settings}>
+      <SnapSlider slideClassName="min-w-[100%] snap-center">
         {reviews?.map((review, idx) => (
           <div key={`review-${idx}`} >
             <div className="flex">
@@ -74,7 +64,7 @@ const Reviews = () => {
             </div>
           </div>
         ))}
-      </Slider>
+      </SnapSlider>
 
     </div>
   )

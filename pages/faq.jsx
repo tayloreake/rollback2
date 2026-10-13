@@ -3,8 +3,9 @@ import Head from 'next/head'
 import getPageMetadata from "../SEO/seo"
 import Jumbotron from "../components/jumbotron"
 import { FaChevronDown, FaChevronUp, FaSearch } from "react-icons/fa"
+import { getFaqs } from "../sanity/sanity-utils"
 
-const FAQ = () => {
+const FAQ = ({ faqs }) => {
   const [openQuestions, setOpenQuestions] = useState({})
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredFAQs, setFilteredFAQs] = useState([])
@@ -18,7 +19,7 @@ const FAQ = () => {
     includeService: false
   })
 
-  const faqData = useMemo(() => [
+  const staticFaqs = useMemo(() => [
     {
       id: 1,
       question: "Is your company registered and licensed to operate in Kenya?",
@@ -168,6 +169,12 @@ Sea Freight: This is the most cost-effective option for a full household move. O
     }
   ], [])
 
+  // CMS-managed FAQs (Sanity `faq` type) with the static list as fallback.
+  // CMS docs use _id; the render + FAQPage schema below only need id/question/answer.
+  const faqData = faqs?.length
+    ? faqs.map((f) => ({ id: f._id || f.id, question: f.question, answer: f.answer }))
+    : staticFaqs
+
   const toggleQuestion = (questionId) => {
     setOpenQuestions(prev => ({
       ...prev,
@@ -199,14 +206,26 @@ Sea Freight: This is the most cost-effective option for a full household move. O
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
+        <link rel="canonical" href={seoData.canonical} />
         <meta property="og:title" content={seoData.openGraph.title} />
         <meta property="og:description" content={seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: (faqData || []).map((f) => ({
+              '@type': 'Question',
+              name: f.question,
+              acceptedAnswer: { '@type': 'Answer', text: String(f.answer || '').slice(0, 1000) },
+            })),
+          }) }}
+        />
       </Head>
 
       <Jumbotron 
         image={'taylor-movers-kenya-professional-team.png'} 
-        title="Frequently Asked Questions"
         subtitle="Get instant answers to all your moving questions. We're here to help make your relocation smooth and stress-free."
         alt={"Frequently Asked Questions about Taylor Movers Kenya moving services"} 
       />
@@ -387,3 +406,12 @@ Sea Freight: This is the most cost-effective option for a full household move. O
 }
 
 export default FAQ
+
+export async function getStaticProps() {
+  try {
+    const faqs = await getFaqs()
+    return { props: { faqs: faqs || [] }, revalidate: 60 }
+  } catch {
+    return { props: { faqs: [] }, revalidate: 60 }
+  }
+}

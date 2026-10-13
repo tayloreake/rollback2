@@ -28,7 +28,7 @@ class ErrorBoundary extends React.Component {
               We encountered an error while loading this content. Please try again later.
             </p>
             <div className="flex gap-4 justify-center">
-              <Link href="/Blog">
+              <Link href="/blog">
                 <button className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 rounded-lg transition-colors">
                   Back to Blog
                 </button>

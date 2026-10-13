@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { toast } from "react-toastify"
-// import { createQuote } from "../sanity/sanity-utils"
 import ReCAPTCHA from "react-google-recaptcha"
-import { createQuote } from "../../sanity/sanity-utils"
 import useFormPersistence from "../../hooks/useFormPersistence"
+import { getAttribution } from "../../utils/attribution"
 
 // Helper function to get current date
 function getCurrentDate() {
@@ -22,10 +21,41 @@ const getInitialFormData = () => ({
   destination: "",
   number: "",
   moveType: "Local House Move",
-  bedrooms: "1br",
+  bedrooms: "1 Bedroom",
   moveDate: getCurrentDate(),
-  ref: "Referal"
+  ref: "Referrals"
 });
+
+const MOVE_TYPES = [
+  "Local House Move",
+  "Office Move",
+  "International Move",
+  "Corporate Staff Relocation",
+  "Storage & Warehousing",
+  "Long-Distance Move",
+  "Business Move",
+  "Other",
+];
+
+const BEDROOM_OPTIONS = [
+  "Studio Apartment",
+  "1 Bedroom",
+  "2 Bedrooms",
+  "3 Bedrooms",
+  "4 Bedrooms",
+  "5 Bedrooms",
+  "6 Bedrooms",
+  "More than 6 Bedrooms",
+];
+
+const REFERRAL_OPTIONS = [
+  "Referrals",
+  "Social Media Pages",
+  "Internet Search",
+  "Door To Door Marketing",
+  "Taylor Mover Trucks",
+  "Previous Interactions",
+];
 
 const QuoteForm = () => {
   // Memoize initial data to prevent re-creation
@@ -66,12 +96,27 @@ const QuoteForm = () => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
+  // P0: accept international formats, normalise server-side to E.164 (default KE).
+  // Audit: was /^0\d{9}$/ which blocked +254/+44/+1 expat & embassy leads.
   const isValidPhoneNumber = (phoneNumber) => {
-    return /^\0\d{9}$/.test(phoneNumber)
+    if (!phoneNumber) return false
+    return /^\+?\d[\d\s-]{7,15}$/.test(phoneNumber.trim())
   }
 
   useEffect(() => {
     if (formSubmitted) {
+      try {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'generate_lead',
+          form_id: 'quote',
+          move_type: formData.moveType,
+          bedrooms: formData.bedrooms,
+          lead_source: formData.ref,
+          value: 1,
+          currency: 'KES',
+        });
+      } catch (e) { /* no-op */ }
       window.dispatchEvent(new CustomEvent("tayloreaFormSubmitted", {
         detail: { status: "success", timestamp: Date.now() }
       }));
@@ -79,16 +124,21 @@ const QuoteForm = () => {
       // Use Next.js router for better navigation
       window.location.href = "/ThankYou";
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formSubmitted]);
 
   const isValidName = (name) => {
-    return name.length >= 2 && /^[a-zA-Z\s]+$/.test(name);
+    if (!name) return false
+    return /^[\p{L}\p{M}' .-]{2,80}$/u.test(name.trim());
   };
 
   const isValidLocation = (location) => {
     return location.length >= 3;
   };
 
+  // Single server-orchestrated submit (Sanity Security §7.3/§8):
+  // POSTs once to /api/submitQuote, which does ledger → SMS/email → Zoho.
+  // No direct Sanity writes from the browser, no dual fan-out.
   const handleSendMessage = async () => {
     const tayloreaMessageContent = formatMessageContent('taylorea');
 
@@ -104,56 +154,20 @@ const QuoteForm = () => {
       setIsSubmitting(true);
 
       // Create timeout promise for all operations
-      const createTimeoutPromise = (ms) => new Promise((_, reject) => 
+      const createTimeoutPromise = (ms) => new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Operation timeout')), ms)
       );
 
-      // First send SMS with timeout
-      const smsToken = await Promise.race([
+      const token = await Promise.race([
         recaptchaRef.current.executeAsync(),
         createTimeoutPromise(10000) // 10 second timeout
       ]);
-      
-      if (!smsToken) {
-        throw new Error('Failed to verify reCAPTCHA for SMS');
+
+      if (!token) {
+        throw new Error('Failed to verify reCAPTCHA');
       }
 
-      // SMS API call with timeout
-      const smsResponse = await Promise.race([
-        fetch("/api/sendSms", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            to: ["+254721410517"],
-            message: tayloreaMessageContent,
-            recaptchaToken: smsToken
-          }),
-        }),
-        createTimeoutPromise(15000) // 15 second timeout
-      ]);
-
-      if (!smsResponse.ok) {
-        const errorData = await smsResponse.json();
-        // throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
-      }
-
-      // Reset reCAPTCHA for email
-      recaptchaRef.current.reset();
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for reset
-
-      // Then send email with timeout
-      const emailToken = await Promise.race([
-        recaptchaRef.current.executeAsync(),
-        createTimeoutPromise(10000) // 10 second timeout
-      ]);
-      
-      if (!emailToken) {
-        throw new Error('Failed to verify reCAPTCHA for email');
-      }
-
-      // Prepare quote data for logging
+      // Prepare quote data for the server
       const quoteDataForLogging = {
         firstName: formData.fname,
         email: formData.email,
@@ -163,58 +177,40 @@ const QuoteForm = () => {
         moveType: formData.moveType,
         bedrooms: formData.bedrooms,
         moveDate: formData.moveDate,
-        referrals: formData.ref
+        referrals: formData.ref,
+        attribution: getAttribution(),
       };
 
-      // Send email to company (sales@taylorea.com)
-      const emailResponse = await Promise.race([
-        fetch("/api/sendEmail", {
+      const response = await Promise.race([
+        fetch("/api/submitQuote", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            to: "sales@taylorea.com",
             message: tayloreaMessageContent,
-            recaptchaToken: emailToken,
+            recaptchaToken: token,
             quoteData: quoteDataForLogging
           }),
         }),
-        createTimeoutPromise(15000) // 15 second timeout
+        createTimeoutPromise(30000) // 30 second timeout
       ]);
 
-      if (!emailResponse.ok) {
-        const errorData = await emailResponse.json();
-        throw new Error(errorData.message || 'Failed to send email to company');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to submit quote request');
       }
 
-      // Save Skip to Sanity
-      // try {
-      //   await createQuote(
-      //     formData.fname,
-      //     formData.email,
-      //     formData.number,
-      //     formData.location,
-      //     formData.destination,
-      //     formData.moveType,
-      //     formData.bedrooms,
-      //     formData.moveDate,
-      //     formData.ref
-      //   );
-      // } catch (error) {
-      //   console.error("Error saving quote to Sanity did not submit..:", error);
-      // }
+      // No direct Sanity writes from the browser (Sanity Security §2/§7).
+      // The server route owns ledger + notifications + Zoho.
 
       setLastSubmissionTime(now);
       toast.success("Quote request submitted successfully! We'll contact you soon.");
-
-      // Clear form data and persisted storage
       clearFormData();
       setFormSubmitted(true);
 
     } catch (error) {
       console.error("Error:", error);
-      toast.success("Quote request submitted successfully! We'll contact you soon.");
       toast.error(error.message || "Failed to submit quote request. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -262,8 +258,8 @@ const QuoteForm = () => {
       toast.error("Please enter a valid email address");
       return false;
     }
-    if (isValidPhoneNumber(formData.number)) {
-      toast.error(`Please enter a valid phone number (07/01XXXXXXXX), ${formData.number + " " + isValidPhoneNumber(formData.number)}`);
+    if (!isValidPhoneNumber(formData.number)) {
+      toast.error(`Please enter a valid phone number (e.g. 0721410517 or +254721410517)`);
       return false;
     }
 
@@ -320,325 +316,119 @@ const QuoteForm = () => {
     }
   }
 
+  const inputCls = 'border border-slate-200 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-[15px] text-gray-900 bg-white placeholder:text-gray-400'
+  const labelCls = 'block text-[13px] font-semibold text-slate-700 mb-1.5'
+
   return (
-    <div className='w-full max-w-[400px] mx-auto quote-form-container'>
-      {/* Header Section */}
-      <div className='py-4 px-4 mb-4 bg-gradient-to-r from-[#FF5000] to-[#FF6B35] rounded-t-xl'>
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="font-bold text-xl text-white mb-1">Request a Quote</h1>
-            <p className='text-white text-sm opacity-90'>Get your free moving estimate</p>
-          </div>
+    <div className='w-full max-w-[480px] mx-auto quote-form-container bg-white rounded-2xl shadow-[0_20px_60px_-15px_rgba(11,27,51,0.35)] border border-slate-100 overflow-hidden'>
+      {/* Enterprise header */}
+      <div className='bg-[#0B1B33] px-6 pt-6 pb-5 relative overflow-hidden'>
+        <div className='absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF5000] via-[#FF8A50] to-[#FF5000]' />
+        <div className='flex items-center gap-2 mb-3'>
+          <span className='text-[11px] font-bold tracking-widest uppercase bg-white/10 text-white px-2.5 py-1 rounded-full border border-white/15'>Taylor Movers • Since 2008</span>
           {showPersistedDataNotice && (
-            <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
-              <span className="text-xs text-white font-medium">📝 Data restored</span>
-            </div>
+            <span className='text-[11px] text-white/90 bg-white/10 px-2.5 py-1 rounded-full'>Draft restored</span>
           )}
         </div>
+        <h2 className='font-bold text-[22px] leading-tight text-white'>Get Your Free Moving Quote</h2>
+        <p className='text-slate-300 text-sm mt-1'>Transparent pricing • No hidden fees • Response within 30 minutes</p>
+        <div className='flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-[12px] text-slate-200'>
+          <span>IAM Member</span><span className='text-white/20'>|</span>
+          <span>40,000+ Successful Moves</span><span className='text-white/20'>|</span>
+          <span>4.9★ from 4,000+ reviews</span>
+        </div>
         {hasPersistedData && (
-          <div className="mt-3 p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-            <div className="flex items-center justify-between">
-              <span className="text-white text-xs font-medium">Continue from where you left off</span>
-              <button
-                type="button"
-                onClick={clearFormData}
-                className="text-white/70 hover:text-white text-xs underline"
-              >
-                Start fresh
-              </button>
-            </div>
+          <div className='mt-3 flex items-center justify-between bg-white/10 border border-white/15 rounded-lg px-3 py-2'>
+            <span className='text-white text-xs'>Continue from where you left off</span>
+            <button type='button' onClick={clearFormData} className='text-white/70 hover:text-white text-xs underline'>Start fresh</button>
           </div>
         )}
       </div>
-      
-      {/* Form Container - Scrollable fields */}
-      <div className='px-4 pb-4 quote-form-scroll-container' style={{ maxHeight: 'calc(90vh - 240px)', overflowY: 'auto', overflowX: 'hidden' }}>
-        {/* Job Application Notice */}
-        <div className='mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg'>
-          <div className='flex items-start space-x-2'>
-            <div className='flex-shrink-0 mt-0.5'>
-              <svg className='w-5 h-5 text-blue-600' fill='currentColor' viewBox='0 0 20 20'>
-                <path fillRule='evenodd' d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z' clipRule='evenodd' />
-              </svg>
+
+      {/* Trust strip */}
+      <div className='grid grid-cols-3 divide-x divide-slate-100 bg-slate-50 border-b border-slate-100 text-center'>
+        <div className='py-2.5 px-2'><p className='text-[13px] font-bold text-slate-900'>Licensed</p><p className='text-[11px] text-slate-500'>& Insured</p></div>
+        <div className='py-2.5 px-2'><p className='text-[13px] font-bold text-slate-900'>Free Survey</p><p className='text-[11px] text-slate-500'>On request</p></div>
+        <div className='py-2.5 px-2'><p className='text-[13px] font-bold text-slate-900'>0712 410 517</p><p className='text-[11px] text-slate-500'>Call / WhatsApp</p></div>
+      </div>
+
+      <div className='px-6 py-5'>
+        <form ref={formRef} onSubmit={handleSubmit} className='w-full flex flex-col gap-5'>
+          <div>
+            <p className='text-[11px] font-bold tracking-widest uppercase text-[#FF5000] mb-3'>1 • Contact details</p>
+            <div className='flex flex-col gap-4'>
+              <div>
+                <label htmlFor='quote-fname' className={labelCls}>Full Name <span className='text-[#FF5000]'>*</span></label>
+                <input type='text' id='quote-fname' name='name' autoComplete='name' value={formData.fname} required placeholder='e.g. Jane Wanjiru-Kamau' onChange={(e) => updateFormData('fname', e.target.value)} className={inputCls} />
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div>
+                  <label htmlFor='quote-phone' className={labelCls}>Phone / WhatsApp <span className='text-[#FF5000]'>*</span></label>
+                  <input type='tel' inputMode='tel' id='quote-phone' name='phone' autoComplete='tel' value={formData.number} required placeholder='+254 712 410 517' onChange={(e) => updateFormData('number', e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label htmlFor='quote-email' className={labelCls}>Email <span className='text-[#FF5000]'>*</span></label>
+                  <input type='email' id='quote-email' name='email' autoComplete='email' value={formData.email} required placeholder='you@company.com' onChange={(e) => updateFormData('email', e.target.value)} className={inputCls} />
+                </div>
+              </div>
             </div>
-            <div className='flex-1'>
-              <p className='text-sm text-blue-800 font-medium mb-1'>
-                Looking for a job?
-              </p>
-              <p className='text-xs text-blue-700'>
-                This form is for moving service quotes only. If you're seeking employment, please{' '}
-                <a 
-                  href='/Jobs' 
-                  className='font-semibold underline hover:text-blue-900 transition-colors'
-                  target='_blank'
-                  rel='noopener noreferrer'
-                >
-                  visit our Jobs page
-                </a>
-                {' '}to apply.
-              </p>
+          </div>
+
+          <div className='h-px bg-slate-100' />
+
+          <div>
+            <p className='text-[11px] font-bold tracking-widest uppercase text-[#FF5000] mb-3'>2 • Move details</p>
+            <div className='flex flex-col gap-4'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div>
+                  <label htmlFor='quote-from' className={labelCls}>Moving From <span className='text-[#FF5000]'>*</span></label>
+                  <input type='text' id='quote-from' name='from' autoComplete='address-level2' value={formData.location} required placeholder='Westlands, Nairobi' onChange={(e) => updateFormData('location', e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label htmlFor='quote-to' className={labelCls}>Moving To <span className='text-[#FF5000]'>*</span></label>
+                  <input type='text' id='quote-to' name='to' value={formData.destination} required placeholder='Kileleshwa, Nairobi' onChange={(e) => updateFormData('destination', e.target.value)} className={inputCls} />
+                </div>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div>
+                  <label htmlFor='quote-type' className={labelCls}>Move Type <span className='text-[#FF5000]'>*</span></label>
+                  <select id='quote-type' name='moveType' value={formData.moveType} onChange={(e) => updateFormData('moveType', e.target.value)} className={inputCls + ' cursor-pointer'}>
+                    {MOVE_TYPES.map((m) => (<option key={m} value={m}>{m}</option>))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor='quote-size' className={labelCls}>Property Size <span className='text-[#FF5000]'>*</span></label>
+                  <select id='quote-size' name='bedrooms' value={formData.bedrooms} onChange={(e) => updateFormData('bedrooms', e.target.value)} className={inputCls + ' cursor-pointer'}>
+                    {BEDROOM_OPTIONS.map((b) => (<option key={b} value={b}>{b}</option>))}
+                  </select>
+                </div>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div>
+                  <label htmlFor='quote-date' className={labelCls}>Preferred Move Date <span className='text-[#FF5000]'>*</span></label>
+                  <input type='date' id='quote-date' name='moveDate' value={formData.moveDate} onChange={handleDateChange} className={inputCls} />
+                </div>
+                <div>
+                  <label htmlFor='quote-ref' className={labelCls}>How did you hear about us?</label>
+                  <select id='quote-ref' name='referral' value={formData.ref} onChange={(e) => updateFormData('ref', e.target.value)} className={inputCls + ' cursor-pointer'}>
+                    {REFERRAL_OPTIONS.map((r) => (<option key={r} value={r}>{r}</option>))}
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <form
-          ref={formRef}
-          onSubmit={handleSubmit}
-          className='w-full flex flex-col items-center justify-center space-y-4'>
-          {/* Prevent form re-rendering by removing unstable keys */}
-          
-          {/* Full Name */}
-          <div className='relative w-full'>
-            <input
-              type='text'
-              value={formData.fname}
-              required
-              placeholder="John Doe"
-              onChange={(e) => updateFormData('fname', e.target.value)}
-              onBlur={(e) => {
-                // Prevent clearing on blur by ensuring value stays
-                if (e.target.value !== formData.fname) {
-                  updateFormData('fname', e.target.value);
-                }
-              }}
-              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
-              style={{ 
-                WebkitAppearance: 'none',
-                WebkitUserSelect: 'text',
-                userSelect: 'text',
-                color: '#374151 !important',
-                backgroundColor: '#ffffff !important'
-              }}
-            />
-            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
-              Full Name
-            </label>
-          </div>
-
-          {/* Mobile Number */}
-          <div className='relative w-full'>
-            <input
-              type='text'
-              value={formData.number}
-              required
-              onChange={(e) => updateFormData('number', e.target.value)}
-              onBlur={(e) => {
-                if (e.target.value !== formData.number) {
-                  updateFormData('number', e.target.value);
-                }
-              }}
-              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
-              placeholder="0700000000"
-              style={{ 
-                WebkitAppearance: 'none',
-                WebkitUserSelect: 'text',
-                userSelect: 'text',
-                color: '#374151 !important',
-                backgroundColor: '#ffffff !important'
-              }}
-            />
-            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
-              Mobile Number
-            </label>
-          </div>
-
-          {/* Email */}
-          <div className='relative w-full'>
-            <input
-              type='email'
-              value={formData.email}
-              placeholder="john@gmail.com"
-              onChange={(e) => updateFormData('email', e.target.value)}
-              onBlur={(e) => {
-                if (e.target.value !== formData.email) {
-                  updateFormData('email', e.target.value);
-                }
-              }}
-              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
-              style={{ 
-                WebkitAppearance: 'none',
-                WebkitUserSelect: 'text',
-                userSelect: 'text',
-                color: '#374151 !important',
-                backgroundColor: '#ffffff !important'
-              }}
-            />
-            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
-              Email Address
-            </label>
-          </div>
-
-          {/* Current Location */}
-          <div className='relative w-full'>
-            <input
-              type='text'
-              value={formData.location}
-              placeholder="Westlands, Nairobi"
-              onChange={(e) => updateFormData('location', e.target.value)}
-              onBlur={(e) => {
-                if (e.target.value !== formData.location) {
-                  updateFormData('location', e.target.value);
-                }
-              }}
-              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
-              style={{ 
-                WebkitAppearance: 'none',
-                WebkitUserSelect: 'text',
-                userSelect: 'text',
-                color: '#374151 !important',
-                backgroundColor: '#ffffff !important'
-              }}
-            />
-            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
-              Current Location
-            </label>
-          </div>
-
-          {/* Destination */}
-          <div className='relative w-full'>
-            <input
-              type='text'
-              value={formData.destination}
-              placeholder="Nairobi CBD"
-              onChange={(e) => updateFormData('destination', e.target.value)}
-              onBlur={(e) => {
-                if (e.target.value !== formData.destination) {
-                  updateFormData('destination', e.target.value);
-                }
-              }}
-              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
-              style={{ 
-                WebkitAppearance: 'none',
-                WebkitUserSelect: 'text',
-                userSelect: 'text',
-                color: '#374151 !important',
-                backgroundColor: '#ffffff !important'
-              }}
-            />
-            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
-              Destination Location
-            </label>
-          </div>
-
-          {/* Move Type */}
-          <div className='relative w-full'>
-            <select
-              onChange={(e) => updateFormData('moveType', e.target.value)}
-              value={formData.moveType}
-              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white appearance-none cursor-pointer'
-              style={{ 
-                WebkitAppearance: 'none',
-                color: '#374151 !important',
-                backgroundColor: '#ffffff !important'
-              }}>
-              <option value="Local House Move">Local House Move</option>
-              <option value="International Move">International Move</option>
-              <option value="Business Move">Business Move</option>
-              <option value="Other">Other</option>
-            </select>
-            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
-              Move Type
-            </label>
-          </div>
-
-          {/* Number of Bedrooms */}
-          <div className='relative w-full'>
-            <select
-              onChange={(e) => updateFormData('bedrooms', e.target.value)}
-              value={formData.bedrooms}
-              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white appearance-none cursor-pointer'
-              style={{ 
-                WebkitAppearance: 'none',
-                color: '#374151 !important',
-                backgroundColor: '#ffffff !important'
-              }}>
-              <option value="1br">1 Bedroom</option>
-              <option value="2br">2 Bedrooms</option>
-              <option value="3br">3 Bedrooms</option>
-              <option value="4br">4 Bedrooms</option>
-              <option value="5br">5 Bedrooms</option>
-              <option value="6br">6 Bedrooms</option>
-              <option value="More than 6br">More than 6 Bedrooms</option>
-              <option value="studio">Studio Apartment</option>
-            </select>
-            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
-              Number of Bedrooms
-            </label>
-          </div>
-
-          {/* Move Date */}
-          <div className='relative w-full'>
-            <input
-              type='date'
-              value={formData.moveDate}
-              onChange={handleDateChange}
-              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white'
-              style={{ 
-                WebkitAppearance: 'none',
-                color: '#374151 !important',
-                backgroundColor: '#ffffff !important'
-              }}
-            />
-            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
-              Preferred Move Date
-            </label>
-          </div>
-
-          {/* How did you find us */}
-          <div className='relative w-full'>
-            <select
-              onChange={(e) => updateFormData('ref', e.target.value)}
-              value={formData.ref}
-              className='border border-slate-300 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-gray-800 bg-white appearance-none cursor-pointer'
-              style={{ 
-                WebkitAppearance: 'none',
-                color: '#374151 !important',
-                backgroundColor: '#ffffff !important'
-              }}>
-              <option value="Referals">Referrals</option>
-              <option value="Social Media Pages">Social Media Pages</option>
-              <option value="Internet Search">Internet Search</option>
-              <option value="Door To Door Marketing">Door To Door Marketing</option>
-              <option value="Taylor Mover Trucks">Taylor Mover Trucks</option>
-              <option value="Previous Interactions">Previous Interactions</option>
-            </select>
-            <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-500 font-medium'>
-              How did you find us?
-            </label>
-          </div>
-
-          {/* reCAPTCHA */}
-          <div className="w-full">
-            <ReCAPTCHA
-              ref={recaptchaRef}
-              size="invisible"
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-            />
+          <div className='w-full'>
+            <ReCAPTCHA ref={recaptchaRef} size='invisible' sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} />
           </div>
         </form>
       </div>
 
-      {/* Submit Button - Fixed at bottom, always visible */}
-      <div className='px-4 pb-6 pt-4 bg-white border-t border-gray-200'>
-        <button
-          type='submit'
-          onClick={(e) => {
-            e.preventDefault();
-            if (formRef.current) {
-              formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-            }
-          }}
-          disabled={isSubmitting}
-          className='w-full bg-[#FF5000] text-white px-6 py-4 rounded-xl hover:bg-[#e04400] transition-all duration-200 font-semibold text-base sm:text-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] shadow-lg'>
-          {isSubmitting ? (
-            <div className="flex items-center justify-center space-x-2">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              <span className="text-sm sm:text-base">Submitting...</span>
-            </div>
-          ) : (
-            <span className="text-sm sm:text-base">Submit Quote Request</span>
-          )}
+      <div className='px-6 pb-6 pt-4 bg-white border-t border-slate-100'>
+        <button type='submit' onClick={(e) => { e.preventDefault(); if (formRef.current) { formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); } }} disabled={isSubmitting} className='w-full bg-[#FF5000] text-white px-6 py-4 rounded-xl hover:bg-[#D94300] transition-all font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_10px_25px_-8px_rgba(255,80,0,0.7)]'>
+          {isSubmitting ? (<span className='flex items-center justify-center gap-2'><span className='animate-spin rounded-full h-5 w-5 border-b-2 border-white' />Submitting secure request…</span>) : (<span>Request My Free Quote →</span>)}
         </button>
+        <p className='text-center text-[12px] text-slate-500 mt-3'>🔒 Your details are encrypted & never shared. Prefer chat? <a href='https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20(ref%3A%20WEB)' target='_blank' rel='noreferrer' className='font-semibold text-[#0B1B33] underline'>WhatsApp us</a> • <a href='tel:+254721410517' className='font-semibold text-[#0B1B33] underline'>Call 0721 410 517</a></p>
       </div>
     </div>
   )

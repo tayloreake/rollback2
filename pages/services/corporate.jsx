@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import getPageMetadata from '../../SEO/seo'
+import { getServiceSEO } from '../../sanity/sanity-utils'
 import Head from 'next/head'
 import Jumbotron from '../../components/jumbotron'
 import dynamic from 'next/dynamic'
@@ -33,7 +34,7 @@ import {
 } from 'react-icons/fa'
 import { MdBusiness, MdSupport, MdSpeed } from 'react-icons/md'
 
-const CorporateStaffRelocation = () => {
+const CorporateStaffRelocation = ({ serviceSEO }) => {
   const whyChooseUs = [
     {
       icon: <BsGear className="text-[#FF5000] text-4xl" />,
@@ -212,12 +213,20 @@ const CorporateStaffRelocation = () => {
   return (
     <div className="w-full">
       <Head>
-        <title>{seoData.title}</title>
-        <meta name="description" content={seoData.description} />
+        <title>{serviceSEO?.metaTitle || seoData.title}</title>
+        <meta name="description" content={serviceSEO?.metaDescription || seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
-        <meta property="og:title" content={seoData.openGraph.title} />
-        <meta property="og:description" content={seoData.openGraph.description} />
+        <link rel="canonical" href={seoData.canonical} />
+        <meta property="og:title" content={serviceSEO?.metaTitle || seoData.openGraph.title} />
+        <meta property="og:description" content={serviceSEO?.metaDescription || seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />
+        {serviceSEO?.ogImageUrl && (<meta property="og:image" content={serviceSEO.ogImageUrl} />)}
+        {seoData.structuredData && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(seoData.structuredData) }}
+          />
+        )}
       </Head>
 
       <Jumbotron 
@@ -484,3 +493,11 @@ const CorporateStaffRelocation = () => {
 }
 
 export default CorporateStaffRelocation
+export async function getStaticProps() {
+  try {
+    const serviceSEO = await getServiceSEO('corporate-staff-relocation')
+    return { props: { serviceSEO: serviceSEO || null }, revalidate: 60 }
+  } catch {
+    return { props: { serviceSEO: null }, revalidate: 60 }
+  }
+}

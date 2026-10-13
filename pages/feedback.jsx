@@ -19,7 +19,7 @@ const Feedback = () => {
         <title>{seoData.title}</title>
         <meta name="description" content={seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
-        <link rel="canonical" href={seoData.canonical} />
+        <link rel="canonical" href="https://taylorea.com/feedback" />
         
         {/* Open Graph */}
         <meta property="og:title" content={seoData.openGraph.title} />
@@ -68,13 +68,13 @@ const Feedback = () => {
             </p>
             <div className="flex justify-center gap-4 flex-wrap">
               <a 
-                href="/Contacts" 
+                href="/contact" 
                 className="px-6 py-3 bg-white text-[#FF5000] font-bold rounded-full hover:shadow-2xl transition-all"
               >
                 Contact Us
               </a>
               <a 
-                href="/Quote" 
+                href="/quote" 
                 className="px-6 py-3 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-[#FF5000] transition-all"
               >
                 Get a Quote

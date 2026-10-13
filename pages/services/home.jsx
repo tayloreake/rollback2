@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import getPageMetadata from '../../SEO/seo'
+import { getServiceSEO } from '../../sanity/sanity-utils'
+import ServiceCmsSections from '../../components/Services/ServiceCmsSections'
 import Head from 'next/head'
 import Jumbotron from '../../components/jumbotron'
 import dynamic from 'next/dynamic'
@@ -29,7 +31,7 @@ import {
 } from 'react-icons/fa'
 import { MdSecurity, MdSpeed } from 'react-icons/md'
 
-const ResidentialMoving = () => {
+const ResidentialMoving = ({ serviceSEO }) => {
 
   const whyChooseUs = [
     {
@@ -163,14 +165,14 @@ const ResidentialMoving = () => {
   return (
     <div className="w-full">
       <Head>
-        <title>{seoData.title}</title>
-        <meta name="description" content={seoData.description} />
+        <title>{serviceSEO?.metaTitle || seoData.title}</title>
+        <meta name="description" content={serviceSEO?.metaDescription || seoData.description} />
         <meta name="keywords" content={seoData.keywords} />
-        <link rel="canonical" href={seoData.canonical} />
+        <link rel="canonical" href="https://taylorea.com/services/home" />
         
         {/* Open Graph */}
-        <meta property="og:title" content={seoData.openGraph.title} />
-        <meta property="og:description" content={seoData.openGraph.description} />
+        <meta property="og:title" content={serviceSEO?.metaTitle || seoData.openGraph.title} />
+        <meta property="og:description" content={serviceSEO?.metaDescription || seoData.openGraph.description} />
         <meta property="og:type" content={seoData.openGraph.type} />
         <meta property="og:url" content={seoData.openGraph.url} />
         <meta property="og:site_name" content={seoData.openGraph.siteName} />
@@ -185,6 +187,7 @@ const ResidentialMoving = () => {
         <meta name="twitter:image" content={seoData.twitter.image} />
         
         {/* Structured Data */}
+        {serviceSEO?.ogImageUrl && (<meta property="og:image" content={serviceSEO.ogImageUrl} />)}
         {seoData.structuredData && (
           <script 
             type="application/ld+json"
@@ -387,9 +390,19 @@ const ResidentialMoving = () => {
       </div>
 
       {/* Newsletter Section */}
+      <ServiceCmsSections content={serviceSEO?.content} />
       <NewsletterSection />
     </div>
   )
 }
 
 export default ResidentialMoving
+
+export async function getStaticProps() {
+  try {
+    const serviceSEO = await getServiceSEO('residential-moving')
+    return { props: { serviceSEO: serviceSEO || null }, revalidate: 60 }
+  } catch {
+    return { props: { serviceSEO: null }, revalidate: 60 }
+  }
+}

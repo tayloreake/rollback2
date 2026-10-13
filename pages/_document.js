@@ -4,6 +4,23 @@ export default function Document() {
     return (
         <Html lang="en" className="scroll-smooth">
             <Head>
+            {/* Consent Mode v2 defaults: deny everything until the visitor
+                chooses in ConsentBanner (audit §1 P1). Must run before GTM. */}
+            <script
+                dangerouslySetInnerHTML={{
+                    __html: `window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments)};window.gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});`,
+                }}
+            />
+            {/* GA4 directly (G-S2W1496B3K). GTM holds no GA4 tag, so this is the
+                single collector. If a GTM Google tag is ever added for this ID,
+                remove this block to avoid double counting. Consent Mode
+                defaults above gate collection until the visitor chooses. */}
+            <script async src="https://www.googletagmanager.com/gtag/js?id=G-S2W1496B3K" />
+            <script
+                dangerouslySetInnerHTML={{
+                    __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-S2W1496B3K');`,
+                }}
+            />
             <script
                    dangerouslySetInnerHTML={{
                     __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -25,30 +42,13 @@ export default function Document() {
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
                 <link rel="manifest" href="/manifest.json" />
                 
-                {/* Resource Hints for Performance */}
-                <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+                {/* Resource Hints for Performance (fonts now via next/font, no external font CSS) */}
                 <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
                 <link rel="dns-prefetch" href="https://cdn.pagesense.io" />
-                <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="preconnect" href="https://cdn.pagesense.io" crossOrigin="anonymous" />
                 
-                {/* Canonical URL base - will be overridden by page-specific canonicals */}
-                <link rel="canonical" href="https://taylorea.com" />
-
-                {/* Google Fonts with optimized loading */}
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-                    rel="stylesheet"
-                    media="print"
-                    onLoad="this.media='all'"
-                />
-                <noscript>
-                    <link
-                        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-                        rel="stylesheet"
-                    />
-                </noscript>
+                {/* Per-page canonicals are rendered by each page's <Head>.
+                    Do NOT add a global canonical here — it de-indexes service pages. */}
             </Head>
             <body className="">
                 {/* Google Tag Manager (noscript) */}

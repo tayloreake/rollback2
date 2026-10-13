@@ -141,27 +141,11 @@ const WebVitals = () => {
 
   // Performance optimizations
   useEffect(() => {
-    // Preload critical resources based on user behavior
+    // Preload only the small logo — never the 2.4 MB packaging PNG or
+    // the missing OTF fonts (audit §2 P1: 404s that blocked render).
     const preloadCriticalResources = () => {
-      // Preload fonts
-      const fontPreloads = [
-        '/fonts/Montserrat-Bold.otf',
-        '/fonts/Montserrat-ExtraBold.otf'
-      ]
-      
-      fontPreloads.forEach(font => {
-        const link = document.createElement('link')
-        link.rel = 'preload'
-        link.href = font
-        link.as = 'font'
-        link.type = 'font/otf'
-        link.crossOrigin = 'anonymous'
-        document.head.appendChild(link)
-      })
-
       // Preload hero images
       const heroImages = [
-        '/assets/Bgs/taylor-packaging-boxes.png',
         '/assets/General/logo.png'
       ]
       

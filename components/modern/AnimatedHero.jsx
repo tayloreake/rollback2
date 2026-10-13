@@ -512,7 +512,7 @@ export const EnhancedHero = ({
                   transition={{ delay: 0.7, duration: 0.6 }}
                 >
                   <motion.button
-                    className="btn-glass text-lg px-8 py-4 rounded-2xl font-semibold hover-scale"
+                    className="bg-[#FF5000] text-white text-lg px-8 py-4 rounded-2xl font-bold shadow-xl hover:bg-[#D94300] transition-colors"
                     onClick={onPrimaryClick}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}

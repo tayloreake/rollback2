@@ -133,6 +133,13 @@ const FeedbackForm = () => {
           to: "marykc@taylorea.com,stephaniem@taylorea.com",
           message,
           recaptchaToken: token,
+          inquiry: {
+            name: contactName.trim() || "Feedback Submitter",
+            email: contactInfo.includes("@") ? contactInfo.trim() : "",
+            phone: contactInfo.includes("@") ? "" : contactInfo.trim(),
+            source: "Feedback",
+            notes: `Feedback NPS ${nps}/10 | Completed: ${completed} | Heard: ${heardAbout}`,
+          },
         }),
       })
       const data = await resp.json()

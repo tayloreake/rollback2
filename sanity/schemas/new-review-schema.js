@@ -56,6 +56,12 @@ export default {
             },
         },
         {
+            name: "approved",
+            title: "Approved (visible on site)",
+            type: "boolean",
+            initialValue: true,
+        },
+        {
             name: "createdAt",
             title: "Created At",
             type: "datetime",

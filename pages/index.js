@@ -126,11 +126,11 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
     // Track navigation click
     gtmTrackButtonClick('Learn More', 'secondary_cta', {
       section: 'Hero',
-      destination: '/About',
+      destination: '/about',
       page_path: router.asPath
     });
     
-    router.push('/About');
+    router.push('/about');
   };
   
   // Track service clicks
@@ -143,20 +143,24 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
     });
   };
 
-  // Newsletter handlers (client-side only placeholder)
+  // Newsletter handlers — POSTs to /api/newsletter (audit §5 P2)
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     try {
+      const r = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.message || 'Subscription failed');
       // Track newsletter signup
       gtmTrackNewsletterSignup(newsletterEmail);
-      
-      // Placeholder success without backend wiring
-      setNewsletterStatus({ type: 'success', message: "Thanks for subscribing! You'll hear from us soon." })
+
+      setNewsletterStatus({ type: 'success', message: j.message || "Thanks for subscribing! You'll hear from us soon." })
       setNewsletterEmail('')
-      // If you later add an API route, you can post like this:
-      // await fetch('/api/newsletter', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: newsletterEmail }) })
     } catch (err) {
-      setNewsletterStatus({ type: 'error', message: 'Something went wrong. Please try again.' })
+      setNewsletterStatus({ type: 'error', message: err.message || 'Something went wrong. Please try again.' })
     }
   };
   const handleNewsletterEmailChange = (e) => setNewsletterEmail(e.target.value);
@@ -164,7 +168,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
   // Get SEO metadata
   const seoData = getPageMetadata("home", {
     location: 'Nairobi',
-    customTitle: 'Taylor Movers - Your Trusted Professional House, office & International movers.',
+    customTitle: 'Movers in Nairobi, Kenya | Taylor Movers',
     customDescription: 'Looking for reliable moving companies in Kenya? Taylor Movers Nairobi offers safe, affordable, stress-free relocations locally & abroad since 2008.',
     includeLocalBusiness: true,
     includeService: false
@@ -207,7 +211,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
       <div ref={heroSectionRef}>
         <EnhancedHero
           subtitle="Professional Moving Services"
-          title="Trusted Professional Movers"
+          title="Nairobi's Trusted Movers Since 2008"
           description="We specialize in local and international relocations with modern approach and exceptional quality. Let us make your next move extraordinary!"
           primaryButtonText="Get Free Quote"
           secondaryButtonText="Learn More"
@@ -282,7 +286,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
               icon={<FaGem />}
               title="Our Complete Services"
               description="Discover our full range of professional moving and relocation services. From residential moves to specialized logistics solutions, we have everything you need for a successful move."
-              backgroundImage="/assets/featured/services-overview.jpg"
+              backgroundImage="/assets/featured/taylorea.jpg"
               href="/services"
               delay={0.6}
             />
@@ -386,10 +390,11 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
               <p className="text-lg md:text-xl mb-8 text-white/90">
                 Be the first to receive moving tips, special offers, and updates from Kenya’s trusted moving company
               </p>
-              <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 justify-center">
+              <form method="post" onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 justify-center">
                 <input
                   type="email"
                   required
+                  name="email"
                   value={newsletterEmail}
                   onChange={handleNewsletterEmailChange}
                   placeholder="Enter your email"

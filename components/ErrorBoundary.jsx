@@ -59,7 +59,7 @@ class ErrorBoundary extends React.Component {
               Try Again
             </button>
             <a
-              href="/Quote"
+              href="/quote"
               className="px-4 py-2 bg-white text-red-600 text-sm font-medium rounded-md border border-red-300 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
               Go to Quote Page
