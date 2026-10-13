@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { toast } from "react-toastify"
-import ReCAPTCHA from "react-google-recaptcha"
+import ReCAPTCHA from "../SafeRecaptcha"
 import useFormPersistence from "../../hooks/useFormPersistence"
 import { getAttribution } from "../../utils/attribution"
 
@@ -159,7 +159,7 @@ const QuoteForm = () => {
       );
 
       const token = await Promise.race([
-        recaptchaRef.current.executeAsync(),
+        recaptchaRef.current?.executeAsync?.(),
         createTimeoutPromise(10000) // 10 second timeout
       ]);
 
@@ -304,7 +304,7 @@ const QuoteForm = () => {
     }
 
     try {
-      const recaptchaValue = await recaptchaRef.current.executeAsync();
+      const recaptchaValue = await recaptchaRef.current?.executeAsync?.();
       if (!recaptchaValue) {
         toast.error("Please verify that you are human");
         return;

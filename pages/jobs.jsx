@@ -4,7 +4,7 @@ import Jumbotron from "../components/jumbotron"
 import getPageMetadata from "../SEO/seo"
 import { BsCheckCircle, BsPeople, BsClock, BsGeoAlt } from "react-icons/bs"
 import { FaTruck, FaBoxes, FaUsers, FaHeadset } from "react-icons/fa"
-import ReCAPTCHA from "react-google-recaptcha"
+import ReCAPTCHA from "../SafeRecaptcha"
 
 const Jobs = ({ jobs }) => {
   // Get SEO metadata
@@ -389,7 +389,7 @@ const JobApplicationForm = ({ job, onClose }) => {
     
     try {
       // Get reCAPTCHA token
-      const recaptchaToken = await recaptchaRef.current.executeAsync()
+      const recaptchaToken = await recaptchaRef.current?.executeAsync?.()
       if (!recaptchaToken) {
         throw new Error('Please verify that you are human')
       }

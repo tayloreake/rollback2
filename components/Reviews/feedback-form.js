@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import Image from "next/image";
 import React, { useState, useRef } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+import ReCAPTCHA from "../SafeRecaptcha"
 
 
 const FeedbackForm = () => {

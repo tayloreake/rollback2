@@ -1,7 +1,7 @@
 // ContactForm.jsx
 import React, { useState, useRef } from "react";
 import { toast } from "react-toastify";
-import ReCAPTCHA from "react-google-recaptcha";
+import ReCAPTCHA from "../SafeRecaptcha"
 
 const ContactForm = () => {
     const [fname, setFname] = useState("")
@@ -26,7 +26,7 @@ const ContactForm = () => {
                 recaptchaToken: null, // Will be set after reCAPTCHA verification
             }
 
-            const smsToken = await recaptchaRef.current.executeAsync();
+            const smsToken = await recaptchaRef.current?.executeAsync?.();
             if (!smsToken) {
                 throw new Error('Failed to verify reCAPTCHA for SMS');
             }
@@ -35,7 +35,7 @@ const ContactForm = () => {
             recaptchaRef.current.reset();
             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for reset
             // Then send email
-            const emailToken = await recaptchaRef.current.executeAsync();
+            const emailToken = await recaptchaRef.current?.executeAsync?.();
             if (!emailToken) {
                 throw new Error('Failed to verify reCAPTCHA for email');
             }

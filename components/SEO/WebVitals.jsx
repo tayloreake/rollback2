@@ -216,28 +216,8 @@ const WebVitals = () => {
       })
     }
 
-    // Critical CSS detection and lazy loading
-    const loadNonCriticalCSS = () => {
-      const nonCriticalCSS = [
-        '/styles/non-critical.css' // You can create this for non-critical styles
-      ]
-
-      nonCriticalCSS.forEach(css => {
-        const link = document.createElement('link')
-        link.rel = 'stylesheet'
-        link.href = css
-        link.media = 'print'
-        link.onload = function() { this.media = 'all' }
-        document.head.appendChild(link)
-      })
-    }
-
-    // Load non-critical CSS after page load
-    if (document.readyState === 'complete') {
-      loadNonCriticalCSS()
-    } else {
-      window.addEventListener('load', loadNonCriticalCSS)
-    }
+    // NOTE: non-critical.css does not exist (404s) — do not inject it.
+    // If deferred styles are ever needed, create the file first, then re-enable.
   }, [])
 
   // This component doesn't render anything - it's just for performance tracking

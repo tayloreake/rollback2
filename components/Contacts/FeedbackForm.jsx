@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react"
-import ReCAPTCHA from "react-google-recaptcha"
+import ReCAPTCHA from "../SafeRecaptcha"
 
 const ratingAreas = [
   "Ease in contacting Taylor Movers",
@@ -120,7 +120,7 @@ const FeedbackForm = () => {
 
     setSubmitting(true)
     try {
-      const token = await recaptchaRef.current.executeAsync()
+      const token = await recaptchaRef.current?.executeAsync?.()
       if (!token) {
         throw new Error('Please verify that you are human')
       }

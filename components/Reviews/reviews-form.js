@@ -1,6 +1,6 @@
 import Image from "next/image"
 import React, { useState, useRef } from "react"
-import ReCAPTCHA from "react-google-recaptcha"
+import ReCAPTCHA from "../SafeRecaptcha"
 
 
 const ratingQuestions = [
@@ -62,7 +62,7 @@ const ReviewForm = ({setIsModalOpen}) => {
         }
     
         // Verify reCAPTCHA
-        const recaptchaValue = await recaptchaRef.current.executeAsync();
+        const recaptchaValue = await recaptchaRef.current?.executeAsync?.();
         if (!recaptchaValue) {
           // setError("Please verify that you are human");
           // return;

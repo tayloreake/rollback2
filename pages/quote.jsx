@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react"
 import Featured from "../components/Quote/Featured"
 import { toast } from "react-toastify"
-import ReCAPTCHA from "react-google-recaptcha"
+import ReCAPTCHA from "../SafeRecaptcha"
 import PageTitle from "../components/PageTitle"
 import getPageMetadata from "../SEO/seo"
 import Head from 'next/head'
@@ -56,7 +56,7 @@ const Quote = () => {
 
       setIsSubmitting(true);
 
-      const token = await recaptchaRef.current.executeAsync();
+      const token = await recaptchaRef.current?.executeAsync?.();
       if (!token) {
         throw new Error('Failed to verify reCAPTCHA');
       }
@@ -210,7 +210,7 @@ const Quote = () => {
     }
 
     try {
-      const recaptchaValue = await recaptchaRef.current.executeAsync();
+      const recaptchaValue = await recaptchaRef.current?.executeAsync?.();
       if (!recaptchaValue) {
         toast.error("Please verify that you are human");
         return;
