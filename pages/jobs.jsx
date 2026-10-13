@@ -4,7 +4,7 @@ import Jumbotron from "../components/jumbotron"
 import getPageMetadata from "../SEO/seo"
 import { BsCheckCircle, BsPeople, BsClock, BsGeoAlt } from "react-icons/bs"
 import { FaTruck, FaBoxes, FaUsers, FaHeadset } from "react-icons/fa"
-import ReCAPTCHA from "../SafeRecaptcha"
+import ReCAPTCHA from "../components/SafeRecaptcha"
 
 const Jobs = ({ jobs }) => {
   // Get SEO metadata

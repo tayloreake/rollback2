@@ -4,8 +4,6 @@
 // Env: same ZOHO_* as lead sync. All functions degrade to [] when unconfigured.
 import { zohoConfigured } from "./zoho"
 
-import { zohoConfigured } from "./zoho"
-
 const base = () => {
   const dc = process.env.ZOHO_DC || "com"
   return {

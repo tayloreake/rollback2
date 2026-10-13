@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react"
 import Featured from "../components/Quote/Featured"
 import { toast } from "react-toastify"
-import ReCAPTCHA from "../SafeRecaptcha"
+import ReCAPTCHA from "../components/SafeRecaptcha"
 import PageTitle from "../components/PageTitle"
 import getPageMetadata from "../SEO/seo"
 import Head from 'next/head'
