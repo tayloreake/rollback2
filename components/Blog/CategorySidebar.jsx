@@ -68,15 +68,24 @@ const CategorySidebar = ({ categories, blogs, activeCategory, onCategoryChange }
   // Count posts per category
   const getCategoryCount = (categoryName) => {
     if (!blogs || !Array.isArray(blogs)) return 0
-    
+
     return blogs.filter(blog => {
       if (!blog.blogCategories) return false
-      return blog.blogCategories.some(cat => 
+      return blog.blogCategories.some(cat =>
         cat.category?.toLowerCase().includes(categoryName.toLowerCase()) ||
         categoryName.toLowerCase().includes(cat.category?.toLowerCase() || '')
       )
     }).length
   }
+
+  // CMS categories first (what editors actually enter in Sanity); the static
+  // list below is only a fallback when the CMS returns nothing.
+  const cmsCategories = (categories || [])
+    .map((c) => (typeof c === 'string' ? c : c?.category))
+    .filter(Boolean)
+  const listCategories = cmsCategories.length
+    ? cmsCategories.map((name) => ({ name }))
+    : mainCategories
 
   // Get total posts
   const totalPosts = blogs ? blogs.length : 0
@@ -121,9 +130,10 @@ const CategorySidebar = ({ categories, blogs, activeCategory, onCategoryChange }
             }`}>{totalPosts}</span>
           </button>
 
-          {/* Main Categories */}
-          {mainCategories.map((category) => {
-            const IconComponent = category.icon
+          {/* CMS Categories (fallback: static list) */}
+          {listCategories.map((category) => {
+            const isStatic = !!category.icon
+            const IconComponent = category.icon || BsFolder2
             const count = getCategoryCount(category.name)
             const isActive = activeCategory === category.name
 
@@ -132,20 +142,24 @@ const CategorySidebar = ({ categories, blogs, activeCategory, onCategoryChange }
                 key={category.name}
                 onClick={() => onCategoryChange(category.name)}
                 className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
-                  isActive 
-                    ? `${category.bgColor} border ${category.borderColor} ${category.color}` 
-                    : theme === 'dark'
-                      ? 'hover:bg-gray-700 text-gray-300'
-                      : 'hover:bg-gray-100 text-gray-700'
+                  isActive
+                    ? 'bg-orange-500/20 border border-orange-500/30 text-orange-400'
+                    : isStatic
+                      ? `${category.bgColor} border ${category.borderColor} ${category.color}`
+                      : theme === 'dark'
+                        ? 'hover:bg-gray-700 text-gray-300'
+                        : 'hover:bg-gray-100 text-gray-700'
                 }`}
               >
                 <div className="flex items-center">
                   <IconComponent className={`mr-3 ${
-                    isActive 
-                      ? category.color 
-                      : theme === 'dark' 
-                        ? 'text-gray-400' 
-                        : 'text-gray-500'
+                    isActive
+                      ? 'text-orange-400'
+                      : isStatic
+                        ? category.color
+                        : theme === 'dark'
+                          ? 'text-gray-400'
+                          : 'text-gray-500'
                   }`} size={16} />
                   <span className="text-sm">{category.name}</span>
                 </div>

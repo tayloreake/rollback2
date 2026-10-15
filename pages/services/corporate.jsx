@@ -204,6 +204,7 @@ const CorporateStaffRelocation = ({ serviceSEO }) => {
   const seoData = getPageMetadata("corporate-staff-relocation", {
     location: 'Nairobi',
     service: 'corporate-staff-relocation',
+    canonicalPath: '/services/corporate',
     customTitle: 'Corporate Staff Relocation Services Kenya | Employee Moving | Taylor Movers',
     customDescription: 'Professional corporate staff relocation services in Kenya & internationally. ✓ Employee moves ✓ HR coordination ✓ Housing support ✓ Family relocations. Call +254 721 410 517!',
     includeService: true,

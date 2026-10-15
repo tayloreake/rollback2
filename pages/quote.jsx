@@ -164,8 +164,8 @@ const Quote = () => {
       return false;
     }
     
-    if (!email || !isValidEmail(email)) {
-      toast.error("Please enter a valid email address");
+    if (email && !isValidEmail(email)) {
+      toast.error("Please enter a valid email address or leave it empty");
       return false;
     }
     if (!isValidPhoneNumber(number)) {
@@ -270,13 +270,13 @@ const Quote = () => {
           <form onSubmit={handleSubmit} className='px-6 md:px-8 py-6 grid md:grid-cols-2 gap-5'>
             <div><label htmlFor='q-fname' className={labelCls}>Full Name *</label><input id='q-fname' name='name' autoComplete='name' type='text' value={fname} required onChange={(e) => setFname(e.target.value)} placeholder="e.g. Brian O&apos;Brien" className={inputCls} /></div>
             <div><label htmlFor='q-phone' className={labelCls}>Phone / WhatsApp *</label><input id='q-phone' name='phone' autoComplete='tel' type='tel' inputMode='tel' value={number} required onChange={(e) => setNumber(e.target.value)} placeholder='+254 712 410 517' className={inputCls} /></div>
-            <div><label htmlFor='q-email' className={labelCls}>Work Email *</label><input id='q-email' name='email' autoComplete='email' type='email' value={email} required onChange={(e) => setEmail(e.target.value)} placeholder='you@company.com' className={inputCls} /></div>
+            <div><label htmlFor='q-email' className={labelCls}>Email</label><input id='q-email' name='email' autoComplete='email' type='email' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='you@company.com (optional)' className={inputCls} /></div>
             <div><label htmlFor='q-date' className={labelCls}>Preferred Move Date *</label><input id='q-date' name='moveDate' type='date' value={moveDate} onChange={handleDateChange} className={inputCls} /></div>
-            <div><label htmlFor='q-from' className={labelCls}>Moving From *</label><input id='q-from' type='text' value={location} onChange={(e) => setLocation(e.target.value)} placeholder='Westlands, Nairobi' className={inputCls} /></div>
-            <div><label htmlFor='q-to' className={labelCls}>Moving To *</label><input id='q-to' type='text' value={destination} onChange={(e) => setDestination(e.target.value)} placeholder='Karen, Nairobi / London, UK' className={inputCls} /></div>
-            <div><label htmlFor='q-type' className={labelCls}>Move Type *</label><select id='q-type' value={moveType} onChange={(e) => setMoveType(e.target.value)} className={inputCls}>{MOVE_TYPES.map(m=>(<option key={m} value={m}>{m}</option>))}</select></div>
-            <div><label htmlFor='q-size' className={labelCls}>Property Size *</label><select id='q-size' value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} className={inputCls}>{BEDROOMS.map(b=>(<option key={b} value={b}>{b}</option>))}</select></div>
-            <div className='md:col-span-2'><label htmlFor='q-ref' className={labelCls}>How did you hear about us?</label><select id='q-ref' value={ref} onChange={(e) => setRef(e.target.value)} className={inputCls}>{REFS.map(r=>(<option key={r} value={r}>{r}</option>))}</select></div>
+            <div><label htmlFor='q-from' className={labelCls}>Moving From *</label><input id='q-from' name='from' type='text' value={location} onChange={(e) => setLocation(e.target.value)} placeholder='Westlands, Nairobi' className={inputCls} /></div>
+            <div><label htmlFor='q-to' className={labelCls}>Moving To *</label><input id='q-to' name='to' type='text' value={destination} onChange={(e) => setDestination(e.target.value)} placeholder='Karen, Nairobi / London, UK' className={inputCls} /></div>
+            <div><label htmlFor='q-type' className={labelCls}>Move Type *</label><select id='q-type' name='moveType' value={moveType} onChange={(e) => setMoveType(e.target.value)} className={inputCls}>{MOVE_TYPES.map(m=>(<option key={m} value={m}>{m}</option>))}</select></div>
+            <div><label htmlFor='q-size' className={labelCls}>Property Size *</label><select id='q-size' name='bedrooms' value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} className={inputCls}>{BEDROOMS.map(b=>(<option key={b} value={b}>{b}</option>))}</select></div>
+            <div className='md:col-span-2'><label htmlFor='q-ref' className={labelCls}>How did you hear about us?</label><select id='q-ref' name='referral' value={ref} onChange={(e) => setRef(e.target.value)} className={inputCls}>{REFS.map(r=>(<option key={r} value={r}>{r}</option>))}</select></div>
             <div className='md:col-span-2'><ReCAPTCHA ref={recaptchaRef} size='invisible' sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} /></div>
             <div className='md:col-span-2'>
               <button type='submit' disabled={isSubmitting} className='w-full bg-[#FF5000] hover:bg-[#D94300] text-white font-bold py-4 rounded-xl shadow-lg disabled:opacity-50'>{isSubmitting ? 'Submitting secure request…' : 'Submit Quote Request →'}</button>

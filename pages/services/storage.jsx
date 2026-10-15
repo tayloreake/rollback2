@@ -244,6 +244,7 @@ const StorageServices = ({ serviceSEO }) => {
   const seoData = getPageMetadata("storage-services", {
     location: 'Nairobi',
     service: 'storage-services',
+    canonicalPath: '/services/storage',
     customTitle: 'Secure Storage Services Nairobi | Professional Warehousing Kenya',
     customDescription: 'Professional storage solutions in Nairobi. ✓ Climate controlled ✓ 24/7 security ✓ Near JKIA ✓ Flexible access ✓ Business & personal storage. Call +254 721 410 517!',
     includeService: true,

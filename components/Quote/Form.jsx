@@ -254,8 +254,8 @@ const QuoteForm = () => {
       return false;
     }
 
-    if (!formData.email || !isValidEmail(formData.email)) {
-      toast.error("Please enter a valid email address");
+    if (formData.email && !isValidEmail(formData.email)) {
+      toast.error("Please enter a valid email address or leave it empty");
       return false;
     }
     if (!isValidPhoneNumber(formData.number)) {
@@ -367,8 +367,8 @@ const QuoteForm = () => {
                   <input type='tel' inputMode='tel' id='quote-phone' name='phone' autoComplete='tel' value={formData.number} required placeholder='+254 712 410 517' onChange={(e) => updateFormData('number', e.target.value)} className={inputCls} />
                 </div>
                 <div>
-                  <label htmlFor='quote-email' className={labelCls}>Email <span className='text-[#FF5000]'>*</span></label>
-                  <input type='email' id='quote-email' name='email' autoComplete='email' value={formData.email} required placeholder='you@company.com' onChange={(e) => updateFormData('email', e.target.value)} className={inputCls} />
+                  <label htmlFor='quote-email' className={labelCls}>Email</label>
+                  <input type='email' id='quote-email' name='email' autoComplete='email' value={formData.email} placeholder='you@company.com (optional)' onChange={(e) => updateFormData('email', e.target.value)} className={inputCls} />
                 </div>
               </div>
             </div>

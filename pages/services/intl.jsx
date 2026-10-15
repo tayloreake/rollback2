@@ -226,6 +226,7 @@ const InternationalMoving = ({ serviceSEO }) => {
   const seoData = getPageMetadata("international-moving", {
     location: 'Nairobi',
     service: 'international-moving',
+    canonicalPath: '/services/intl',
     customTitle: 'Expert International Moving Services Kenya | Taylor Movers Global',
     customDescription: 'Professional international relocation from Kenya to Europe, Middle East, North America & Asia. ✓ Air & sea freight ✓ Customs clearance ✓ Global network. Call +254 721 410 517!',
     includeService: true,

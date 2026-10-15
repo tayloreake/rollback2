@@ -11,7 +11,6 @@ import {
 } from "react-icons/bs"
 import { FaFacebook, FaLinkedin } from "react-icons/fa";
 import { RiTwitterXLine } from "react-icons/ri";
-import QuoteModal from "./Quote/QuoteModal";
 import { urlFor } from '../lib/sanity';
 import { getCaseStudyBlogs, getRecentBlogs } from '../sanity/sanity-utils';
 
@@ -77,33 +76,6 @@ const Footer = ({ caseStudies = [] }) => {
 
   return (
     <>
-      <section className="bg-gradient-to-br from-[#FF5000] via-[#FF6B35] to-[#FF8A50] text-white relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-20 h-20 bg-white rounded-full animate-float"></div>
-          <div className="absolute bottom-20 right-20 w-16 h-16 bg-white rounded-full animate-float" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-1/2 left-1/3 w-12 h-12 bg-white rounded-full animate-bounce-gentle" style={{animationDelay: '2s'}}></div>
-        </div>
-        
-        <div className="container py-12 relative z-10">
-          <div className="row py-8">
-            <div className="col-12 text-center animate-fade-in-up">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-shadow-lg">
-                Request a Quotation
-              </h2>
-              <p className="text-lg md:text-xl font-light mb-8 text-white/90">
-                Feel Free to ask, or send your request via chat
-              </p>
-              <div className="flex justify-center animate-scale-in" style={{animationDelay: '0.3s'}}>
-                <QuoteModal quotebtn={"default"} />
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Gradient overlay */}
-        <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#6D6E71] to-transparent"></div>
-      </section>
       <section className='bg-white text-gray-800 w-full px-2 flex flex-col items-center justify-center relative overflow-hidden'>
         
         <div className='pt-16 pb-8 container w-full relative z-10'>

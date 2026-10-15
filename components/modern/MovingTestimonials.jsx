@@ -268,6 +268,7 @@ const MovingTestimonials = ({
             <div className="absolute inset-y-0 left-4 flex items-center">
               <motion.button
                 onClick={prevReview}
+                aria-label="Previous testimonial"
                 className="bg-white/80 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg transition-all duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
@@ -279,6 +280,7 @@ const MovingTestimonials = ({
             <div className="absolute inset-y-0 right-4 flex items-center">
               <motion.button
                 onClick={nextReview}
+                aria-label="Next testimonial"
                 className="bg-white/80 backdrop-blur-sm hover:bg-white p-3 rounded-full shadow-lg transition-all duration-300"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
@@ -294,6 +296,7 @@ const MovingTestimonials = ({
               <motion.button
                 key={index}
                 onClick={() => goToReview(index)}
+                aria-label={`Go to testimonial ${index + 1}`}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex % 6 ? 'bg-[#FF5000] scale-125' : 'bg-gray-300'
                   }`}
                 whileHover={{ scale: 1.2 }}
@@ -306,6 +309,7 @@ const MovingTestimonials = ({
           <div className="flex justify-center mt-6">
             <motion.button
               onClick={togglePlayPause}
+              aria-label={isPlaying ? "Pause testimonial autoplay" : "Play testimonial autoplay"}
               className="bg-[#FF5000] text-white px-6 py-3 rounded-full font-medium hover:bg-[#e04400] transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

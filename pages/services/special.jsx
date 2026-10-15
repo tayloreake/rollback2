@@ -25,6 +25,7 @@ const SpecializedServices = ({ serviceSEO }) => {
   const seoData = getPageMetadata("specialized-services", {
     location: 'Nairobi',
     service: 'specialized-services',
+    canonicalPath: '/services/special',
     customTitle: 'Specialized Moving Services Nairobi | Pet Relocation | Taylor Movers',
     customDescription: 'Professional pet relocation services in Nairobi and internationally. Safe, stress-free pet moving with proper documentation and veterinary care. Call +254 721 410 517!',
     includeService: true,

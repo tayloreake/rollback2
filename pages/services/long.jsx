@@ -197,6 +197,7 @@ const LongDistanceMoving = ({ serviceSEO }) => {
   const seoData = getPageMetadata("long-distance-moving", {
     location: 'Nairobi',
     service: 'long-distance-moving',
+    canonicalPath: '/services/long',
     customTitle: 'Professional Long-Distance Moving Services Kenya | Taylor Movers',
     customDescription: 'Trusted long-distance consolidated moving services across Kenya and beyond. ✓ 40,000+ successful moves ✓ Expert handling ✓ 15+ years experience. Call +254 721 410 517!',
     includeService: true,

@@ -183,6 +183,7 @@ const OfficeRelocation = ({ serviceSEO }) => {
   const seoData = getPageMetadata("office-relocation", {
     location: 'Nairobi',
     service: 'office-relocation',
+    canonicalPath: '/services/office',
     customTitle: 'Professional Office Relocation Services Nairobi | Taylor Movers Kenya',
     customDescription: 'Expert office moving services in Nairobi & Kenya. ✓ Minimal downtime ✓ Secure handling ✓ Government & corporate moves ✓ 40,000+ successful moves. Call +254 721 410 517!',
     includeService: true,

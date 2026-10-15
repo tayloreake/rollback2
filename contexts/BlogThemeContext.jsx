@@ -41,11 +41,10 @@ export const BlogThemeProvider = ({ children }) => {
     isLight: theme === 'light'
   }
 
-  // Prevent flash of wrong theme
-  if (!mounted) {
-    return null
-  }
-
+  // Render on the server with the default theme so SEO tags and headings are
+  // present in server HTML (previously returned null pre-mount, which left
+  // /blog and posts with empty <title> for crawlers). Client preference from
+  // localStorage still applies on mount; worst case is a one-frame flash.
   return (
     <BlogThemeContext.Provider value={value}>
       {children}
