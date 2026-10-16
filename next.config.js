@@ -109,6 +109,15 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // Sanity Studio must never be indexed (robots.txt alone doesn't stop it).
+        source: '/admin/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+      {
+        source: '/admin',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+      {
         source: '/:path*',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },

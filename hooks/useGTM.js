@@ -13,19 +13,30 @@ export const useGTM = () => {
   const router = useRouter();
   const scrollTrackedRef = useRef(new Set());
 
+  const lastPathRef = useRef(null);
+
   useEffect(() => {
     // Initialize GTM
     initGTM();
 
-    // Track initial page view
-    const handleRouteChange = (url) => {
+    // Push a page_view only when the path actually changed. Depending on the
+    // whole `router` object re-ran this effect on every router update and
+    // pushed duplicate page_view events.
+    const trackOnce = (url) => {
+      const path = (url || '').split('#')[0];
+      if (lastPathRef.current === path) return;
+      lastPathRef.current = path;
       gtmTrackPageView(url, document.title);
+    };
+
+    const handleRouteChange = (url) => {
+      trackOnce(url);
       // Reset scroll tracking for new page
       scrollTrackedRef.current.clear();
     };
 
     // Track current page on mount
-    gtmTrackPageView(router.asPath, document.title);
+    trackOnce(router.asPath);
 
     // Listen for route changes
     router.events.on('routeChangeComplete', handleRouteChange);
@@ -33,7 +44,8 @@ export const useGTM = () => {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange);
     };
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.events]);
 
   return null; // This hook doesn't render anything
 };

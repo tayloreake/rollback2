@@ -1,7 +1,10 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://taylorea.com",
-  generateRobotsTxt: true,
+  // robots.txt is maintained by hand in public/robots.txt. Letting next-sitemap
+  // generate it overwrote that file on every build (re-adding Host: and
+  // Disallow: /_next/).
+  generateRobotsTxt: false,
 
   // Exclude certain paths
   exclude: [

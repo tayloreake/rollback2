@@ -306,7 +306,7 @@ export async function getServerSideProps(context) {
 
   // Reject malformed slugs early (never hit Sanity with garbage).
   if (!slug || typeof slug !== "string" || slug.length > 200 || /["'${}<>\\]/.test(slug)) {
-    return { props: { blog: null } }
+    return { notFound: true }
   }
 
   try {
@@ -314,11 +314,8 @@ export async function getServerSideProps(context) {
     
     // If blog is not found, return null
     if (!blog) {
-      return {
-        props: {
-          blog: null,
-        },
-      }
+      // Real 404 (not a 200 "not found" page) so Google drops dead URLs.
+      return { notFound: true }
     }
 
     return {

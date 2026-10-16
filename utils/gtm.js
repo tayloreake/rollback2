@@ -48,11 +48,11 @@ export const gtmTrackContactSubmission = (formData = {}) => {
 };
 
 // Track newsletter signups
-export const gtmTrackNewsletterSignup = (email) => {
+// NOTE: the email address is intentionally NOT pushed to the dataLayer (PII).
+export const gtmTrackNewsletterSignup = () => {
   gtmTrackEvent({
     event: 'newsletter_signup',
     form_name: 'Newsletter',
-    user_email: email, // Be careful with PII - consider hashing
     timestamp: new Date().toISOString()
   });
 };
