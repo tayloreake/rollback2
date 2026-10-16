@@ -262,23 +262,10 @@ const AdvancedSEO = ({
         />
       ))}
 
-      {/* Google Analytics 4 */}
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA4_ID || 'G-XXXXXXXXXX'}`}
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${process.env.NEXT_PUBLIC_GA4_ID || 'G-XXXXXXXXXX'}', {
-            page_title: '${metaTitle}',
-            page_location: '${currentUrl}',
-            custom_map: {'dimension1': 'page_type'}
-          });
-        `}
-      </Script>
+      {/* Google Analytics is owned SOLELY by GTM — no hardcoded gtag here.
+          A previous version loaded gtag.js with G-XXXXXXXXXX and called
+          gtag('config'), double-counting page_views and firing without
+          consent. GTM (GTM-W6T72F2Z) is the single collector. */}
 
       {/* Microsoft Clarity */}
       <Script id="microsoft-clarity" strategy="afterInteractive">

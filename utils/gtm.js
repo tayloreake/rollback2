@@ -11,7 +11,7 @@ export const initGTM = () => {
 export const gtmTrackEvent = (event) => {
   if (typeof window !== 'undefined' && window.dataLayer) {
     window.dataLayer.push(event);
-    console.log('GTM Event:', event); // For debugging - remove in production
+    if (process.env.NODE_ENV === 'development') console.log('GTM Event:', event);
   }
 };
 

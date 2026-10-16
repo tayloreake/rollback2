@@ -11,6 +11,8 @@ module.exports = {
     '/404',
     '/500',
     '/ThankYou',
+    '/thank-you',
+    '/services/moves',
     '/test',
     '/hero-demo',
     '/enhanced-home',
@@ -23,31 +25,12 @@ module.exports = {
   ],
 
   // Additional paths to include
+  // NOTE: service pages (office, intl, long, etc.) exist as files in
+  // pages/services/ and are auto-discovered — do NOT re-list them here
+  // (that duplicates every service URL in the sitemap). Only list routes
+  // next-sitemap cannot discover (none currently).
   additionalPaths: async (config) => {
-    const result = []
-
-    // Add service pages dynamically with shortened URLs
-    const services = [
-      { slug: 'home', priority: 0.9, changefreq: 'monthly' },
-      { slug: 'office', priority: 0.9, changefreq: 'monthly' },
-      { slug: 'corporate', priority: 0.9, changefreq: 'monthly' },
-      { slug: 'intl', priority: 0.9, changefreq: 'weekly' },
-      { slug: 'storage', priority: 0.8, changefreq: 'monthly' },
-      { slug: 'long', priority: 0.9, changefreq: 'monthly' },
-      { slug: 'special', priority: 0.8, changefreq: 'monthly' },
-      { slug: 'moves', priority: 0.8, changefreq: 'monthly' }
-    ]
-
-    services.forEach(service => {
-      result.push({
-        loc: `/services/${service.slug}`,
-        changefreq: service.changefreq,
-        priority: service.priority,
-        lastmod: new Date().toISOString()
-      })
-    })
-
-    return result
+    return []
   },
 
   // Transform function for dynamic content
@@ -70,13 +53,18 @@ module.exports = {
       changefreq = 'monthly'
     }
 
+    // NOTE: no lastmod here — stamping every URL with "now" on each build
+    // makes Google recrawl everything pointlessly. next-sitemap omits
+    // lastmod when autoLastmod is false (set below); server-sitemap.xml
+    // carries real _updatedAt per blog post.
     return {
       loc: path,
       changefreq,
       priority,
-      lastmod: config.autoLastmod ? new Date().toISOString() : undefined,
+      lastmod: undefined,
     }
   },
+  autoLastmod: false,
 
   // Robots.txt configuration
   robotsTxtOptions: {

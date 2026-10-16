@@ -337,7 +337,9 @@ const Navbar = () => {
                     <div className='flex items-center space-x-3'>
                         <ShowQuote />
                         <button 
+                            type="button"
                             onClick={() => setOpen(true)}
+                            aria-label="Open menu"
                             className={`p-2.5 rounded-lg transition-all duration-200 border shadow-sm ${
                                 isEnhancedHomePage 
                                     ? 'bg-white/20 backdrop-blur-sm hover:bg-white/30 border-white/30 text-black' 
@@ -450,7 +452,9 @@ const Navbar = () => {
                                 />
                             </Link>
                             <button 
+                                type="button"
                                 onClick={() => setOpen(false)} 
+                                aria-label="Close menu"
                                 className='p-2 rounded-full hover:bg-gray-100 transition-colors duration-200'
                             >
                                 <AiOutlineClose size={20} className='text-gray-600' />

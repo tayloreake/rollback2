@@ -105,6 +105,10 @@ const Quote = () => {
           currency: 'KES',
         });
       } catch (e) { /* no-op */ }
+      // Keep the toast visible, then follow the same funnel as Quote/Form.jsx:
+      // land on /ThankYou (lowercase /thank-you 301s there) so the Ads
+      // conversion has a page-based fallback trigger too.
+      setTimeout(() => { try { window.location.href = "/ThankYou"; } catch {} }, 1200);
       
       // Reset form
       setFname("");

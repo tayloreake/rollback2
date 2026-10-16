@@ -14,12 +14,18 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error("server-sitemap fetch failed:", e?.message)
   }
+  const esc = (s) =>
+    String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
   const urls = (posts || [])
-    .filter((p) => p?.slug)
+    .filter((p) => p?.slug && /^[A-Za-z0-9_-]+$/.test(p.slug))
     .map(
       (p) =>
-        `  <url><loc>${siteUrl}/blog/${p.slug}</loc>` +
-        (p._updatedAt ? `<lastmod>${p._updatedAt}</lastmod>` : "") +
+        `  <url><loc>${siteUrl}/blog/${esc(p.slug)}</loc>` +
+        (p._updatedAt ? `<lastmod>${esc(p._updatedAt)}</lastmod>` : "") +
         `</url>`
     )
     .join("\n")

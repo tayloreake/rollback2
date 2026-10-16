@@ -67,9 +67,11 @@ export async function getBlogs() {
   )
 }
 export async function getBlog(slug) {
-  return createClient(clientConfig).fetch(`
-  *[_type=="blogs" && slug.current == '${slug}'][0]
-`)
+  if (!slug || typeof slug !== "string") return null
+  return createClient(clientConfig).fetch(
+    `*[_type=="blogs" && slug.current == $slug][0]`,
+    { slug }
+  )
 }
 export async function getBlogsByCategory(key) {
   return createClient(clientConfig).fetch(`

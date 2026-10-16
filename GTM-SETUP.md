@@ -11,21 +11,24 @@ The site pushes these dataLayer events: `page_view`, `generate_lead`,
   `ad_personalization` when the visitor chooses in the banner.
 - No tag should fire before consent except strictly necessary ones.
 
-## 2. GA4 — G-S2W1496B3K (HARDCODED — do not duplicate in GTM)
-The gtag snippet lives directly in `pages/_document.js` (single collector,
-consent-gated by the defaults above it). Do NOT also create a GTM Google tag
-for this ID — that would double-count every pageview.
+## 2. GA4 — G-S2W1496B3K (GTM-OWNED — no hardcoded gtag on site)
+Hardcoded gtag.js was removed from `_document.js` (it double-counted with
+the GTM Google tag). GTM is now the single collector:
+1. Tags → New → **Google tag** for G-S2W1496B3K on Initialization – All Pages,
+   with automatic page-views on history change turned OFF.
 2. Tags → New → **GA4 Event**, event name `page_view`.
    Trigger: Custom Event `page_view` (the SPA push from `useGTM`).
-   In the Google tag settings, turn OFF automatic page-view on history
-   change to avoid doubles.
 3. Tags → New → **GA4 Event**, event name `generate_lead`.
    Trigger: Custom Event `generate_lead`. Mark as **Key event** in GA4.
-4. Verify in GA4 Realtime + DebugView.
+4. Verify in GA4 Realtime + DebugView (one page_view per navigation, not two).
 
 ## 3. Google Ads (existing AW-966026451)
 - Tags → New → **Google Ads Conversion**, Conversion ID `AW-966026451`,
   Conversion Label `<PASTE LABEL>`, trigger Custom Event `generate_lead`.
+  YES — reuse the existing "Submit lead form" conversion, don't create a new one.
+- Secondary fallback trigger: Page View on `/ThankYou` (lowercase `/thank-you`
+  301s there). Primary counting must stay event-based — the quote forms push
+  `generate_lead` before navigating, so URL-only triggers undercount.
 - Enable **Enhanced Conversions** (hashed email/phone from the lead form).
 - Keep call tracking (0721 410 517) as is.
 

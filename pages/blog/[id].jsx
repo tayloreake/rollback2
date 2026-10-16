@@ -15,6 +15,18 @@ import Head from "next/head"
 import { formatDate } from "../../utils/formatDate"
 import { BlogThemeProvider, useBlogTheme } from "../../contexts/BlogThemeContext"
 
+// urlFor(...).url() THROWS on malformed/missing Sanity images — that was the
+// production 500 (e.g. "From Nairobi to Mombasa" with a bad image ref).
+// Every image render must go through this safe helper (returns null, never throws).
+const safeImageUrl = (img) => {
+  try {
+    if (!img) return null
+    return urlFor(img).url()
+  } catch {
+    return null
+  }
+}
+
 const BlogPostContent = ({ blog }) => {
   const { theme } = useBlogTheme()
   
@@ -72,10 +84,10 @@ const BlogPostContent = ({ blog }) => {
           <div className={`flex items-center mb-4 pb-4 border-b ${
             theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
           }`}>
-            {blog.author.authorImage && (
+            {blog.author.authorImage && safeImageUrl(blog.author.authorImage) && (
               <div className="w-12 h-12 rounded-full overflow-hidden mr-3">
                 <Image
-                  src={urlFor(blog.author.authorImage).url()}
+                  src={safeImageUrl(blog.author.authorImage)}
                   alt={blog.author.authorName}
                   width={48}
                   height={48}
@@ -148,8 +160,8 @@ const BlogPostContent = ({ blog }) => {
         <link rel="canonical" href={`https://taylorea.com/blog/${blog?.slug?.current || ''}`} />
         <meta property="og:title" content={blog?.metaTitle || blog?.blogTitle || 'Blog Post'} />
         <meta property="og:description" content={blog?.metaDescription || blog?.blogExcerpt || ''} />
-        {blog?.blogImage && (
-          <meta property="og:image" content={urlFor(blog.blogImage).url()} />
+        {blog?.blogImage && safeImageUrl(blog.blogImage) && (
+          <meta property="og:image" content={safeImageUrl(blog.blogImage)} />
         )}
         <meta property="og:type" content="article" />
         <script
@@ -210,12 +222,12 @@ const BlogPostContent = ({ blog }) => {
               </div>
               
               <div className="flex items-center space-x-4">
-                <button className="flex items-center space-x-1 hover:text-red-400 transition-colors">
+                <button type="button" aria-label="Like this article" className="flex items-center space-x-1 hover:text-red-400 transition-colors">
                   <BsHeart size={16} />
                   <span>70</span>
                 </button>
                 
-                <button className="flex items-center space-x-1 hover:text-orange-400 transition-colors">
+                <button type="button" aria-label="Save this article" className="flex items-center space-x-1 hover:text-orange-400 transition-colors">
                   <BsBookmark size={16} />
                   <span>Save</span>
                 </button>
@@ -231,11 +243,10 @@ const BlogPostContent = ({ blog }) => {
             )}
           </header>
 
-          {/* Featured image */}
-          {blog?.blogImage && (
+        {blog?.blogImage && safeImageUrl(blog.blogImage) && (
             <div className="mb-8 rounded-lg overflow-hidden">
               <Image
-                src={urlFor(blog.blogImage).url()}
+                src={safeImageUrl(blog.blogImage)}
                 alt={blog?.blogTitle || 'Blog image'}
                 width={800}
                 height={400}
@@ -292,6 +303,11 @@ const BlogPostContent = ({ blog }) => {
 
 export async function getServerSideProps(context) {
   const { id: slug = "" } = context.params
+
+  // Reject malformed slugs early (never hit Sanity with garbage).
+  if (!slug || typeof slug !== "string" || slug.length > 200 || /["'${}<>\\]/.test(slug)) {
+    return { props: { blog: null } }
+  }
 
   try {
     const blog = await getBlog(slug)

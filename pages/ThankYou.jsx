@@ -8,7 +8,6 @@ import { PortableText } from '@portabletext/react';
 import Jumbotron from "../components/jumbotron"
 import { CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Script from 'next/script'
 
 const ThankYou = ({ thankYou }) => {
     const [data, setData] = useState(thankYou)
@@ -25,23 +24,12 @@ const ThankYou = ({ thankYou }) => {
         <>
             <Head>
               {/* P0: Thank-you must not count as organic conversion — noindex + excluded from sitemap */}
+              {/* Ads conversion owned SOLELY by GTM (AW-966026451) off dataLayer
+                  'generate_lead'. No hardcoded gtag here (consent bypass).
+                  /thank-you 301s here (next.config.js). */}
               <meta name="robots" content="noindex, nofollow" />
               <link rel="canonical" href="https://taylorea.com/ThankYou" />
             </Head>
-            {/* Google Ads gtag.js */}
-            <Script
-                strategy="afterInteractive"
-                src="https://www.googletagmanager.com/gtag/js?id=AW-966026451"
-            />
-
-            <Script id="gtag-init" strategy="afterInteractive">
-                {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'AW-966026451');
-        `}
-            </Script>
             <div className='w-full h-full'>
                 <Jumbotron image={'taylor-movers-kenya-professional-team.png'} text={""} />
                 <div className="row mx-auto items-center">

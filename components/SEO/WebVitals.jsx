@@ -6,17 +6,18 @@ const WebVitals = () => {
   const router = useRouter()
 
   useEffect(() => {
-    // Web Vitals reporting function
+    // Web Vitals reporting function — via dataLayer so GTM/consent owns delivery.
+    // Never call window.gtag directly (no hardcoded GA4 on site).
     const reportWebVitals = (metric) => {
-      // Send to Google Analytics
-      if (window.gtag) {
-        window.gtag('event', metric.name, {
-          event_category: 'Web Vitals',
-          event_label: metric.id,
+      try {
+        window.dataLayer = window.dataLayer || []
+        window.dataLayer.push({
+          event: 'web_vitals',
+          web_vitals_name: metric.name,
+          web_vitals_id: metric.id,
           value: Math.round(metric.name === 'CLS' ? metric.value * 1000 : metric.value),
-          non_interaction: true,
         })
-      }
+      } catch { /* no-op */ }
 
       // Send to console for development
       if (process.env.NODE_ENV === 'development') {
@@ -41,17 +42,17 @@ const WebVitals = () => {
     // Performance observer for custom metrics
     if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
       try {
-        // Monitor Long Tasks (important for FID)
+        // Monitor Long Tasks (important for FID) — dataLayer only, sampled
         const longTaskObserver = new PerformanceObserver((list) => {
           list.getEntries().forEach((entry) => {
             if (entry.duration > 50) { // Tasks longer than 50ms
-              if (window.gtag) {
-                window.gtag('event', 'long_task', {
-                  event_category: 'Performance',
+              try {
+                window.dataLayer = window.dataLayer || []
+                window.dataLayer.push({
+                  event: 'long_task',
                   value: Math.round(entry.duration),
-                  custom_parameter_1: entry.name
                 })
-              }
+              } catch { /* no-op */ }
             }
           })
         })
@@ -61,12 +62,13 @@ const WebVitals = () => {
         const layoutShiftObserver = new PerformanceObserver((list) => {
           list.getEntries().forEach((entry) => {
             if (!entry.hadRecentInput) {
-              if (window.gtag) {
-                window.gtag('event', 'layout_shift', {
-                  event_category: 'Performance',
+              try {
+                window.dataLayer = window.dataLayer || []
+                window.dataLayer.push({
+                  event: 'layout_shift',
                   value: Math.round(entry.value * 1000)
                 })
-              }
+              } catch { /* no-op */ }
             }
           })
         })
@@ -75,12 +77,13 @@ const WebVitals = () => {
         // Monitor First Input
         const firstInputObserver = new PerformanceObserver((list) => {
           list.getEntries().forEach((entry) => {
-            if (window.gtag) {
-              window.gtag('event', 'first_input', {
-                event_category: 'Performance',
+            try {
+              window.dataLayer = window.dataLayer || []
+              window.dataLayer.push({
+                event: 'first_input',
                 value: Math.round(entry.processingStart - entry.startTime)
               })
-            }
+            } catch { /* no-op */ }
           })
         })
         firstInputObserver.observe({ entryTypes: ['first-input'] })
@@ -89,54 +92,11 @@ const WebVitals = () => {
       }
     }
 
-    // Track navigation timing
-    const trackNavigationTiming = () => {
-      if (typeof window !== 'undefined' && window.performance && window.performance.timing) {
-        const timing = window.performance.timing
-        const navigationStart = timing.navigationStart
-        
-        const metrics = {
-          dns: timing.domainLookupEnd - timing.domainLookupStart,
-          tcp: timing.connectEnd - timing.connectStart,
-          ssl: timing.secureConnectionStart > 0 ? timing.connectEnd - timing.secureConnectionStart : 0,
-          ttfb: timing.responseStart - timing.requestStart,
-          download: timing.responseEnd - timing.responseStart,
-          dom: timing.domComplete - timing.domLoading,
-          total: timing.loadEventEnd - navigationStart
-        }
-
-        // Send metrics to analytics
-        Object.keys(metrics).forEach(key => {
-          if (metrics[key] > 0 && window.gtag) {
-            window.gtag('event', `navigation_${key}`, {
-              event_category: 'Navigation Timing',
-              value: metrics[key]
-            })
-          }
-        })
-      }
-    }
-
-    // Track on route change
-    const handleRouteChange = () => {
-      // Small delay to ensure metrics are available
-      setTimeout(trackNavigationTiming, 100)
-    }
-
-    router.events.on('routeChangeComplete', handleRouteChange)
-    
-    // Track initial load
-    if (document.readyState === 'complete') {
-      trackNavigationTiming()
-    } else {
-      window.addEventListener('load', trackNavigationTiming)
-    }
-
-    // Cleanup
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-      window.removeEventListener('load', trackNavigationTiming)
-    }
+    // Navigation-timing events REMOVED (audit: duplicate/noisy hits).
+    // WebVitals previously sent window.gtag('event','navigation_*') directly,
+    // bypassing Consent Mode + GTM and inflating GA4 event counts.
+    // Core Web Vitals above (via web-vitals lib) are enough; add more only
+    // as GTM custom events if needed.
   }, [router])
 
   // Performance optimizations
@@ -227,6 +187,7 @@ const WebVitals = () => {
 export default WebVitals
 
 // Utility function to measure custom performance metrics
+// Pushes to dataLayer (GTM-owned). Never calls window.gtag directly.
 export const measurePerformance = (name, fn) => {
   if (typeof window !== 'undefined' && window.performance && window.performance.mark) {
     const startMark = `${name}-start`
@@ -244,12 +205,11 @@ export const measurePerformance = (name, fn) => {
         window.performance.measure(measureName, startMark, endMark)
         
         const measure = window.performance.getEntriesByName(measureName)[0]
-        if (measure && window.gtag) {
-          window.gtag('event', 'custom_performance', {
-            event_category: 'Performance',
-            event_label: name,
-            value: Math.round(measure.duration)
-          })
+        if (measure) {
+          try {
+            window.dataLayer = window.dataLayer || []
+            window.dataLayer.push({ event: 'custom_performance', event_label: name, value: Math.round(measure.duration) })
+          } catch { /* no-op */ }
         }
       })
     } else {
@@ -258,12 +218,11 @@ export const measurePerformance = (name, fn) => {
       window.performance.measure(measureName, startMark, endMark)
       
       const measure = window.performance.getEntriesByName(measureName)[0]
-      if (measure && window.gtag) {
-        window.gtag('event', 'custom_performance', {
-          event_category: 'Performance',
-          event_label: name,
-          value: Math.round(measure.duration)
-        })
+      if (measure) {
+        try {
+          window.dataLayer = window.dataLayer || []
+          window.dataLayer.push({ event: 'custom_performance', event_label: name, value: Math.round(measure.duration) })
+        } catch { /* no-op */ }
       }
       
       return result

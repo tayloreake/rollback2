@@ -53,7 +53,9 @@ const SearchBar = ({ onSearch, placeholder = "Search by title or hashtags..." })
         />
         {searchTerm && (
           <button
+            type="button"
             onClick={clearSearch}
+            aria-label="Clear search"
             className={`mr-3 p-1 transition-colors ${
               theme === 'dark'
                 ? 'text-gray-400 hover:text-white'

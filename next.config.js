@@ -80,6 +80,14 @@ const nextConfig = {
       { source: '/Quotes', destination: '/quote', permanent: true },
       { source: '/ServicesPage', destination: '/services', permanent: true },
       { source: '/services/moves', destination: '/services/long', permanent: true },
+      // Legacy service slugs still indexed / linked externally.
+      { source: '/services/international', destination: '/services/intl', permanent: true },
+      { source: '/services/office-moving', destination: '/services/office', permanent: true },
+      { source: '/services/international-moving', destination: '/services/intl', permanent: true },
+      { source: '/services/office-relocation', destination: '/services/office', permanent: true },
+      // Thank-you casing: file route is /ThankYou (case-sensitive on Vercel),
+      // Ads + audit expect lowercase. Normalize to the real route.
+      { source: '/thank-you', destination: '/ThankYou', permanent: true },
       { source: '/services/legacy-service', destination: '/services', permanent: true },
       { source: '/services/corporate-staff-relocation-simple', destination: '/services/corporate', permanent: true },
       { source: '/test', destination: '/', permanent: true },

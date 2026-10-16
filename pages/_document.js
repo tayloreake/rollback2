@@ -11,16 +11,11 @@ export default function Document() {
                     __html: `window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments)};window.gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});`,
                 }}
             />
-            {/* GA4 directly (G-S2W1496B3K). GTM holds no GA4 tag, so this is the
-                single collector. If a GTM Google tag is ever added for this ID,
-                remove this block to avoid double counting. Consent Mode
-                defaults above gate collection until the visitor chooses. */}
-            <script async src="https://www.googletagmanager.com/gtag/js?id=G-S2W1496B3K" />
-            <script
-                dangerouslySetInnerHTML={{
-                    __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-S2W1496B3K');`,
-                }}
-            />
+            {/* GA4 is owned SOLELY by GTM (container GTM-W6T72F2Z).
+                Do NOT add a hardcoded gtag.js / gtag('config') here — it
+                double-counts every page_view with the GTM Google tag.
+                GTM fires GA4 page_view off the dataLayer 'page_view' event
+                pushed by useGTM (history-change auto page-views OFF). */}
             <script
                    dangerouslySetInnerHTML={{
                     __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

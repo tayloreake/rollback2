@@ -226,7 +226,7 @@ const CommentSection = ({ postId }) => {
         </div>
         
         <div className="flex items-center space-x-4 mt-2 text-xs">
-          <button className={`flex items-center space-x-1 transition-colors ${
+          <button type="button" aria-label="Like this comment" className={`flex items-center space-x-1 transition-colors ${
             theme === 'dark'
               ? 'text-gray-400 hover:text-red-400'
               : 'text-gray-500 hover:text-red-500'
@@ -237,6 +237,8 @@ const CommentSection = ({ postId }) => {
           
           {!isReply && (
             <button
+              type="button"
+              aria-label="Reply to this comment"
               onClick={() => setReplyingTo(comment.id)}
               className={`flex items-center space-x-1 transition-colors ${
                 theme === 'dark'
@@ -249,7 +251,7 @@ const CommentSection = ({ postId }) => {
             </button>
           )}
           
-          <button className={`transition-colors ${
+          <button type="button" aria-label="More comment options" className={`transition-colors ${
             theme === 'dark'
               ? 'text-gray-400 hover:text-white'
               : 'text-gray-500 hover:text-gray-900'
