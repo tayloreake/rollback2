@@ -65,8 +65,9 @@ import {
 
 export default function Home({ landingPage, reviews, clients, clientCategories, siteLogos, landingAbout, landingServices, caseStudies }) {
   const builder = imageUrlBuilder(client)
-  const [reviewsData, setReviewsData] = useState(reviews || [])
-  const clientReviews = reviews || []
+  const [reviewsData, setReviewsData] = useState(reviews || []);
+  // clientReviews is retained for localStorage batching; reviews now come from Zoho CRM
+  const clientReviews = reviews || [];
   const data = landingPage[0]
   const router = useRouter()
   
@@ -78,7 +79,6 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
   const heroSectionRef = useSectionTracking('Hero Section')
   const servicesSectionRef = useSectionTracking('Services Section')
   const whyChooseSectionRef = useSectionTracking('Why Choose Us Section')
-  const testimonialsSectionRef = useSectionTracking('Testimonials Section')
   const caseStudiesSectionRef = useSectionTracking('Case Studies Section')
   const newsletterSectionRef = useSectionTracking('Newsletter Section')
   
@@ -355,16 +355,6 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
         </div>
       </section>
 
-      {/* Moving Testimonials */}
-      <div ref={testimonialsSectionRef}>
-        <MovingTestimonials
-          title="What Our Clients Say"
-          subtitle="Real experiences from our satisfied customers across Kenya and beyond"
-          autoPlay={true}
-          interval={5000}
-        />
-      </div>
-
       {/* Case Studies */}
       <div ref={caseStudiesSectionRef}>
         <CaseStudies
@@ -434,10 +424,11 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
 export async function getStaticProps() {
   try {
     // Parallel data fetching - much faster than sequential
-    const [landingPage, reviews, clients, siteLogos, landingServices, landingAbout, clientCategories, caseStudies] = 
+    const [landingPage, clients, siteLogos, landingServices, landingAbout, clientCategories, caseStudies] = 
       await Promise.all([
         getLandingPageData(),
-        getClientReviews(),
+        // getClientReviews() — reviews now originate from Zoho CRM (submitted via /api/reviews),
+        // not from Sanity. Removed to keep Sanity as content-only.
         getClientLogos(),
         getSiteLogos(),
         getLandingServices(),
@@ -449,7 +440,9 @@ export async function getStaticProps() {
     return {
       props: {
         landingPage: landingPage || [],
-        reviews: reviews || [],
+        // reviews — now originates from Zoho CRM (submitted via /api/reviews),
+        // not from Sanity. Kept as empty array to avoid breaking the component signature.
+        reviews: [],
         clients: clients || [],
         clientCategories: clientCategories || [],
         siteLogos: siteLogos || [],

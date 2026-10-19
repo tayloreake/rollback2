@@ -105,12 +105,10 @@ export async function getClientLogos() {
 }
 
 export async function getClientReviews() {
-  return createClient(clientConfig).fetch(
-    groq`*[_type == "review" && (!defined(approved) || approved == true)]{
-        ...,
-        
-      }`
-  )
+  // Reviews now originate from Zoho CRM (submitted via /api/reviews),
+  // not from Sanity. This function returns an empty result so the homepage
+  // can display a gated message without crashing on 0 Sanity records.
+  return [];
 }
 export async function getSiteLogos() {
   return createClient(clientConfig).fetch(
