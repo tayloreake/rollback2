@@ -106,7 +106,7 @@ export async function getClientLogos() {
 
 export async function getClientReviews() {
   return createClient(clientConfig).fetch(
-    groq`*[_type == "newreview" && (!defined(approved) || approved == true)]{
+    groq`*[_type == "review" && (!defined(approved) || approved == true)]{
         ...,
         
       }`
@@ -283,3 +283,30 @@ export async function getRecentBlogs(limit = 5) {
 }
 
 
+
+// ⚠️ DISABLED: Production review writes are controlled via Zoho CRM.
+// Set REVIEW_SANITY_WRITE_ENABLED=true only as a temporary fallback.
+export async function createReview(sentiment, review, name, email) {
+  if (process.env.REVIEW_SANITY_WRITE_ENABLED !== "true") {
+    console.warn("createReview blocked: production review writes are disabled (reviews go to Zoho)")
+    return null
+  }
+  try {
+    const client = getWriteClient()
+    if (!client) {
+      console.error("Write client not available")
+      return null
+    }
+    return client.create({
+      _type: "review",
+      name,
+      email,
+      sentiment,
+      review,
+      approved: true,
+    })
+  } catch (error) {
+    console.error("Error creating review in Sanity:", error)
+    throw new Error("Failed to create review")
+  }
+}
