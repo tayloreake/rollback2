@@ -42,7 +42,33 @@ const api = async (path, method = "GET", body) => {
     headers: { Authorization: `Zoho-oauthtoken ${token}`, "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
   })
-  return r.json()
+  // A non-2xx response can carry an HTML/empty body — r.json() would throw a
+  // SyntaxError and mask the real API error. Surface the status + body instead.
+  const text = await r.text()
+  let parsed = null
+  try { parsed = text ? JSON.parse(text) : null } catch { /* non-JSON body */ }
+
+  if (!r.ok) {
+    const detail = parsed?.message || parsed?.error?.message || text.slice(0, 200) || r.statusText
+    throw new Error(`Zoho ${method} ${path} → HTTP ${r.status}: ${detail}`)
+  }
+
+  // Zoho's search endpoint returns HTTP 204 with an EMPTY body when nothing
+  // matches. r.json() throws "Unexpected end of JSON input" on that, which is
+  // what silently dropped every new quote (the throw aborted before the
+  // create). Treat it as a valid "no matches" result.
+  if (!parsed) return { data: [] }
+  return parsed
+}
+
+// Zoho's documented search form for CUSTOM modules (Website_Quotes is
+// CustomModule20). The `?email=` shorthand only reliably works on standard
+// modules (Leads/Contacts) and has returned empty/non-JSON bodies here.
+const quoteSearch = async (email) => {
+  const criteria = encodeURIComponent(`(Email:equals:${email})`)
+  const found = await api(`/Website_Quotes/search?criteria=${criteria}`)
+  const hit = found?.data?.[0]
+  return hit?.id || null
 }
 
 export async function syncQuoteToZoho(quote = {}, attribution = {}) {
@@ -51,10 +77,16 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
   }
   try {
     const email = String(quote.email || "").trim()
+    // Dedupe is best-effort: a search failure must NEVER block the write
+    // (this is what silently dropped every quote — the throw aborted before
+    // the create). Fall through to a plain create instead.
     let recordId = null
     if (email) {
-      const found = await api(`/Website_Quotes/search?email=${encodeURIComponent(email)}`)
-      recordId = found?.data?.[0]?.id || null
+      try {
+        recordId = await quoteSearch(email)
+      } catch (e) {
+        console.warn("Zoho quote dedupe search failed (creating anyway):", e?.message)
+      }
     }
     const record = {
       Name: String(quote.firstName || "Website Lead").slice(0, 100),
@@ -73,7 +105,10 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
       ].join(" | ").slice(0, 255),
     }
     if (recordId) {
-      await api("/Website_Quotes/upsert", "POST", { data: [{ ...record, id: recordId }] })
+      // duplicate_check_fields makes the upsert idempotent on Email.
+      await api("/Website_Quotes/upsert?duplicate_check_fields=Email", "POST", {
+        data: [{ ...record, id: recordId }],
+      })
     } else {
       const created = await api("/Website_Quotes", "POST", { data: [record] })
       recordId = created?.data?.[0]?.details?.id || null

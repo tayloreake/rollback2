@@ -80,3 +80,36 @@ under Kenya DPA → Mmugambi + legal, not a dev task.
 - [x] `lead` schema + SEO fields (`metaTitle/metaDescription/ogImage`) on service/blogs/landingService
 - [x] Service field titles clarified without renaming (non-breaking)
 - [ ] Human steps above (§1–§7)
+
+## 8. Quote → Zoho bug (fixed 19 Oct 2026)
+**Symptom:** the live `/quote` form returned success and redirected to
+`/ThankYou`, but `POST /api/submitQuote` responded
+`{"success":true,"ledgerId":null,"zoho":"pending"}` and **no record was ever
+created in Zoho** — verified by driving the live form 3× and by Zoho's own
+data (zero quote records after the 11 Oct migration).
+
+**Root cause:** Zoho's `search` endpoint returns **HTTP 204 with an empty
+body** when nothing matches. `utils/zoho.js` called `r.json()` on it, which
+throws `SyntaxError: Unexpected end of JSON input`. `syncQuoteToZoho` caught
+that and returned `{ok:false}`, so the function aborted **before** the create.
+Every new quote (no existing email) hit this path. `syncInquiryToZoho` never
+calls search, which is why contact / jobs / newsletter kept working.
+
+**Fix (`utils/zoho.js`):**
+- `api()` now reads the body as text and treats an empty/204 body as
+  `{data: []}` instead of throwing; real non-2xx errors surface their status
+  and message.
+- The dedupe search uses Zoho's documented custom-module form
+  `search?criteria=(Email:equals:…)` and is wrapped in its own try/catch so a
+  search failure can never block the write.
+- The upsert now sends `duplicate_check_fields=Email` (idempotent on Email).
+
+**Also fixed:** `pages/api/submitQuote.js` and `pages/api/sendEmail.js` no
+longer swallow Zoho failures — the API returns `zohoError` and logs it, so a
+total CRM outage is visible instead of looking like a clean submission.
+`components/Reviews/reviews-form.js` sent the literal string
+`"recaptchaToken"` to `/api/sendEmail`, so every review notification email
+failed; it now sends the real token.
+
+**Verify after deploy:** submit a test quote and confirm Zoho
+`Website_Quotes` gains a record and the response is `"zoho":"synced"`.

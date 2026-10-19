@@ -86,9 +86,17 @@ export default async function handler(req, res) {
     }
 
     // Non-quote inquiries (contact / feedback / job) → Zoho Website Inquiries.
-    // Fire-and-forget: never fails the request.
+    // Awaited (not fire-and-forget) so a Zoho failure is logged instead of
+    // being swallowed by a bare .catch(() => {}).
     if (inquiry) {
-      syncInquiryToZoho(inquiry).catch(() => {});
+      try {
+        const zoho = await syncInquiryToZoho(inquiry)
+        if (!zoho?.ok && !zoho?.skipped) {
+          console.error("Zoho inquiry sync failed:", zoho?.error || "unknown")
+        }
+      } catch (e) {
+        console.error("Zoho inquiry sync threw:", e?.message)
+      }
     }
 
     return res.status(200).json({

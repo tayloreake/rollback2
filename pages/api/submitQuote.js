@@ -10,7 +10,7 @@
 import { rateLimiter } from "./middleware/rateLimiter"
 import { getClientIp, getDetailedIpInfo, getGeolocation } from "../../utils/getClientIp"
 import { verifyRecaptcha, validateQuoteData, sendSalesEmail, sendLeadSms } from "../../utils/leadNotify"
-import { createLeadRecord, patchLeadRecord } from "../../utils/leadLedger"
+import { createLeadRecord, patchLeadRecord, ledgerConfigured } from "../../utils/leadLedger"
 import { syncQuoteToZoho } from "../../utils/zoho"
 
 const limiter = rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 })
@@ -98,26 +98,44 @@ export default async function handler(req, res) {
 
     // 3. Zoho attempt → patch ledger
     let zoho = { skipped: true }
+    let zohoError = null
     try {
       zoho = await syncQuoteToZoho(quoteData, attribution)
+      if (zoho?.ok) {
+        zohoError = null
+      } else if (!zoho?.skipped) {
+        zohoError = zoho?.error || "Zoho sync failed"
+      }
       if (ledgerId) {
         if (zoho?.ok) {
           await patchLeadRecord(ledgerId, { status: "synced_to_zoho", zohoLeadId: zoho.leadId, emailSent: mail.ok, smsSent: sms.ok })
         } else if (!zoho?.skipped) {
-          await patchLeadRecord(ledgerId, { syncError: zoho.error || "Zoho sync failed", emailSent: mail.ok, smsSent: sms.ok })
+          await patchLeadRecord(ledgerId, { syncError: zohoError, emailSent: mail.ok, smsSent: sms.ok })
         }
       }
     } catch (e) {
-      console.error("Zoho sync error (lead safe in ledger):", e?.message)
+      zohoError = e?.message || "Zoho sync threw"
+      console.error("Zoho sync error (lead safe in ledger):", zohoError)
       if (ledgerId) {
-        try { await patchLeadRecord(ledgerId, { syncError: e?.message, emailSent: mail.ok, smsSent: sms.ok }) } catch {}
+        try { await patchLeadRecord(ledgerId, { syncError: zohoError, emailSent: mail.ok, smsSent: sms.ok }) } catch {}
       }
     }
 
     if (!mail.ok && !sms.ok) {
       return res.status(500).json({ success: false, message: "Failed to deliver quote request. Please try again." })
     }
-    return res.status(200).json({ success: true, message: "Quote request submitted successfully", ledgerId, zoho: zoho?.ok ? "synced" : "pending" })
+    // Surface the CRM + ledger outcomes and errors so a silent failure is
+    // visible in logs/alerting instead of looking like a clean submission.
+    if (zohoError) console.error("Quote Zoho sync failed:", zohoError)
+    if (!ledgerConfigured()) console.warn("Quote submitted but leads ledger is not configured — no Sanity record written")
+    return res.status(200).json({
+      success: true,
+      message: "Quote request submitted successfully",
+      ledgerId,
+      ledger: ledgerId ? "written" : (ledgerConfigured() ? "failed" : "unconfigured"),
+      zoho: zoho?.ok ? "synced" : "pending",
+      zohoError: zoho?.ok ? null : zohoError,
+    })
   } catch (error) {
     console.error("Error in submitQuote handler:", error)
     if (error?.message === "Too many requests") {

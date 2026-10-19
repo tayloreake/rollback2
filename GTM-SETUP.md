@@ -32,6 +32,16 @@ the GTM Google tag). GTM is now the single collector:
 - Enable **Enhanced Conversions** (hashed email/phone from the lead form).
 - Keep call tracking (0721 410 517) as is.
 
+### Verify the quote funnel end-to-end
+The quote form is the only conversion that must reach Zoho *and* fire the Ads
+tag. After deploying, submit a test quote and check:
+1. `POST /api/submitQuote` returns `"zoho":"synced"` (not `"pending"`).
+2. A record appears in Zoho `Website_Quotes`.
+3. GA4 DebugView shows `generate_lead`; Ads shows the conversion.
+
+If it returns `"pending"`, read the `zohoError` field in the response — it now
+carries the real Zoho error instead of failing silently.
+
 ## 4. Meta Pixel (paused until ID provided)
 - Set `NEXT_PUBLIC_META_PIXEL_ID` in Vercel env, redeploy — the site then
   loads Pixel on ads-consent only, fires PageView + Lead (with event_id

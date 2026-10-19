@@ -25,16 +25,28 @@ export const ledgerConfigured = () => Boolean(getClient())
 export async function createLeadRecord(lead) {
   const client = getClient()
   if (!client) {
-    console.warn("Leads ledger not configured — skipping (set SANITY_LEADS_TOKEN)")
+    // Loud on purpose: a silent null here means every quote is only in Zoho,
+    // with no independent record of "was this received".
+    console.warn(
+      "Leads ledger NOT configured — quote will not be recorded in Sanity. " +
+      "Set SANITY_LEADS_TOKEN (write-scoped token for the private 'leads-ledger' dataset). " +
+      "See SANITY-SECURITY.md §2."
+    )
     return null
   }
-  const doc = await client.create({
-    _type: "lead",
-    status: "received",
-    ...lead,
-    submittedAt: new Date().toISOString(),
-  })
-  return doc
+  try {
+    const doc = await client.create({
+      _type: "lead",
+      status: "received",
+      ...lead,
+      submittedAt: new Date().toISOString(),
+    })
+    return doc
+  } catch (e) {
+    // Distinguish a real write failure from "not configured".
+    console.error("Leads ledger write failed:", e?.message)
+    return null
+  }
 }
 
 export async function patchLeadRecord(id, patch) {

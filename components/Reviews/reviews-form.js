@@ -125,7 +125,9 @@ const ReviewForm = ({setIsModalOpen}) => {
             body: JSON.stringify({
               to: "sales@taylorea.com",
               message: messageContent,
-              recaptchaToken: "recaptchaToken"
+              // Was the literal string "recaptchaToken" — Google always
+              // rejected it, so every review notification email failed.
+              recaptchaToken: recaptchaValue,
             }),
           });
           setSuccess(true);
