@@ -1,16 +1,12 @@
 // Quote intake orchestrator (Sanity Security §7.3 + §8).
 // Flow, in order:
 //   1. validate + reCAPTCHA
-//   2. write lead to the PRIVATE leads-ledger dataset (status "received") —
-//      the source of truth for "was this received", independent of Zoho
-//   3. send SMS + sales email (existing trails, kept as-is)
-//   4. attempt Zoho CRM Leads create → patch ledger "synced_to_zoho" + lead id;
-//      on failure leave "received" with the error (retryable, nothing lost)
-// Nothing here writes to the public `production` dataset.
+//   2. send SMS + sales email (existing trails, kept as-is)
+//   3. attempt Zoho CRM Leads create/upsert — the system of record for management reporting
+// Nothing here writes to the public Sanity dataset.
 import { rateLimiter } from "./middleware/rateLimiter"
 import { getClientIp, getDetailedIpInfo, getGeolocation } from "../../utils/getClientIp"
 import { verifyRecaptcha, validateQuoteData, sendSalesEmail, sendLeadSms } from "../../utils/leadNotify"
-import { createLeadRecord, patchLeadRecord, ledgerConfigured } from "../../utils/leadLedger"
 import { syncQuoteToZoho } from "../../utils/zoho"
 
 const limiter = rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 })
@@ -61,43 +57,12 @@ export default async function handler(req, res) {
     const ipDetails = getDetailedIpInfo(req)
     const geolocation = getGeolocation(req)
 
-    // 1. Ledger first — independent of everything downstream
-    let ledgerId = null
-    try {
-      const doc = await createLeadRecord({
-        firstName: quoteData.firstName,
-        email: quoteData.email,
-        phoneNumber: quoteData.phoneNumber,
-        location: quoteData.location,
-        destination: quoteData.destination,
-        moveType: quoteData.moveType,
-        bedrooms: quoteData.bedrooms,
-        moveDate: quoteData.moveDate,
-        referrals: quoteData.referrals,
-        attribution: {
-          utm_source: attribution.utm_source || "",
-          utm_medium: attribution.utm_medium || "",
-          utm_campaign: attribution.utm_campaign || "",
-          gclid: attribution.gclid || "",
-          landing_page: attribution.landing_page || "",
-          referrer: attribution.referrer || "",
-        },
-        ipAddress,
-        recaptchaScore: recaptchaResult.score,
-        emailSent: false,
-        smsSent: false,
-      })
-      ledgerId = doc?._id || null
-    } catch (e) {
-      console.error("Ledger write failed (continuing):", e?.message)
-    }
-
-    // 2. SMS + email trails (kept as-is)
+    // 1. SMS + email trails (kept as-is)
     const sms = await sendLeadSms(message, ipAddress)
     const mail = await sendSalesEmail(message, attribution)
 
-    // 3. Zoho attempt → patch ledger
-    let zoho = { skipped: true }
+    // 2. Zoho attempt — system of record for management reporting
+    let zoho = { ok: false, error: null }
     let zohoError = null
     try {
       zoho = await syncQuoteToZoho(quoteData, attribution)
@@ -106,33 +71,21 @@ export default async function handler(req, res) {
       } else if (!zoho?.skipped) {
         zohoError = zoho?.error || "Zoho sync failed"
       }
-      if (ledgerId) {
-        if (zoho?.ok) {
-          await patchLeadRecord(ledgerId, { status: "synced_to_zoho", zohoLeadId: zoho.leadId, emailSent: mail.ok, smsSent: sms.ok })
-        } else if (!zoho?.skipped) {
-          await patchLeadRecord(ledgerId, { syncError: zohoError, emailSent: mail.ok, smsSent: sms.ok })
-        }
-      }
     } catch (e) {
       zohoError = e?.message || "Zoho sync threw"
-      console.error("Zoho sync error (lead safe in ledger):", zohoError)
-      if (ledgerId) {
-        try { await patchLeadRecord(ledgerId, { syncError: zohoError, emailSent: mail.ok, smsSent: sms.ok }) } catch {}
-      }
+      console.error("Quote Zoho sync threw:", zohoError)
+      zoho = { ok: false, error: zohoError }
     }
 
     if (!mail.ok && !sms.ok) {
       return res.status(500).json({ success: false, message: "Failed to deliver quote request. Please try again." })
     }
-    // Surface the CRM + ledger outcomes and errors so a silent failure is
-    // visible in logs/alerting instead of looking like a clean submission.
+    // Surface the CRM outcome so a silent failure is visible in logs/alerting
+    // instead of looking like a clean submission.
     if (zohoError) console.error("Quote Zoho sync failed:", zohoError)
-    if (!ledgerConfigured()) console.warn("Quote submitted but leads ledger is not configured — no Sanity record written")
     return res.status(200).json({
       success: true,
       message: "Quote request submitted successfully",
-      ledgerId,
-      ledger: ledgerId ? "written" : (ledgerConfigured() ? "failed" : "unconfigured"),
       zoho: zoho?.ok ? "synced" : "pending",
       zohoError: zoho?.ok ? null : zohoError,
     })

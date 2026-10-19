@@ -7,7 +7,6 @@ import category from "./sanity/schemas/category-schema"
 import tag from "./sanity/schemas/tag-schema"
 import blog from "./sanity/schemas/blog-schema"
 import servicespage from "./sanity/schemas/servicespage-schema"
-import quote from "./sanity/schemas/quote_req-schema"
 import review from "./sanity/schemas/review-schema"
 import clientreview from "./sanity/schemas/new-review-schema"
 import clientlogo from "./sanity/schemas/client-logos-schema"
@@ -17,8 +16,6 @@ import landingAbout from "./sanity/schemas/landing-about-schema"
 import landingService from "./sanity/schemas/landing-services-schema"
 import siteLogos from "./sanity/schemas/site-logos-schema";
 import thankYouMessage from "./sanity/schemas/thankyou-schema";
-import blacklistedip from "./sanity/schemas/blacklisted-schema";
-import lead from "./sanity/schemas/lead-schema";
 import faq from "./sanity/schemas/faq-schema";
 import job from "./sanity/schemas/job-schema";
 import announcement from "./sanity/schemas/announcement-schema";
@@ -32,7 +29,7 @@ const config = defineConfig({
   // Server mutations must use SANITY_API_TOKEN env var (see sanity/config/server-client.js).
   plugins: [deskTool()],
   schema: {
-    types: [service, landingPage, aboutPage, servicespage, category, tag, blog, quote, review, clientcategory, clientlogo, clientreview, about, landingAbout, landingService, siteLogos, thankYouMessage, blacklistedip, lead, faq, job, announcement],
+    types: [service, landingPage, aboutPage, servicespage, category, tag, blog, review, clientcategory, clientlogo, clientreview, about, landingAbout, landingService, siteLogos, thankYouMessage, faq, job, announcement],
   },
 })
 

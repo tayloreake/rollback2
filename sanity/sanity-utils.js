@@ -4,7 +4,6 @@ import clientConfig from "./config/client-config"
 import serverConfig from "./config/server-client"
 
 // Reads use the public tokenless client.
-// Writes (createQuote/createReview) must use the server token when available.
 const getWriteClient = () => {
   const token = process.env.SANITY_API_TOKEN || process.env.NEXT_SANITY_API_TOKEN
   if (token && !token.startsWith("REVOKED")) return createClient({ ...serverConfig, token })
@@ -206,15 +205,6 @@ export async function getTags() {
       }`
   )
 }
-export async function getBlacklistedIps() {
-  return createClient(clientConfig).fetch(
-    groq`*[_type == "blacklistedips"]{
-        ...,
-      }`
-  )
-}
-
-// CMS-managed content (non-PII — safe on the public dataset)
 export async function getFaqs() {
   try {
     return createClient(clientConfig).fetch(
@@ -292,78 +282,4 @@ export async function getRecentBlogs(limit = 5) {
   }
 }
 
-export async function createQuote(
-  firstName,
-  email,
-  phoneNumber,
-  location,
-  destination,
-  moveType,
-  bedrooms,
-  moveDate,
-  referrals,
-  ipAddress = null,
-  ipDetails = null,
-  geolocation = null,
-  recaptchaScore = null,
-  emailSent = false,
-  smsSent = false
-) {
-  // Sanity Security §2: production quote writes are DISABLED by default.
-  // Set QUOTE_SANITY_WRITE_ENABLED=true only as a temporary fallback, and
-  // NEVER to the public production dataset (use a private dataset instead).
-  if (process.env.QUOTE_SANITY_WRITE_ENABLED !== "true") {
-    console.warn("createQuote blocked: production quote writes are disabled (see Sanity Security §2)")
-    return null
-  }
-  try {
-    const quoteData = {
-      _type: "quote",
-      firstName,
-      email,
-      phoneNumber,
-      location,
-      destination,
-      moveType,
-      bedrooms,
-      moveDate,
-      refferals: referrals,
-      submittedAt: new Date().toISOString(),
-      submissionStatus: "pending",
-      emailSent,
-      smsSent,
-    };
 
-    // Add IP tracking data if provided
-    if (ipAddress) {
-      quoteData.ipAddress = ipAddress;
-    }
-    if (ipDetails) {
-      quoteData.ipDetails = ipDetails;
-    }
-    if (geolocation) {
-      quoteData.geolocation = geolocation;
-    }
-    if (recaptchaScore !== null) {
-      quoteData.recaptchaScore = recaptchaScore;
-    }
-
-    return getWriteClient().create(quoteData);
-  } catch (error) {
-    console.error("Error creating quote in Sanity:", error);
-    throw new Error("Failed to create quote");
-  }
-}
-
-export async function createReview(sentiment, review, name, email) {
-  const client = getWriteClient()
-
-  return client.create({
-    _type: "review",
-    name,
-    email,
-    sentiment,
-    review,
-    createdAt: new Date().toISOString(),
-  })
-}
