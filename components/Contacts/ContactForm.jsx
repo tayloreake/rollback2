@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import ReCAPTCHA from "../SafeRecaptcha"
+import { getAttribution } from "../../utils/attribution"
 
 const ContactForm = () => {
     const [fname, setFname] = useState("")
@@ -50,6 +51,9 @@ const ContactForm = () => {
                   email: email,
                   phone: number,
                   source: "Contact Form",
+                  // Google Ads click id + Zoho SalesIQ visitor id, so the CRM record can be tied to the ad click and the chat/visit history
+                  gclid: getAttribution().gclid || "",
+                  siq_visitor_id: getAttribution().siq_visitor_id || "",
                   notes: `Contact via website | From: ${fname} ${lname} | ${message.slice(0, 150)}`,
                 },
             }
@@ -119,6 +123,8 @@ const ContactForm = () => {
         <form
             onSubmit={(e) => handleSubmit(e)}
             className='flex-col'>
+          {/* Filled by Zoho zcga.js with the Google Ads click id */}
+          <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
             <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
                 <div className='rounded-xl relative w-full mb-4 md:mr-2'>
                     <label className='font-[600] text-sm text-gray-600 mb-1'>
