@@ -272,6 +272,8 @@ const Quote = () => {
             <div className='flex gap-2 text-[12px]'><a href='https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20(ref%3A%20WEB)' target='_blank' rel='noreferrer' className='px-3 py-2 rounded-lg bg-green-600 text-white font-semibold'>WhatsApp</a><a href='tel:+254721410517' className='px-3 py-2 rounded-lg bg-slate-900 text-white font-semibold'>Call Sales</a></div>
           </div>
           <form onSubmit={handleSubmit} className='px-6 md:px-8 py-6 grid md:grid-cols-2 gap-5'>
+            {/* Filled by Zoho zcga.js with the Google Ads click id */}
+            <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
             <div><label htmlFor='q-fname' className={labelCls}>Full Name *</label><input id='q-fname' name='name' autoComplete='name' type='text' value={fname} required onChange={(e) => setFname(e.target.value)} placeholder="e.g. Brian O&apos;Brien" className={inputCls} /></div>
             <div><label htmlFor='q-phone' className={labelCls}>Phone / WhatsApp *</label><input id='q-phone' name='phone' autoComplete='tel' type='tel' inputMode='tel' value={number} required onChange={(e) => setNumber(e.target.value)} placeholder='+254 712 410 517' className={inputCls} /></div>
             <div><label htmlFor='q-email' className={labelCls}>Email</label><input id='q-email' name='email' autoComplete='email' type='email' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='you@company.com (optional)' className={inputCls} /></div>

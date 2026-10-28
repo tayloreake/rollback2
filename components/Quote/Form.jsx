@@ -354,6 +354,8 @@ const QuoteForm = () => {
 
       <div className='px-6 py-5'>
         <form ref={formRef} onSubmit={handleSubmit} className='w-full flex flex-col gap-5'>
+          {/* Filled by Zoho zcga.js with the Google Ads click id */}
+          <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
           <div>
             <p className='text-[11px] font-bold tracking-widest uppercase text-[#FF5000] mb-3'>1 • Contact details</p>
             <div className='flex flex-col gap-4'>

@@ -27,16 +27,29 @@ const loadLinkedIn = () => {
   document.head.appendChild(s)
 }
 
+// Zoho CRM Google Ads tracking (zcga.js): fills the hidden #zc_gad field with the
+// ad click id. Ads-consent gated like the other ad tags.
+const loadZohoGad = () => {
+  if (document.getElementById("zoho-zcga")) return
+  const s = document.createElement("script")
+  s.id = "zoho-zcga"
+  s.src = "https://crm.zoho.com/crm/javascript/zcga.js"
+  s.async = true
+  document.body.appendChild(s)
+}
+
 const ConsentGatedTags = () => {
   useEffect(() => {
-    if (!META_ID && !LINKEDIN_ID) return
+    const hasPixels = Boolean(META_ID || LINKEDIN_ID)
     const onConsent = () => {
       try {
         const raw = localStorage.getItem("tm-consent-v1")
         const c = raw ? JSON.parse(raw) : null
         if (c?.ads) {
+          loadZohoGad()
           loadMeta()
           loadLinkedIn()
+          if (!hasPixels) return
           window.dataLayer = window.dataLayer || []
           // Forward generate_lead to Meta (event_id reserved for future CAPI dedupe)
           const push = window.dataLayer.push.bind(window.dataLayer)
