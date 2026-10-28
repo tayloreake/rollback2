@@ -99,6 +99,7 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
       Property_Size: String(quote.bedrooms || "").slice(0, 100) || undefined,
       Move_Date: String(quote.moveDate || "").slice(0, 50) || undefined,
       GCLID: String(attribution.gclid || "").slice(0, 100) || undefined,
+      SalesIQ_Visitor_ID: String(attribution.siq_visitor_id || "").slice(0, 100) || undefined,
       Quote_Notes: [
         `UTM: ${(attribution.utm_source || "")}/${(attribution.utm_medium || "")}/${(attribution.utm_campaign || "")}`,
         `landing: ${attribution.landing_page || ""}`,
@@ -122,7 +123,7 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
 
 // Generic non-quote inquiry (contact / feedback / job application) → the same
 // Website Inquiries section, distinguished by Lead_Source. Fire-and-forget.
-export async function syncInquiryToZoho({ name, email, phone, source, notes } = {}) {
+export async function syncInquiryToZoho({ name, email, phone, source, notes, gclid, siq_visitor_id } = {}) {
   if (!zohoConfigured()) {
     return { skipped: true }
   }
@@ -133,6 +134,8 @@ export async function syncInquiryToZoho({ name, email, phone, source, notes } = 
       Phone: String(phone || "").slice(0, 30) || undefined,
       Lead_Source: String(source || "Website").slice(0, 100),
       Quote_Notes: String(notes || "").slice(0, 255) || undefined,
+      GCLID: String(gclid || "").slice(0, 100) || undefined,
+      SalesIQ_Visitor_ID: String(siq_visitor_id || "").slice(0, 100) || undefined,
     }
     const created = await api("/Website_Quotes", "POST", { data: [record] })
     const id = created?.data?.[0]?.details?.id || null
