@@ -1,6 +1,7 @@
 // ContactForm.jsx
 import React, { useState, useRef } from "react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 import ReCAPTCHA from "../SafeRecaptcha"
 
 const ContactForm = () => {
@@ -10,6 +11,7 @@ const ContactForm = () => {
     const [number, setNumber] = useState("")
     const [message, setMessage] = useState("")
     const recaptchaRef = useRef(null)
+    const router = useRouter()
 
     const isValidPhoneNumber = (phoneNumber) => {
         if (!phoneNumber) return false
@@ -79,6 +81,8 @@ const ContactForm = () => {
             setEmail("")
             setMessage("")
             setNumber("")
+            // Success: send the visitor to the thank-you page
+            router.push("/ThankYou")
         } catch (error) {
             console.error("Error sending SMS/email:", error)
         }
