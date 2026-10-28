@@ -41,9 +41,23 @@ export const initAttribution = () => {
   } catch { /* no-op */ }
 }
 
+// Zoho SalesIQ visitor id (uvid). Not a documented getter, so fully guarded:
+// empty string until the widget has loaded (it loads after consent).
+export const getSalesIQVisitorId = () => {
+  try {
+    const vis = typeof window !== "undefined" && window.$zoho && window.$zoho.salesiq && window.$zoho.salesiq.visitor
+    const id = vis && typeof vis.uniqueid === "function" ? vis.uniqueid() : ""
+    return typeof id === "string" ? id.slice(0, 100) : ""
+  } catch { return "" }
+}
+
 export const getAttribution = () => {
   try {
     const raw = readCookie(COOKIE)
-    return raw ? JSON.parse(raw) : {}
+    const base = raw ? JSON.parse(raw) : {}
+    // Zoho zcga.js writes the Google Ads click id into #zc_gad; prefer it when present.
+    const gad = typeof document !== "undefined" ? (document.getElementById("zc_gad")?.value || "") : ""
+    const siq = getSalesIQVisitorId()
+    return { ...base, ...(gad ? { gclid: gad } : {}), ...(siq ? { siq_visitor_id: siq } : {}) }
   } catch { return {} }
 }
