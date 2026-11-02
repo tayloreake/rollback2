@@ -77,7 +77,7 @@ const Contacts = () => {
             <div className="text-center p-4 bg-gray-50 rounded-lg hover:shadow-lg transition-shadow">
               <BsWhatsapp className="text-[#FF5000] text-3xl mx-auto mb-3" />
               <h3 className="font-bold text-sm mb-2">WhatsApp</h3>
-              <a href="https://wa.me/254721410517" target="_blank" className="text-[#FF5000] hover:underline text-sm">
+              <a href="https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20%28ref%3A%20CONTACT%29" target="_blank" rel="noreferrer" className="text-[#FF5000] hover:underline text-sm">
                 Chat with us
               </a>
             </div>
@@ -143,7 +143,7 @@ const Contacts = () => {
                 Call Now: +254 721 410 517
               </a>
               <a 
-                href="https://wa.me/254721410517" 
+                href="https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20%28ref%3A%20CONTACT%29" 
                 target="_blank"
                 className="px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:shadow-2xl transition-all"
               >
