@@ -36,10 +36,13 @@ export function validateQuoteData(quoteData) {
   if (!quoteData) return { ok: false, error: "Missing quote data" }
   const phoneOk = /^\+?\d[\d\s-]{7,15}$/.test(String(quoteData.phoneNumber || "").trim())
   if (!phoneOk) return { ok: false, error: "Invalid phone number" }
-  const nameOk = /^[\p{L}\p{M}' .-]{2,80}$/u.test(String(quoteData.firstName || "").trim())
-  if (!nameOk) return { ok: false, error: "Invalid name" }
+  const firstNameOk = /^[\p{L}\p{M}' .-]{2,80}$/u.test(String(quoteData.firstName || "").trim())
+  if (!firstNameOk) return { ok: false, error: "Invalid first name" }
+  const lastNameOk = /^[\p{L}\p{M}' .-]{1,80}$/u.test(String(quoteData.lastName || "").trim())
+  if (!lastNameOk) return { ok: false, error: "Invalid last name" }
   quoteData.phoneNumber = normalizePhone(quoteData.phoneNumber)
   if (typeof quoteData.firstName === "string") quoteData.firstName = quoteData.firstName.trim().slice(0, 80)
+  if (typeof quoteData.lastName === "string") quoteData.lastName = quoteData.lastName.trim().slice(0, 80)
   if (typeof quoteData.email === "string") quoteData.email = quoteData.email.trim().slice(0, 120)
   return { ok: true }
 }

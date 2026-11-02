@@ -1,6 +1,5 @@
 // Server-only Zoho CRM sync (Sanity Security §2).
-// Writes website quotes to the dedicated Website_Quotes section —
-// never to Leads, never to Sanity production.
+// Writes website quotes to the Zoho Leads module — never to Sanity production.
 // Env required: ZOHO_CLIENT_ID, ZOHO_CLIENT_SECRET, ZOHO_REFRESH_TOKEN,
 // optional ZOHO_DC ("com" | "eu" | "in", default "com").
 // recaptchaScore is intentionally never sent. Failures returned, never thrown.
@@ -61,12 +60,11 @@ const api = async (path, method = "GET", body) => {
   return parsed
 }
 
-// Zoho's documented search form for CUSTOM modules (Website_Quotes is
-// CustomModule20). The `?email=` shorthand only reliably works on standard
-// modules (Leads/Contacts) and has returned empty/non-JSON bodies here.
-const quoteSearch = async (email) => {
+// Zoho's documented search form for the standard Leads module.
+// The `?email=` shorthand only reliably works on standard modules (Leads/Contacts).
+const leadSearch = async (email) => {
   const criteria = encodeURIComponent(`(Email:equals:${email})`)
-  const found = await api(`/Website_Quotes/search?criteria=${criteria}`)
+  const found = await api(`/Leads/search?criteria=${criteria}`)
   const hit = found?.data?.[0]
   return hit?.id || null
 }
@@ -77,42 +75,44 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
   }
   try {
     const email = String(quote.email || "").trim()
+    // Split firstName / lastName — both are required for Zoho Leads.
+    const firstName = String(quote.firstName || "").trim().slice(0, 80)
+    const lastName = String(quote.lastName || "").trim().slice(0, 80)
+    const displayName = [firstName, lastName].filter(Boolean).join(" ") || "Website Lead"
     // Dedupe is best-effort: a search failure must NEVER block the write
     // (this is what silently dropped every quote — the throw aborted before
     // the create). Fall through to a plain create instead.
     let recordId = null
     if (email) {
       try {
-        recordId = await quoteSearch(email)
+        recordId = await leadSearch(email)
       } catch (e) {
-        console.warn("Zoho quote dedupe search failed (creating anyway):", e?.message)
+        console.warn("Zoho lead dedupe search failed (creating anyway):", e?.message)
       }
     }
     const record = {
-      Name: String(quote.firstName || "Website Lead").slice(0, 100),
+      First_Name: firstName || undefined,
+      Last_Name: lastName || undefined,
+      Name: displayName,
       Email: email || undefined,
-      Phone: String(quote.phoneNumber || "").slice(0, 30),
-      Lead_Source: String(quote.referrals || quote.ref || "Website").slice(0, 100),
-      Move_Type: String(quote.moveType || "").slice(0, 100) || undefined,
-      Move_From: String(quote.location || "").slice(0, 255) || undefined,
-      Move_To: String(quote.destination || "").slice(0, 255) || undefined,
+      Phone: String(quote.phoneNumber || "").slice(0, 30) || undefined,
+      How_did_you_hear_about_us: String(quote.referrals || quote.ref || "Website").slice(0, 100),
+      Move_Types: String(quote.moveType || "").slice(0, 100) || undefined,
+      Origin_Address_Street_Address: String(quote.location || "").slice(0, 255) || undefined,
+      Destination_Address_Street_Address: String(quote.destination || "").slice(0, 255) || undefined,
       Property_Size: String(quote.bedrooms || "").slice(0, 100) || undefined,
-      Move_Date: String(quote.moveDate || "").slice(0, 50) || undefined,
+      Proposed_Move_Date: String(quote.moveDate || "").slice(0, 50) || undefined,
       GCLID: String(attribution.gclid || "").slice(0, 100) || undefined,
-      Quote_Notes: [
-        `UTM: ${(attribution.utm_source || "")}/${(attribution.utm_medium || "")}/${(attribution.utm_campaign || "")}`,
-        `landing: ${attribution.landing_page || ""}`,
-      ].join(" | ").slice(0, 255),
     }
     if (recordId) {
       // duplicate_check_fields makes the upsert idempotent on Email.
-      await api("/Website_Quotes/upsert?duplicate_check_fields=Email", "POST", {
+      await api("/Leads/upsert?duplicate_check_fields=Email", "POST", {
         data: [{ ...record, id: recordId }],
       })
     } else {
-      const created = await api("/Website_Quotes", "POST", { data: [record] })
+      const created = await api("/Leads", "POST", { data: [record] })
       recordId = created?.data?.[0]?.details?.id || null
-      if (!recordId) throw new Error(created?.data?.[0]?.message || "Website Quote create returned no id")
+      if (!recordId) throw new Error(created?.data?.[0]?.message || "Lead create returned no id")
     }
     return { ok: true, leadId: recordId }
   } catch (e) {
@@ -120,21 +120,22 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
   }
 }
 
-// Generic non-quote inquiry (contact / feedback / job application) → the same
-// Website Inquiries section, distinguished by Lead_Source. Fire-and-forget.
+// Generic non-quote inquiry (contact / feedback / job application) → Zoho Leads
+// module, distinguished by How_did_you_hear_about_us.
 export async function syncInquiryToZoho({ name, email, phone, source, notes } = {}) {
   if (!zohoConfigured()) {
     return { skipped: true }
   }
   try {
     const record = {
+      First_Name: String(name || "Website Inquiry").slice(0, 80),
+      Last_Name: undefined,
       Name: String(name || "Website Inquiry").slice(0, 100),
       Email: String(email || "").trim() || undefined,
       Phone: String(phone || "").slice(0, 30) || undefined,
-      Lead_Source: String(source || "Website").slice(0, 100),
-      Quote_Notes: String(notes || "").slice(0, 255) || undefined,
+      How_did_you_hear_about_us: String(source || "Website").slice(0, 100),
     }
-    const created = await api("/Website_Quotes", "POST", { data: [record] })
+    const created = await api("/Leads", "POST", { data: [record] })
     const id = created?.data?.[0]?.details?.id || null
     if (!id) throw new Error(created?.data?.[0]?.message || "Inquiry create returned no id")
     return { ok: true, leadId: id }

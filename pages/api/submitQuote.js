@@ -14,7 +14,7 @@ const limiter = rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 })
 const buildMessage = (q) =>
   [
     "New Move Request:",
-    `Name: ${q.firstName || ""}`,
+    `Name: ${q.firstName || ""} ${q.lastName || ""}`.trim(),
     `Email: ${q.email || ""}`,
     `Phone Number: ${q.phoneNumber || ""}`,
     `Move Type: ${q.moveType || ""}`,
