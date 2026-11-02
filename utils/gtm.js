@@ -1,4 +1,5 @@
 // Google Tag Manager utility functions
+import { getAttribution, deriveLeadSource } from './attribution';
 
 // Initialize dataLayer if it doesn't exist
 export const initGTM = () => {
@@ -37,6 +38,103 @@ export const gtmTrackQuoteSubmission = (formData = {}) => {
   });
 };
 
+// ---------------------------------------------------------------------------
+// T6 / T7 — attribution events (playbook "GTM data layer pushes")
+// ---------------------------------------------------------------------------
+// NOTE ON EVENT NAME: the playbook calls the lead event `lead`. The live GTM
+// container (GTM-W6T72F2Z) fires the GA4 key event AND the Google Ads
+// conversion (AW-966026451) off `generate_lead` — see GTM-SETUP.md §2/§3.
+// Emitting a second `lead` event would double-count conversions the moment a
+// trigger is added for it, so the push stays on `generate_lead` and carries
+// every field the playbook asks for (campaign_id, gclid, utm_*, lead_source,
+// form_id, event_action). Point GTM at `generate_lead` and read them there.
+
+// Dedupe window — a delegated document click listener and component-level
+// onClick handlers can both fire for the same tap (e.g. Navbar tel: links).
+const REPEAT_WINDOW_MS = 800;
+const lastPushed = {};
+const isDuplicate = (key) => {
+  const now = Date.now();
+  if (lastPushed[key] && now - lastPushed[key] < REPEAT_WINDOW_MS) return true;
+  lastPushed[key] = now;
+  return false;
+};
+
+// Helper — campaign_id from the URL, falling back to the first-touch cookie
+// so a navigation without the query string still carries the campaign.
+export const getCampaignIdFromUrl = () => {
+  if (typeof window === 'undefined') return '';
+  try {
+    const fromUrl = new URLSearchParams(window.location.search).get('campaign_id');
+    if (fromUrl) return fromUrl;
+    return getAttribution().campaign_id || '';
+  } catch {
+    return '';
+  }
+};
+
+const attributionFields = (attribution = {}) => ({
+  // Cookie first, URL second — the CRM record is built from the same cookie,
+  // so GA4 and Zoho must agree on which campaign produced the lead.
+  // (getCampaignIdFromUrl still exists for click events, which have no CRM row.)
+  campaign_id: String(attribution.campaign_id || '') || getCampaignIdFromUrl(),
+  gclid: String(attribution.gclid || ''),
+  utm_source: String(attribution.utm_source || ''),
+  utm_medium: String(attribution.utm_medium || ''),
+  utm_campaign: String(attribution.utm_campaign || ''),
+});
+
+// 1. Lead form submission — fires when the user submits the Quote or Contact
+//    form. `source` is optional; without it the channel is derived from the
+//    campaign data / the visitor's own "how did you hear about us" answer.
+export const gtmPushLead = (leadData = {}) => {
+  const attribution = leadData.attribution || getAttribution();
+  gtmTrackEvent({
+    event: 'generate_lead',
+    event_category: 'engagement',
+    event_action: 'form_submit',
+    form_id: leadData.formId || 'quote',
+    lead_source: leadData.source || deriveLeadSource(attribution, leadData.referral || ''),
+    referral_answer: leadData.referral || '',
+    ...attributionFields(attribution),
+    user_id: leadData.userId || '',
+    value: leadData.value === undefined ? 1 : leadData.value,
+    currency: 'KES',
+    ...(leadData.move_type ? { move_type: leadData.move_type } : {}),
+    ...(leadData.bedrooms ? { bedrooms: leadData.bedrooms } : {}),
+    timestamp: new Date().toISOString(),
+  });
+};
+
+// 2. WhatsApp click — fires when a wa.me link is tapped. `refCode` comes from
+//    the link's `ref` param or the `(ref: XXX)` marker inside its text.
+export const gtmPushWhatsAppClick = (refCode = '', channel = 'Website') => {
+  if (isDuplicate('whatsapp_click')) return;
+  gtmTrackEvent({
+    event: 'whatsapp_click',
+    event_category: 'engagement',
+    event_action: 'click_to_whatsapp',
+    whatsapp_ref: String(refCode || ''),
+    channel: String(channel || 'Website'),
+    campaign_id: getCampaignIdFromUrl(),
+    timestamp: new Date().toISOString(),
+  });
+};
+
+// 3. Phone click — fires when a tel: link is tapped.
+export const gtmPushPhoneClick = (phoneNumber = '') => {
+  if (isDuplicate('phone_click')) return;
+  gtmTrackEvent({
+    event: 'phone_click',
+    event_category: 'engagement',
+    event_action: 'click_to_call',
+    contact_method: 'Phone',
+    phone_number: String(phoneNumber || ''),
+    campaign_id: getCampaignIdFromUrl(),
+    timestamp: new Date().toISOString(),
+  });
+};
+
 // Track contact form submissions
 export const gtmTrackContactSubmission = (formData = {}) => {
   gtmTrackEvent({
@@ -57,14 +155,9 @@ export const gtmTrackNewsletterSignup = () => {
   });
 };
 
-// Track phone number clicks
-export const gtmTrackPhoneClick = () => {
-  gtmTrackEvent({
-    event: 'phone_click',
-    contact_method: 'Phone',
-    phone_number: '+254 721 410 517',
-    timestamp: new Date().toISOString()
-  });
+// Track phone number clicks (legacy wrapper — now carries campaign_id)
+export const gtmTrackPhoneClick = (phoneNumber) => {
+  gtmPushPhoneClick(phoneNumber || '+254 721 410 517');
 };
 
 // Track service page visits
@@ -169,6 +262,10 @@ export default {
   initGTM,
   gtmTrackEvent,
   gtmTrackPageView,
+  gtmPushLead,
+  gtmPushWhatsAppClick,
+  gtmPushPhoneClick,
+  getCampaignIdFromUrl,
   gtmTrackQuoteSubmission,
   gtmTrackContactSubmission,
   gtmTrackNewsletterSignup,

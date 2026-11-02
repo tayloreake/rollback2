@@ -83,11 +83,17 @@ export default async function handler(req, res) {
     // Surface the CRM outcome so a silent failure is visible in logs/alerting
     // instead of looking like a clean submission.
     if (zohoError) console.error("Quote Zoho sync failed:", zohoError)
+    if (zoho?.droppedAttribution?.length) {
+      console.warn("Zoho dropped attribution field(s):", zoho.droppedAttribution.join(", "))
+    }
     return res.status(200).json({
       success: true,
       message: "Quote request submitted successfully",
       zoho: zoho?.ok ? "synced" : "pending",
       zohoError: zoho?.ok ? null : zohoError,
+      // T7 test plan: fields Zoho rejected (should be [] once the custom
+      // fields exist on the Leads module).
+      zohoDroppedFields: zoho?.droppedAttribution || [],
     })
   } catch (error) {
     console.error("Error in submitQuote handler:", error)

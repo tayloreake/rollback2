@@ -59,7 +59,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, message: "'message' field is required" });
     }
 
-    const result = await sendSalesEmail(message, {}, {
+    const result = await sendSalesEmail(message, inquiry?.attribution || {}, {
       to: pickRecipients(req.body.to),
       subject: cleanSubject(req.body.subject, "Taylor Movers Website Message"),
     });
@@ -93,6 +93,10 @@ export default async function handler(req, res) {
         const zoho = await syncInquiryToZoho(inquiry)
         if (!zoho?.ok && !zoho?.skipped) {
           console.error("Zoho inquiry sync failed:", zoho?.error || "unknown")
+        } else if (zoho?.droppedAttribution?.length) {
+          // A custom field is missing/invalid in this CRM org — visible in
+          // logs instead of silently losing campaign attribution.
+          console.warn("Zoho dropped attribution field(s):", zoho.droppedAttribution.join(", "))
         }
       } catch (e) {
         console.error("Zoho inquiry sync threw:", e?.message)

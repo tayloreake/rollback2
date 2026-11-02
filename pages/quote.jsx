@@ -5,7 +5,9 @@ import ReCAPTCHA from "../components/SafeRecaptcha"
 import PageTitle from "../components/PageTitle"
 import getPageMetadata from "../SEO/seo"
 import Head from 'next/head'
-import { getAttribution } from '../utils/attribution'
+import { getFormAttribution } from '../utils/attribution'
+import { gtmPushLead } from '../utils/gtm'
+import AttributionHiddenFields from '../components/AttributionHiddenFields'
 
 const Quote = () => {
   const [fname, setFname] = useState("")
@@ -79,7 +81,7 @@ const Quote = () => {
             bedrooms: bedrooms,
             moveDate: moveDate,
             referrals: ref,
-            attribution: getAttribution(),
+            attribution: getFormAttribution(),
           },
         }),
       });
@@ -93,18 +95,15 @@ const Quote = () => {
 
       setLastSubmissionTime(now);
       toast.success("Quote request submitted successfully! We'll contact you soon.");
-      try {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: 'generate_lead',
-          form_id: 'quote',
-          move_type: moveType,
-          bedrooms: bedrooms,
-          lead_source: ref,
-          value: 1,
-          currency: 'KES',
-        });
-      } catch (e) { /* no-op */ }
+      // T6/T7 — single lead push carrying campaign_id/gclid/utm_* (GTM fires
+      // the GA4 key event + Google Ads conversion off `generate_lead`).
+      gtmPushLead({
+        formId: 'quote',
+        move_type: moveType,
+        bedrooms: bedrooms,
+        referral: ref,
+        attribution: getFormAttribution(),
+      });
       // Keep the toast visible, then follow the same funnel as Quote/Form.jsx:
       // land on /ThankYou (lowercase /thank-you 301s there) so the Ads
       // conversion has a page-based fallback trigger too.
@@ -286,6 +285,8 @@ const Quote = () => {
               <button type='submit' disabled={isSubmitting} className='w-full bg-[#FF5000] hover:bg-[#D94300] text-white font-bold py-4 rounded-xl shadow-lg disabled:opacity-50'>{isSubmitting ? 'Submitting secure request…' : 'Submit Quote Request →'}</button>
               <p className='text-[12px] text-slate-500 mt-3 text-center'>🔒 Encrypted & confidential. We never share your details. By submitting you agree to be contacted about your move.</p>
             </div>
+            {/* T7 — hidden UTM/GCLID/Campaign_ID attribution fields */}
+            <AttributionHiddenFields />
           </form>
         </div>
         <aside className='flex flex-col gap-4'>

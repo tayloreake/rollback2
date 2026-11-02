@@ -51,6 +51,7 @@ export function formatAttributionBlock(attribution = {}) {
   return [
     "--- Attribution ---",
     `utm: ${(attribution.utm_source || "")}/${(attribution.utm_medium || "")}/${(attribution.utm_campaign || "")}`,
+    `campaign_id: ${attribution.campaign_id || ""}`,
     `gclid: ${attribution.gclid || ""}`,
     `landing: ${attribution.landing_page || ""}`,
     `referrer: ${attribution.referrer || ""}`,

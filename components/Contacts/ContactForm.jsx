@@ -2,6 +2,9 @@
 import React, { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import ReCAPTCHA from "../SafeRecaptcha"
+import AttributionHiddenFields from "../AttributionHiddenFields"
+import { getFormAttribution } from "../../utils/attribution"
+import { gtmPushLead } from "../../utils/gtm"
 
 const ContactForm = () => {
     const [fname, setFname] = useState("")
@@ -49,6 +52,8 @@ const ContactForm = () => {
                   phone: number,
                   source: "Contact Form",
                   notes: `Contact via website | From: ${fname} ${lname} | ${message.slice(0, 150)}`,
+                  // T7 — first-touch attribution (UTM/GCLID/Campaign_ID)
+                  attribution: getFormAttribution(),
                 },
             }
             const smsResponse = await fetch("/api/sendSms", {
@@ -102,6 +107,12 @@ const ContactForm = () => {
         if (!fname || !lname || !email || !number || !message)
             return toast.error("Please fill in all fields correctly")
         if (isValidPhoneNumber(number)) {
+            // T6/T7 — lead push with campaign attribution (GTM → GA4/Ads)
+            gtmPushLead({
+                formId: "contact",
+                referral: "",
+                attribution: getFormAttribution(),
+            })
             // Phone number is valid, proceed with form submission
             handleSendSMS()
             // Add your form submission logic here
@@ -190,6 +201,8 @@ const ContactForm = () => {
                 className='font-bold px-4 py-2 mb-2 bg-[#F05423] text-white w-full rounded-xl'>
                 Send Message
             </button>
+            {/* T7 — hidden UTM/GCLID/Campaign_ID attribution fields */}
+            <AttributionHiddenFields />
         </form>
     )
 };

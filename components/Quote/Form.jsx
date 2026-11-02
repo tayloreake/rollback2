@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { toast } from "react-toastify"
 import ReCAPTCHA from "../SafeRecaptcha"
 import useFormPersistence from "../../hooks/useFormPersistence"
-import { getAttribution } from "../../utils/attribution"
+import AttributionHiddenFields from "../AttributionHiddenFields"
+import { getFormAttribution } from "../../utils/attribution"
+import { gtmPushLead } from "../../utils/gtm"
 
 // Helper function to get current date
 function getCurrentDate() {
@@ -105,18 +107,15 @@ const QuoteForm = () => {
 
   useEffect(() => {
     if (formSubmitted) {
-      try {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: 'generate_lead',
-          form_id: 'quote',
-          move_type: formData.moveType,
-          bedrooms: formData.bedrooms,
-          lead_source: formData.ref,
-          value: 1,
-          currency: 'KES',
-        });
-      } catch (e) { /* no-op */ }
+      // T6/T7 — single lead push (GA4 key event + Google Ads conversion in
+      // GTM fire off `generate_lead`; it now carries campaign_id/gclid/utm_*).
+      gtmPushLead({
+        formId: "quote",
+        move_type: formData.moveType,
+        bedrooms: formData.bedrooms,
+        referral: formData.ref,
+        attribution: getFormAttribution(),
+      });
       window.dispatchEvent(new CustomEvent("tayloreaFormSubmitted", {
         detail: { status: "success", timestamp: Date.now() }
       }));
@@ -178,7 +177,7 @@ const QuoteForm = () => {
         bedrooms: formData.bedrooms,
         moveDate: formData.moveDate,
         referrals: formData.ref,
-        attribution: getAttribution(),
+        attribution: getFormAttribution(),
       };
 
       const response = await Promise.race([
@@ -421,6 +420,9 @@ const QuoteForm = () => {
           <div className='w-full'>
             <ReCAPTCHA ref={recaptchaRef} size='invisible' sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} />
           </div>
+
+          {/* T7 — hidden UTM/GCLID/Campaign_ID attribution fields */}
+          <AttributionHiddenFields />
         </form>
       </div>
 

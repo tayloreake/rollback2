@@ -57,3 +57,51 @@ carries the real Zoho error instead of failing silently.
 - GTM Preview → test quote on staging → Publish.
 - Search Console: resubmit `sitemap.xml` (old casing 301s are in
   `next.config.js` redirects).
+
+## 7. T6/T7 — attribution: hidden fields + dataLayer (IN CODE, not GTM)
+
+Everything below ships with the site. **Do not paste the playbook's Custom
+HTML block into GTM** — it re-reads URL params only (no cookie), so it would
+blank the hidden fields on any page reached without `?campaign_id=...`, and
+`querySelector` throws on pages that have no such inputs.
+
+### Hidden fields (Quote form ×2 + Contact form)
+`utm_source`, `utm_medium`, `utm_campaign`, `gclid`, `campaign_id` — rendered
+by `components/AttributionHiddenFields.jsx`, filled from the 90-day first-touch
+cookie (`utils/attribution.js`, `tm_attr`) with URL-param fallback. The server
+payload uses the same source (`getFormAttribution()`), so DOM and CRM agree.
+
+### dataLayer events pushed by the site
+| Event | Fired by | Fields |
+|-------|----------|--------|
+| `generate_lead` | Quote + Contact submit (`gtmPushLead`) | `form_id`, `lead_source` (normalised), `referral_answer`, `campaign_id`, `gclid`, `utm_source/medium/campaign`, `user_id`, `move_type`, `bedrooms`, `value`, `currency`, `timestamp` |
+| `whatsapp_click` | any `wa.me` link (`useClickTracking`) | `whatsapp_ref`, `channel`, `campaign_id` |
+| `phone_click` | any `tel:` link + Navbar | `phone_number`, `campaign_id` |
+
+**The playbook calls the lead event `lead`. This site pushes `generate_lead`**
+because the GA4 key event *and* the Google Ads conversion (AW-966026451) are
+already triggered off it (§2/§3 above) — adding a second `lead` event would
+double-count the moment a trigger is created for it. Keep the existing
+triggers; they now receive campaign attribution automatically.
+
+`lead_source` values (playbook T3 normalisation):
+`Google Ads | Meta Ads | WhatsApp | Google Business Profile | Referral | Email | Other`.
+
+### Zoho CRM (Leads module)
+`Campaign_ID`, `UTM_Source`, `UTM_Medium`, `UTM_Campaign`, `GCLID`,
+`Lead_Source` are written with every website lead (quotes *and* inquiries).
+If one of those fields does not exist yet in the CRM org (or is a restricted
+picklist), Zoho rejects **only that field** and the write still succeeds —
+check `zohoDroppedFields` in the `POST /api/submitQuote` response (must be
+`[]` once the custom fields are created) and the server log line
+`Zoho rejected field "..."`.
+
+### Test plan (3 records, then delete them)
+1. `taylorea.com/?campaign_id=CAM-GOOGLE-20261012-001&gclid=TEST&utmsource…` →
+   submit Quote form → Zoho lead with `Campaign_ID`, `GCLID`, `Lead_Source=Google Ads`,
+   and `generate_lead` in GA4 DebugView.
+2. Meta link with `?campaign_id=CAM-META-20261015-002&utm_source=meta` →
+   submit Contact form → `Lead_Source=Meta Ads`.
+3. Any `wa.me` link → GTM Preview shows `whatsapp_click` with `whatsapp_ref`
+   and `campaign_id` → submit a form → `Lead_Source=WhatsApp`.
+

@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from "react"
 import ReCAPTCHA from "../SafeRecaptcha"
+import { getFormAttribution } from "../../utils/attribution"
 
 const ratingAreas = [
   "Ease in contacting Taylor Movers",
@@ -139,6 +140,8 @@ const FeedbackForm = () => {
             phone: contactInfo.includes("@") ? "" : contactInfo.trim(),
             source: "Feedback",
             notes: `Feedback NPS ${nps}/10 | Completed: ${completed} | Heard: ${heardAbout}`,
+            // T7 — first-touch attribution (UTM/GCLID/Campaign_ID)
+            attribution: getFormAttribution(),
           },
         }),
       })

@@ -19,6 +19,7 @@ import { Montserrat } from 'next/font/google'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useGTM, useScrollTracking } from '../hooks/useGTM'
+import { useClickTracking } from '../hooks/useClickTracking'
 
 // GA4 is managed in GTM (container GTM-W6T72F2Z), NOT hard-coded here.
 // Single WOFF2 font loading (audit §2 P1) — replaces local OTF/TTF,
@@ -43,6 +44,9 @@ function MyApp({ Component, pageProps }) {
 
   // First-touch attribution (UTM/gclid/landing in a 90-day cookie)
   useEffect(() => { initAttribution() }, [])
+
+  // T6: tel: / wa.me clicks → dataLayer (whatsapp_click, phone_click)
+  useClickTracking()
   
   // Initialize scroll depth tracking
   useScrollTracking()
