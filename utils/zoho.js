@@ -100,10 +100,15 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
       Move_Date: String(quote.moveDate || "").slice(0, 50) || undefined,
       GCLID: String(attribution.gclid || "").slice(0, 100) || undefined,
       SalesIQ_Visitor_ID: String(attribution.siq_visitor_id || "").slice(0, 100) || undefined,
-      Quote_Notes: [
-        `UTM: ${(attribution.utm_source || "")}/${(attribution.utm_medium || "")}/${(attribution.utm_campaign || "")}`,
-        `landing: ${attribution.landing_page || ""}`,
-      ].join(" | ").slice(0, 255),
+      // T7: first-touch attribution mapped to dedicated CRM fields (created 2 Nov 2026)
+      Campaign_ID: String(attribution.campaign_id || "").slice(0, 100) || undefined,
+      UTM_Source: String(attribution.utm_source || "").slice(0, 100) || undefined,
+      UTM_Medium: String(attribution.utm_medium || "").slice(0, 100) || undefined,
+      UTM_Campaign: String(attribution.utm_campaign || "").slice(0, 255) || undefined,
+      UTM_Term: String(attribution.utm_term || "").slice(0, 255) || undefined,
+      UTM_Content: String(attribution.utm_content || "").slice(0, 255) || undefined,
+      Landing_Page: String(attribution.landing_page || "").slice(0, 255) || undefined,
+      Referrer_URL: String(attribution.referrer || "").slice(0, 255) || undefined,
     }
     if (recordId) {
       // duplicate_check_fields makes the upsert idempotent on Email.
@@ -123,19 +128,32 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
 
 // Generic non-quote inquiry (contact / feedback / job application) → the same
 // Website Inquiries section, distinguished by Lead_Source. Fire-and-forget.
-export async function syncInquiryToZoho({ name, email, phone, source, notes, gclid, siq_visitor_id } = {}) {
+export async function syncInquiryToZoho({ name, email, phone, source, notes, gclid, siq_visitor_id, attribution = {} } = {}) {
   if (!zohoConfigured()) {
     return { skipped: true }
   }
   try {
+    // attribution = utils/attribution cookie (UTMs, campaign_id, landing, referrer).
+    // Optional so existing callers (reviews, newsletter) keep working; explicit gclid/siq args win.
+    const att = attribution || {}
+    const g = gclid || att.gclid || ""
+    const siq = siq_visitor_id || att.siq_visitor_id || ""
     const record = {
       Name: String(name || "Website Inquiry").slice(0, 100),
       Email: String(email || "").trim() || undefined,
       Phone: String(phone || "").slice(0, 30) || undefined,
       Lead_Source: String(source || "Website").slice(0, 100),
       Quote_Notes: String(notes || "").slice(0, 255) || undefined,
-      GCLID: String(gclid || "").slice(0, 100) || undefined,
-      SalesIQ_Visitor_ID: String(siq_visitor_id || "").slice(0, 100) || undefined,
+      GCLID: String(g).slice(0, 100) || undefined,
+      SalesIQ_Visitor_ID: String(siq).slice(0, 100) || undefined,
+      Campaign_ID: String(att.campaign_id || "").slice(0, 100) || undefined,
+      UTM_Source: String(att.utm_source || "").slice(0, 100) || undefined,
+      UTM_Medium: String(att.utm_medium || "").slice(0, 100) || undefined,
+      UTM_Campaign: String(att.utm_campaign || "").slice(0, 255) || undefined,
+      UTM_Term: String(att.utm_term || "").slice(0, 255) || undefined,
+      UTM_Content: String(att.utm_content || "").slice(0, 255) || undefined,
+      Landing_Page: String(att.landing_page || "").slice(0, 255) || undefined,
+      Referrer_URL: String(att.referrer || "").slice(0, 255) || undefined,
     }
     const created = await api("/Website_Quotes", "POST", { data: [record] })
     const id = created?.data?.[0]?.details?.id || null

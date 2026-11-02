@@ -76,8 +76,8 @@ const AdvancedSEO = ({
         "priceRange": "$$",
         "aggregateRating": {
           "@type": "AggregateRating",
-          "ratingValue": "4.8",
-          "reviewCount": "150"
+          "ratingValue": "4.9",
+          "reviewCount": "4000"
         },
         "serviceArea": {
           "@type": "GeoCircle",
