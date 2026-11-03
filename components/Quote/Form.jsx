@@ -102,7 +102,11 @@ const QuoteForm = () => {
   // Audit: was /^0\d{9}$/ which blocked +254/+44/+1 expat & embassy leads.
   const isValidPhoneNumber = (phoneNumber) => {
     if (!phoneNumber) return false
-    return /^\+?\d[\d\s-]{7,15}$/.test(phoneNumber.trim())
+    const v = phoneNumber.trim()
+    // International: optional + then digits with spaces, dashes, dots or parentheses; 7-15 digits total (E.164)
+    if (!/^\+?[0-9][0-9\s().-]{5,20}$/.test(v)) return false
+    const digits = v.replace(/\D/g, "")
+    return digits.length >= 7 && digits.length <= 15
   }
 
   useEffect(() => {
@@ -258,7 +262,7 @@ const QuoteForm = () => {
       return false;
     }
     if (!isValidPhoneNumber(formData.number)) {
-      toast.error(`Please enter a valid phone number (e.g. 0721410517 or +254721410517)`);
+      toast.error(`Please enter a valid phone number with country code (e.g. +254 721 410 517 or +44 20 7946 0958)`);
       return false;
     }
 
@@ -282,9 +286,8 @@ const QuoteForm = () => {
     selectedDate.setHours(0, 0, 0, 0);
     currentDate.setHours(0, 0, 0, 0);
 
-    console.log("Selected Date:", selectedDate, "Current Date:", currentDate);
     if (selectedDate < currentDate) {
-      toast.error("Please select a future date for the move");
+      toast.error("Please select today or a future date for the move");
       return false;
     }
     return true;
@@ -353,6 +356,8 @@ const QuoteForm = () => {
 
       <div className='px-6 py-5'>
         <form ref={formRef} onSubmit={handleSubmit} className='w-full flex flex-col gap-5'>
+          {/* Filled by Zoho zcga.js with the Google Ads click id */}
+          <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
           <div>
             <p className='text-[11px] font-bold tracking-widest uppercase text-[#FF5000] mb-3'>1 • Contact details</p>
             <div className='flex flex-col gap-4'>
@@ -363,7 +368,7 @@ const QuoteForm = () => {
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                 <div>
                   <label htmlFor='quote-phone' className={labelCls}>Phone / WhatsApp <span className='text-[#FF5000]'>*</span></label>
-                  <input type='tel' inputMode='tel' id='quote-phone' name='phone' autoComplete='tel' value={formData.number} required placeholder='+254 712 410 517' onChange={(e) => updateFormData('number', e.target.value)} className={inputCls} />
+                  <input type='tel' inputMode='tel' id='quote-phone' name='phone' autoComplete='tel' value={formData.number} required placeholder='+254 721 410 517 / +44 20 7946 0958' onChange={(e) => updateFormData('number', e.target.value)} className={inputCls} />
                 </div>
                 <div>
                   <label htmlFor='quote-email' className={labelCls}>Email</label>

@@ -199,6 +199,11 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
       Destination_Address_Street_Address: String(quote.destination || "").slice(0, 255) || undefined,
       Property_Size: String(quote.bedrooms || "").slice(0, 100) || undefined,
       Proposed_Move_Date: String(quote.moveDate || "").slice(0, 50) || undefined,
+      SalesIQ_Visitor_ID: String(attribution.siq_visitor_id || "").slice(0, 100) || undefined,
+      UTM_Term: String(attribution.utm_term || "").slice(0, 255) || undefined,
+      UTM_Content: String(attribution.utm_content || "").slice(0, 255) || undefined,
+      Landing_Page: String(attribution.landing_page || "").slice(0, 255) || undefined,
+      Referrer_URL: String(attribution.referrer || "").slice(0, 255) || undefined,
       // T7 — campaign attribution (playbook §4 field mapping)
       ...attributionRecord(attribution, quote.referrals || quote.ref || ""),
     }
@@ -212,11 +217,16 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
 // Generic non-quote inquiry (contact / feedback / job application) → Zoho Leads
 // module, distinguished by How_did_you_hear_about_us. Carries the same T7
 // attribution fields as quotes when the visitor arrived from a campaign.
-export async function syncInquiryToZoho({ name, email, phone, source, notes, attribution = {} } = {}) {
+export async function syncInquiryToZoho({ name, email, phone, source, notes, gclid, siq_visitor_id, attribution = {} } = {}) {
   if (!zohoConfigured()) {
     return { skipped: true }
   }
   try {
+    // attribution = utils/attribution cookie (UTMs, campaign_id, landing, referrer).
+    // Optional so existing callers (reviews, newsletter) keep working; explicit gclid/siq args win.
+    const att = attribution || {}
+    const g = gclid || att.gclid || ""
+    const siq = siq_visitor_id || att.siq_visitor_id || ""
     const record = {
       First_Name: String(name || "Website Inquiry").slice(0, 80),
       Last_Name: undefined,
@@ -224,7 +234,13 @@ export async function syncInquiryToZoho({ name, email, phone, source, notes, att
       Email: String(email || "").trim() || undefined,
       Phone: String(phone || "").slice(0, 30) || undefined,
       How_did_you_hear_about_us: String(source || "Website").slice(0, 100),
-      ...attributionRecord(attribution, source || ""),
+      Quote_Notes: String(notes || "").slice(0, 255) || undefined,
+      SalesIQ_Visitor_ID: String(siq).slice(0, 100) || undefined,
+      UTM_Term: String(att.utm_term || "").slice(0, 255) || undefined,
+      UTM_Content: String(att.utm_content || "").slice(0, 255) || undefined,
+      Landing_Page: String(att.landing_page || "").slice(0, 255) || undefined,
+      Referrer_URL: String(att.referrer || "").slice(0, 255) || undefined,
+      ...attributionRecord({ ...att, ...(g ? { gclid: g } : {}) }, source || ""),
     }
     const { id, dropped } = await writeLead(record, null)
     return { ok: true, leadId: id, droppedAttribution: dropped }

@@ -1,9 +1,10 @@
 // ContactForm.jsx
 import React, { useState, useRef } from "react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 import ReCAPTCHA from "../SafeRecaptcha"
 import AttributionHiddenFields from "../AttributionHiddenFields"
-import { getFormAttribution } from "../../utils/attribution"
+import { getAttribution, getFormAttribution } from "../../utils/attribution"
 import { gtmPushLead } from "../../utils/gtm"
 
 const ContactForm = () => {
@@ -13,10 +14,15 @@ const ContactForm = () => {
     const [number, setNumber] = useState("")
     const [message, setMessage] = useState("")
     const recaptchaRef = useRef(null)
+    const router = useRouter()
 
     const isValidPhoneNumber = (phoneNumber) => {
         if (!phoneNumber) return false
-        return /^\+?\d[\d\s-]{7,15}$/.test(phoneNumber.trim())
+        const v = phoneNumber.trim()
+        // International: optional + then digits with spaces, dashes, dots or parentheses; 7-15 digits total (E.164)
+        if (!/^\+?[0-9][0-9\s().-]{5,20}$/.test(v)) return false
+        const digits = v.replace(/\D/g, "")
+        return digits.length >= 7 && digits.length <= 15
     }
 
     const handleSendSMS = async () => {
@@ -42,6 +48,8 @@ const ContactForm = () => {
             if (!emailToken) {
                 throw new Error('Failed to verify reCAPTCHA for email');
             }
+            const att = getAttribution();
+            const formAtt = getFormAttribution();
             const emailOptions = {
                 message: messageContent,
                 recaptchaToken: emailToken,
@@ -51,9 +59,12 @@ const ContactForm = () => {
                   email: email,
                   phone: number,
                   source: "Contact Form",
+                  // Full first-touch attribution (UTMs, campaign_id, landing, referrer) + Google Ads
+                  // click id + SalesIQ visitor id, so the CRM record ties to the ad click and visit history
+                  attribution: { ...att, ...formAtt },
+                  gclid: att.gclid || formAtt.gclid || "",
+                  siq_visitor_id: att.siq_visitor_id || formAtt.siq_visitor_id || "",
                   notes: `Contact via website | From: ${fname} ${lname} | ${message.slice(0, 150)}`,
-                  // T7 — first-touch attribution (UTM/GCLID/Campaign_ID)
-                  attribution: getFormAttribution(),
                 },
             }
             const smsResponse = await fetch("/api/sendSms", {
@@ -84,6 +95,8 @@ const ContactForm = () => {
             setEmail("")
             setMessage("")
             setNumber("")
+            // Success: send the visitor to the thank-you page
+            router.push("/ThankYou")
         } catch (error) {
             console.error("Error sending SMS/email:", error)
         }
@@ -119,13 +132,15 @@ const ContactForm = () => {
             toast.success("Your message has been sent")
         } else {
             // Phone number does not match the required format, show error message
-            toast.error("Phone number does not match the required format +254...")
+            toast.error("Please enter a valid phone number with country code (e.g. +254 721 410 517 or +44 20 7946 0958)")
         }
     }
     return (
         <form
             onSubmit={(e) => handleSubmit(e)}
             className='flex-col'>
+          {/* Filled by Zoho zcga.js with the Google Ads click id */}
+          <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
             <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
                 <div className='rounded-xl relative w-full mb-4 md:mr-2'>
                     <label className='font-[600] text-sm text-gray-600 mb-1'>
@@ -176,7 +191,7 @@ const ContactForm = () => {
                     type='text'
                     value={number}
                     required
-                    placeholder="0712345678"
+                    placeholder="+254 721 410 517 / +44 20 7946 0958"
                     onChange={(e) => setNumber(e.target.value)}
                     className='px-2 w-full py-2 rounded-xl'
                 />

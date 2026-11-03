@@ -29,7 +29,11 @@ const Quote = () => {
 
   const isValidPhoneNumber = (phoneNumber) => {
     if (!phoneNumber) return false
-    return /^\+?\d[\d\s-]{7,15}$/.test(phoneNumber.trim())
+    const v = phoneNumber.trim()
+    // International: optional + then digits with spaces, dashes, dots or parentheses; 7-15 digits total (E.164)
+    if (!/^\+?[0-9][0-9\s().-]{5,20}$/.test(v)) return false
+    const digits = v.replace(/\D/g, "")
+    return digits.length >= 7 && digits.length <= 15
   }
 
   const isValidName = (name) => {
@@ -172,7 +176,7 @@ const Quote = () => {
       return false;
     }
     if (!isValidPhoneNumber(number)) {
-      toast.error(`Please enter a valid phone number (e.g. 0721410517 or +254721410517)`);
+      toast.error(`Please enter a valid phone number with country code (e.g. +254 721 410 517 or +44 20 7946 0958)`);
       return false;
     }
     
@@ -193,8 +197,10 @@ const Quote = () => {
     
     const selectedDate = new Date(moveDate);
     const currentDate = new Date();
+    selectedDate.setHours(0, 0, 0, 0);
+    currentDate.setHours(0, 0, 0, 0);
     if (selectedDate < currentDate) {
-      toast.error("Please select a future date for the move");
+      toast.error("Please select today or a future date for the move");
       return false;
     }
     return true;
@@ -271,8 +277,10 @@ const Quote = () => {
             <div className='flex gap-2 text-[12px]'><a href='https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20(ref%3A%20WEB)' target='_blank' rel='noreferrer' className='px-3 py-2 rounded-lg bg-green-600 text-white font-semibold'>WhatsApp</a><a href='tel:+254721410517' className='px-3 py-2 rounded-lg bg-slate-900 text-white font-semibold'>Call Sales</a></div>
           </div>
           <form onSubmit={handleSubmit} className='px-6 md:px-8 py-6 grid md:grid-cols-2 gap-5'>
+            {/* Filled by Zoho zcga.js with the Google Ads click id */}
+            <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
             <div><label htmlFor='q-fname' className={labelCls}>Full Name *</label><input id='q-fname' name='name' autoComplete='name' type='text' value={fname} required onChange={(e) => setFname(e.target.value)} placeholder="e.g. Brian O&apos;Brien" className={inputCls} /></div>
-            <div><label htmlFor='q-phone' className={labelCls}>Phone / WhatsApp *</label><input id='q-phone' name='phone' autoComplete='tel' type='tel' inputMode='tel' value={number} required onChange={(e) => setNumber(e.target.value)} placeholder='+254 712 410 517' className={inputCls} /></div>
+            <div><label htmlFor='q-phone' className={labelCls}>Phone / WhatsApp *</label><input id='q-phone' name='phone' autoComplete='tel' type='tel' inputMode='tel' value={number} required onChange={(e) => setNumber(e.target.value)} placeholder='+254 721 410 517 / +44 20 7946 0958' className={inputCls} /></div>
             <div><label htmlFor='q-email' className={labelCls}>Email</label><input id='q-email' name='email' autoComplete='email' type='email' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='you@company.com (optional)' className={inputCls} /></div>
             <div><label htmlFor='q-date' className={labelCls}>Preferred Move Date *</label><input id='q-date' name='moveDate' type='date' value={moveDate} onChange={handleDateChange} className={inputCls} /></div>
             <div><label htmlFor='q-from' className={labelCls}>Moving From *</label><input id='q-from' name='from' type='text' value={location} onChange={(e) => setLocation(e.target.value)} placeholder='Westlands, Nairobi' className={inputCls} /></div>

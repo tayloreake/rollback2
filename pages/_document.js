@@ -8,7 +8,7 @@ export default function Document() {
                 chooses in ConsentBanner (audit §1 P1). Must run before GTM. */}
             <script
                 dangerouslySetInnerHTML={{
-                    __html: `window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments)};window.gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});`,
+                    __html: `window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments)};window.gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});try{var c=JSON.parse(localStorage.getItem('tm-consent-v1')||'null');if(c){var a=c.analytics?'granted':'denied',d=c.ads?'granted':'denied';window.gtag('consent','update',{analytics_storage:a,ad_storage:d,ad_user_data:d,ad_personalization:d});}}catch(e){}`,
                 }}
             />
             {/* GA4 is owned SOLELY by GTM (container GTM-W6T72F2Z).
