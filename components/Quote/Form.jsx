@@ -3,6 +3,7 @@ import { toast } from "react-toastify"
 import ReCAPTCHA from "../SafeRecaptcha"
 import useFormPersistence from "../../hooks/useFormPersistence"
 import { getAttribution } from "../../utils/attribution"
+import { newEventId, getMetaContext } from "../../utils/metaTracking"
 
 // Helper function to get current date
 function getCurrentDate() {
@@ -75,6 +76,7 @@ const QuoteForm = () => {
   const [showPersistedDataNotice, setShowPersistedDataNotice] = useState(false)
   const recaptchaRef = useRef(null)
   const formRef = useRef(null)
+  const leadEventIdRef = useRef(null)
 
   // Show notice if persisted data was loaded
   useEffect(() => {
@@ -113,6 +115,7 @@ const QuoteForm = () => {
           move_type: formData.moveType,
           bedrooms: formData.bedrooms,
           lead_source: formData.ref,
+          event_id: leadEventIdRef.current || undefined,
           value: 1,
           currency: 'KES',
         });
@@ -167,6 +170,9 @@ const QuoteForm = () => {
         throw new Error('Failed to verify reCAPTCHA');
       }
 
+      // One event_id shared by browser pixel and server CAPI (dedupe)
+      leadEventIdRef.current = newEventId()
+
       // Prepare quote data for the server
       const quoteDataForLogging = {
         firstName: formData.fname,
@@ -190,7 +196,8 @@ const QuoteForm = () => {
           body: JSON.stringify({
             message: tayloreaMessageContent,
             recaptchaToken: token,
-            quoteData: quoteDataForLogging
+            quoteData: quoteDataForLogging,
+            meta: getMetaContext(leadEventIdRef.current),
           }),
         }),
         createTimeoutPromise(30000) // 30 second timeout

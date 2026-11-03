@@ -8,6 +8,7 @@ import { rateLimiter } from "./middleware/rateLimiter"
 import { getClientIp, getDetailedIpInfo, getGeolocation } from "../../utils/getClientIp"
 import { verifyRecaptcha, validateQuoteData, sendSalesEmail, sendLeadSms } from "../../utils/leadNotify"
 import { syncQuoteToZoho } from "../../utils/zoho"
+import { sendLeadToMeta } from "../../utils/metaCapi"
 
 const limiter = rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 })
 
@@ -32,7 +33,7 @@ export default async function handler(req, res) {
   const ipAddress = getClientIp(req)
   try {
     await limiter(req)
-    const { message, recaptchaToken, quoteData } = req.body
+    const { message, recaptchaToken, quoteData, meta } = req.body
     if (!recaptchaToken) {
       return res.status(400).json({ success: false, message: "reCAPTCHA token is required" })
     }
@@ -75,6 +76,20 @@ export default async function handler(req, res) {
       zohoError = e?.message || "Zoho sync threw"
       console.error("Quote Zoho sync threw:", zohoError)
       zoho = { ok: false, error: zohoError }
+    }
+
+    // 3. Meta Conversions API (T15b). Consent-gated, deduped with the browser
+    // pixel by event_id. Failures are logged only and never block the lead.
+    try {
+      const capi = await sendLeadToMeta({
+        quoteData,
+        meta: meta || {},
+        ip: ipAddress,
+        userAgent: req.headers["user-agent"],
+      })
+      if (!capi.ok && !capi.skipped) console.error("Meta CAPI failed:", capi.error)
+    } catch (e) {
+      console.error("Meta CAPI threw:", e?.message)
     }
 
     if (!mail.ok && !sms.ok) {

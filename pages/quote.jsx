@@ -6,6 +6,7 @@ import PageTitle from "../components/PageTitle"
 import getPageMetadata from "../SEO/seo"
 import Head from 'next/head'
 import { getAttribution } from '../utils/attribution'
+import { newEventId, getMetaContext } from '../utils/metaTracking'
 
 const Quote = () => {
   const [fname, setFname] = useState("")
@@ -61,6 +62,7 @@ const Quote = () => {
         throw new Error('Failed to verify reCAPTCHA');
       }
 
+      const leadEventId = newEventId();
       const response = await fetch("/api/submitQuote", {
         method: "POST",
         headers: {
@@ -69,6 +71,7 @@ const Quote = () => {
         body: JSON.stringify({
           message: tayloreaMessageContent,
           recaptchaToken: token,
+          meta: getMetaContext(leadEventId),
           quoteData: {
             firstName: fname,
             email: email,
@@ -101,6 +104,7 @@ const Quote = () => {
           move_type: moveType,
           bedrooms: bedrooms,
           lead_source: ref,
+          event_id: leadEventId,
           value: 1,
           currency: 'KES',
         });
