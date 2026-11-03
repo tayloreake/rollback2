@@ -27,29 +27,17 @@ const ContactForm = () => {
 
     const handleSendSMS = async () => {
         const messageContent = formatMessageContent()
+        const att = getAttribution()
+        const formAtt = getFormAttribution()
 
+        // 1. Email + Zoho first — that is the system of record. The internal
+        // SMS alert must never block a lead from reaching the CRM.
+        let emailOk = false
         try {
-            const options = {
-                to: [`+254721410517`],
-                message: messageContent,
-                recaptchaToken: null, // Will be set after reCAPTCHA verification
-            }
-
-            const smsToken = await recaptchaRef.current?.executeAsync?.();
-            if (!smsToken) {
-                throw new Error('Failed to verify reCAPTCHA for SMS');
-            }
-            options.recaptchaToken = smsToken;
-
-            recaptchaRef.current.reset();
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for reset
-            // Then send email
             const emailToken = await recaptchaRef.current?.executeAsync?.();
             if (!emailToken) {
                 throw new Error('Failed to verify reCAPTCHA for email');
             }
-            const att = getAttribution();
-            const formAtt = getFormAttribution();
             const emailOptions = {
                 message: messageContent,
                 recaptchaToken: emailToken,
@@ -67,18 +55,6 @@ const ContactForm = () => {
                   notes: `Contact via website | From: ${fname} ${lname} | ${message.slice(0, 150)}`,
                 },
             }
-            const smsResponse = await fetch("/api/sendSms", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(options),
-            })
-            if (!smsResponse.ok) {
-                const errorData = await smsResponse.json();
-                toast.error(errorData.error || errorData.message || 'Failed to send SMS')
-                throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
-            }
             const emailResponse = await fetch("/api/sendEmail", {
                 method: "POST",
                 headers: {
@@ -86,10 +62,43 @@ const ContactForm = () => {
                 },
                 body: JSON.stringify(emailOptions),
             })
-            const smsData = await smsResponse.json()
-            const emailData = await emailResponse.json()
+            const emailData = await emailResponse.json().catch(() => ({}))
+            if (!emailResponse.ok) {
+                toast.error(emailData.error || emailData.message || "Failed to send your message")
+            } else {
+                emailOk = true
+            }
+        } catch (error) {
+            console.error("Error sending contact email:", error)
+            toast.error("We couldn't send your message. Please call us on +254 721 410 517.")
+        }
 
-            // toast.success("Request submitted")
+        // 2. Best-effort internal SMS alert (owner notification only).
+        try {
+            recaptchaRef.current.reset();
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for reset
+            const smsToken = await recaptchaRef.current?.executeAsync?.();
+            if (smsToken) {
+                const smsResponse = await fetch("/api/sendSms", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        to: [`+254721410517`],
+                        message: messageContent,
+                        recaptchaToken: smsToken,
+                    }),
+                })
+                if (!smsResponse.ok) {
+                    console.warn("Contact SMS notification failed:", smsResponse.status)
+                }
+            }
+        } catch (error) {
+            console.warn("Contact SMS notification failed:", error)
+        }
+
+        if (emailOk) {
             setFname("")
             setLname("")
             setEmail("")
@@ -97,8 +106,6 @@ const ContactForm = () => {
             setNumber("")
             // Success: send the visitor to the thank-you page
             router.push("/ThankYou")
-        } catch (error) {
-            console.error("Error sending SMS/email:", error)
         }
     }
     const formatMessageContent = () => {
@@ -128,8 +135,6 @@ const ContactForm = () => {
             })
             // Phone number is valid, proceed with form submission
             handleSendSMS()
-            // Add your form submission logic here
-            toast.success("Your message has been sent")
         } else {
             // Phone number does not match the required format, show error message
             toast.error("Please enter a valid phone number with country code (e.g. +254 721 410 517 or +44 20 7946 0958)")
