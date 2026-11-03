@@ -6,6 +6,14 @@ import AttributionHiddenFields from "../AttributionHiddenFields"
 import { getFormAttribution } from "../../utils/attribution"
 import { gtmPushLead } from "../../utils/gtm"
 
+// Split a "Full Name" input into Zoho's required First_Name / Last_Name pair.
+const splitName = (raw) => {
+  const parts = String(raw || "").trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return { firstName: "", lastName: "" }
+  if (parts.length === 1) return { firstName: "", lastName: parts[0] }
+  return { firstName: parts[0], lastName: parts.slice(1).join(" ") }
+}
+
 // Helper function to get current date
 function getCurrentDate() {
   const currentDate = new Date();
@@ -171,8 +179,10 @@ const QuoteForm = () => {
       }
 
       // Prepare quote data for the server
+      const nameParts = splitName(formData.fname)
       const quoteDataForLogging = {
-        firstName: formData.fname,
+        firstName: nameParts.firstName,
+        lastName: nameParts.lastName,
         email: formData.email,
         phoneNumber: formData.number,
         location: formData.location,

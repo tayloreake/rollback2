@@ -84,16 +84,48 @@ const leadSearch = async (email) => {
 // They are therefore sent as OPTIONAL extras: if a field doesn't exist yet in
 // this CRM org (or is a restricted picklist), Zoho rejects it and we drop
 // just that field — a missing custom field must never cost a lead.
-const ATTRIBUTION_FIELDS = ["Campaign_ID", "UTM_Source", "UTM_Medium", "UTM_Campaign", "Lead_Source"]
-// Least critical first: this is the order we sacrifice them when Zoho rejects
-// the record without naming the field. GCLID goes last — it is the one T15
-// (Google Ads offline conversions) cannot work without.
-const SACRIFICE_ORDER = ["Lead_Source", "UTM_Medium", "UTM_Campaign", "UTM_Source", "Campaign_ID", "GCLID"]
-const DROPPABLE = new Set(["GCLID", ...ATTRIBUTION_FIELDS])
+const ATTRIBUTION_FIELDS = ["Campaign_ID", "UTM_Source", "UTM_Medium", "UTM_Campaign", "UTM_Term", "Lead_Source"]
+// Fields that identify the lead itself. Zoho's Leads module mandates
+// Last_Name; everything else is optional and may be dropped, so a CRM schema
+// mismatch can never cost us a lead.
+const CORE_FIELDS = new Set(["First_Name", "Last_Name", "Email", "Phone"])
+// Least critical first: the order we sacrifice optional fields when Zoho
+// rejects the record without naming the field. GCLID goes near the end — it is
+// the one T15 (Google Ads offline conversions) cannot work without.
+const SACRIFICE_ORDER = [
+  "Description",
+  "Lead_Source",
+  "UTM_Term",
+  "UTM_Medium",
+  "UTM_Campaign",
+  "UTM_Source",
+  "Campaign_ID",
+  "GCLID",
+  "How_did_you_hear_about_us",
+  "Property_Size",
+  "Move_Types",
+  "Destination_Address_Street_Address",
+  "Origin_Address_Street_Address",
+  "Proposed_Move_Date",
+]
+const isDroppable = (name) => !CORE_FIELDS.has(name)
 
 const clean = (value, max = 100) => {
   const s = String(value || "").trim()
   return s ? s.slice(0, max) : undefined
+}
+
+// Split a display name into Zoho's First_Name / Last_Name pair.
+// Zoho Leads mandates Last_Name but not First_Name, so a single token becomes
+// Last_Name (mirrors splitFullName in utils/leadNotify.js).
+const splitName = (raw, max = 80) => {
+  const parts = String(raw || "").trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return { firstName: "", lastName: "" }
+  if (parts.length === 1) return { firstName: "", lastName: parts[0].slice(0, max) }
+  return {
+    firstName: parts[0].slice(0, max),
+    lastName: parts.slice(1).join(" ").slice(0, max),
+  }
 }
 
 // Only "your field is bad" errors are recoverable by dropping a field.
@@ -137,12 +169,15 @@ async function writeLead(record, existingId) {
       return { id, dropped }
     } catch (err) {
       if (!isFieldError(err)) throw err
-      // Never sacrifice a core field (name/phone/move data) to make a write pass.
+      // Never sacrifice a core field (name/phone) to make a write pass.
       let name = offendingField(err)
-      if (name && !DROPPABLE.has(name)) throw err
+      if (name && !isDroppable(name)) throw err
       if (!name || current[name] === undefined) {
-        name = SACRIFICE_ORDER.find((k) => current[k] !== undefined)
+        name = SACRIFICE_ORDER.find((k) => current[k] !== undefined && isDroppable(k))
       }
+      // Last resort: drop any remaining optional field so a future CRM schema
+      // change cannot block the lead entirely.
+      if (!name) name = Object.keys(current).find((k) => k !== "id" && isDroppable(k))
       if (!name) throw err
       delete current[name]
       dropped.push(name)
@@ -161,6 +196,7 @@ const attributionRecord = (attribution = {}, rawReferral = "") => ({
   UTM_Source: clean(attribution.utm_source),
   UTM_Medium: clean(attribution.utm_medium),
   UTM_Campaign: clean(attribution.utm_campaign),
+  UTM_Term: clean(attribution.utm_term),
   GCLID: clean(attribution.gclid),
   // Normalised channel (playbook T3): Google Ads | Meta Ads | WhatsApp | ...
   Lead_Source: clean(deriveLeadSource(attribution, rawReferral)),
@@ -172,10 +208,15 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
   }
   try {
     const email = String(quote.email || "").trim()
-    // Split firstName / lastName — both are required for Zoho Leads.
-    const firstName = String(quote.firstName || "").trim().slice(0, 80)
-    const lastName = String(quote.lastName || "").trim().slice(0, 80)
-    const displayName = [firstName, lastName].filter(Boolean).join(" ") || "Website Lead"
+    // Split firstName / lastName. Zoho Leads mandates Last_Name but not
+    // First_Name, so a single-name submission still becomes a valid lead.
+    let firstName = String(quote.firstName || "").trim().slice(0, 80)
+    let lastName = String(quote.lastName || "").trim().slice(0, 80)
+    if (!lastName && firstName) {
+      const split = splitName(firstName)
+      firstName = split.firstName
+      lastName = split.lastName
+    }
     // Dedupe is best-effort: a search failure must NEVER block the write
     // (this is what silently dropped every quote — the throw aborted before
     // the create). Fall through to a plain create instead.
@@ -187,10 +228,13 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
         console.warn("Zoho lead dedupe search failed (creating anyway):", e?.message)
       }
     }
+    // Only fields that exist on this CRM's Leads module are sent. Name,
+    // SalesIQ_Visitor_ID, UTM_Content, Landing_Page, Referrer_URL and
+    // Quote_Notes do not exist there — sending them made Zoho reject every
+    // lead (the real cause of "inquiries missing from the CRM").
     const record = {
       First_Name: firstName || undefined,
-      Last_Name: lastName || undefined,
-      Name: displayName,
+      Last_Name: lastName || firstName || "Website Lead",
       Email: email || undefined,
       Phone: String(quote.phoneNumber || "").slice(0, 30) || undefined,
       How_did_you_hear_about_us: String(quote.referrals || quote.ref || "Website").slice(0, 100),
@@ -199,11 +243,6 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
       Destination_Address_Street_Address: String(quote.destination || "").slice(0, 255) || undefined,
       Property_Size: String(quote.bedrooms || "").slice(0, 100) || undefined,
       Proposed_Move_Date: String(quote.moveDate || "").slice(0, 50) || undefined,
-      SalesIQ_Visitor_ID: String(attribution.siq_visitor_id || "").slice(0, 100) || undefined,
-      UTM_Term: String(attribution.utm_term || "").slice(0, 255) || undefined,
-      UTM_Content: String(attribution.utm_content || "").slice(0, 255) || undefined,
-      Landing_Page: String(attribution.landing_page || "").slice(0, 255) || undefined,
-      Referrer_URL: String(attribution.referrer || "").slice(0, 255) || undefined,
       // T7 — campaign attribution (playbook §4 field mapping)
       ...attributionRecord(attribution, quote.referrals || quote.ref || ""),
     }
@@ -217,7 +256,7 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
 // Generic non-quote inquiry (contact / feedback / job application) → Zoho Leads
 // module, distinguished by How_did_you_hear_about_us. Carries the same T7
 // attribution fields as quotes when the visitor arrived from a campaign.
-export async function syncInquiryToZoho({ name, email, phone, source, notes, gclid, siq_visitor_id, attribution = {} } = {}) {
+export async function syncInquiryToZoho({ name, email, phone, source, notes, gclid, attribution = {} } = {}) {
   if (!zohoConfigured()) {
     return { skipped: true }
   }
@@ -226,20 +265,20 @@ export async function syncInquiryToZoho({ name, email, phone, source, notes, gcl
     // Optional so existing callers (reviews, newsletter) keep working; explicit gclid/siq args win.
     const att = attribution || {}
     const g = gclid || att.gclid || ""
-    const siq = siq_visitor_id || att.siq_visitor_id || ""
+    const full = String(name || "").trim()
+    const split = splitName(full)
+    // Only fields that exist on this CRM's Leads module are sent. Name,
+    // SalesIQ_Visitor_ID, UTM_Content, Landing_Page, Referrer_URL and
+    // Quote_Notes do not exist there — sending them made Zoho reject every
+    // inquiry. Description is the standard notes field.
     const record = {
-      First_Name: String(name || "Website Inquiry").slice(0, 80),
-      Last_Name: undefined,
-      Name: String(name || "Website Inquiry").slice(0, 100),
+      First_Name: split.firstName || undefined,
+      // Zoho Leads mandates Last_Name.
+      Last_Name: split.lastName || full.slice(0, 80) || "Website Inquiry",
       Email: String(email || "").trim() || undefined,
       Phone: String(phone || "").slice(0, 30) || undefined,
       How_did_you_hear_about_us: String(source || "Website").slice(0, 100),
-      Quote_Notes: String(notes || "").slice(0, 255) || undefined,
-      SalesIQ_Visitor_ID: String(siq).slice(0, 100) || undefined,
-      UTM_Term: String(att.utm_term || "").slice(0, 255) || undefined,
-      UTM_Content: String(att.utm_content || "").slice(0, 255) || undefined,
-      Landing_Page: String(att.landing_page || "").slice(0, 255) || undefined,
-      Referrer_URL: String(att.referrer || "").slice(0, 255) || undefined,
+      Description: String(notes || "").slice(0, 500) || undefined,
       ...attributionRecord({ ...att, ...(g ? { gclid: g } : {}) }, source || ""),
     }
     const { id, dropped } = await writeLead(record, null)

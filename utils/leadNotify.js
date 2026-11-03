@@ -30,19 +30,43 @@ export const normalizePhone = (raw) => {
   return p.slice(0, 16)
 }
 
+// Split a display name into Zoho's First_Name / Last_Name pair.
+// Zoho Leads mandates Last_Name but not First_Name, so a single token becomes
+// Last_Name. Exported so the Zoho writer applies the exact same rule.
+export function splitFullName(raw, max = 80) {
+  const parts = String(raw || "").trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return { firstName: "", lastName: "" }
+  if (parts.length === 1) return { firstName: "", lastName: parts[0].slice(0, max) }
+  return {
+    firstName: parts[0].slice(0, max),
+    lastName: parts.slice(1).join(" ").slice(0, max),
+  }
+}
+
 // Server-side validation mirrors the client (intl phone + real names).
 // Normalizes in place. Returns { ok } or { ok: false, error }.
+// Accepts either firstName + lastName or one "Full Name" string: the website
+// quote forms only collected a full name, and Zoho's Leads create requires a
+// Last_Name, so we split here instead of rejecting an otherwise valid lead.
 export function validateQuoteData(quoteData) {
   if (!quoteData) return { ok: false, error: "Missing quote data" }
   const phoneOk = /^\+?\d[\d\s-]{7,15}$/.test(String(quoteData.phoneNumber || "").trim())
   if (!phoneOk) return { ok: false, error: "Invalid phone number" }
-  const firstNameOk = /^[\p{L}\p{M}' .-]{2,80}$/u.test(String(quoteData.firstName || "").trim())
-  if (!firstNameOk) return { ok: false, error: "Invalid first name" }
-  const lastNameOk = /^[\p{L}\p{M}' .-]{1,80}$/u.test(String(quoteData.lastName || "").trim())
-  if (!lastNameOk) return { ok: false, error: "Invalid last name" }
+
+  let firstName = String(quoteData.firstName || "").trim()
+  let lastName = String(quoteData.lastName || "").trim()
+  if (!lastName && firstName) {
+    const split = splitFullName(firstName)
+    firstName = split.firstName
+    lastName = split.lastName
+  }
+  const nameRe = /^[\p{L}\p{M}' .-]{1,80}$/u
+  if (!lastName || !nameRe.test(lastName)) return { ok: false, error: "Invalid name" }
+  if (firstName && !nameRe.test(firstName)) return { ok: false, error: "Invalid name" }
+
   quoteData.phoneNumber = normalizePhone(quoteData.phoneNumber)
-  if (typeof quoteData.firstName === "string") quoteData.firstName = quoteData.firstName.trim().slice(0, 80)
-  if (typeof quoteData.lastName === "string") quoteData.lastName = quoteData.lastName.trim().slice(0, 80)
+  quoteData.firstName = firstName.slice(0, 80)
+  quoteData.lastName = lastName.slice(0, 80)
   if (typeof quoteData.email === "string") quoteData.email = quoteData.email.trim().slice(0, 120)
   return { ok: true }
 }

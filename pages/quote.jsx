@@ -9,6 +9,14 @@ import { getFormAttribution } from '../utils/attribution'
 import { gtmPushLead } from '../utils/gtm'
 import AttributionHiddenFields from '../components/AttributionHiddenFields'
 
+// Split a "Full Name" input into Zoho's required First_Name / Last_Name pair.
+const splitName = (raw) => {
+  const parts = String(raw || '').trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return { firstName: '', lastName: '' }
+  if (parts.length === 1) return { firstName: '', lastName: parts[0] }
+  return { firstName: parts[0], lastName: parts.slice(1).join(' ') }
+}
+
 const Quote = () => {
   const [fname, setFname] = useState("")
   const [email, setEmail] = useState("")
@@ -76,7 +84,7 @@ const Quote = () => {
           message: tayloreaMessageContent,
           recaptchaToken: token,
           quoteData: {
-            firstName: fname,
+            ...splitName(fname),
             email: email,
             phoneNumber: number,
             location: location,
