@@ -17,8 +17,24 @@ let cachedExp = 0
 
 const base = () => DC[process.env.ZOHO_DC] || DC.com
 
-export const zohoConfigured = () =>
-  Boolean(process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET && process.env.ZOHO_REFRESH_TOKEN)
+const REQUIRED_ENV = ["ZOHO_CLIENT_ID", "ZOHO_CLIENT_SECRET", "ZOHO_REFRESH_TOKEN"]
+
+const missingZohoEnv = () => REQUIRED_ENV.filter((k) => !process.env[k])
+
+export const zohoConfigured = () => missingZohoEnv().length === 0
+
+// A missing runtime variable used to make every form silently succeed while
+// no lead reached the CRM. Never let that happen quietly again: the server log
+// must say exactly which variable is missing (names only, never values).
+function warnNotConfigured(scope) {
+  const missing = missingZohoEnv()
+  if (!missing.length) return
+  console.error(
+    `[zoho] ${scope}: CRM sync SKIPPED — missing runtime env ${missing.join(", ")}. ` +
+      `The visitor was handled, but NO lead was written to Zoho. ` +
+      `Set these variables in the deployment (Vercel → Project → Settings → Environment Variables) and redeploy.`
+  )
+}
 
 async function getAccessToken() {
   if (cachedToken && Date.now() < cachedExp) return cachedToken
@@ -212,7 +228,8 @@ const attributionRecord = (attribution = {}, rawReferral = "") => ({
 
 export async function syncQuoteToZoho(quote = {}, attribution = {}) {
   if (!zohoConfigured()) {
-    return { skipped: true }
+    warnNotConfigured("syncQuoteToZoho")
+    return { skipped: true, reason: "not_configured", missing: missingZohoEnv() }
   }
   try {
     const email = String(quote.email || "").trim()
@@ -270,7 +287,8 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
 // attribution fields as quotes when the visitor arrived from a campaign.
 export async function syncInquiryToZoho({ name, email, phone, source, notes, gclid, attribution = {} } = {}) {
   if (!zohoConfigured()) {
-    return { skipped: true }
+    warnNotConfigured("syncInquiryToZoho")
+    return { skipped: true, reason: "not_configured", missing: missingZohoEnv() }
   }
   try {
     // attribution = utils/attribution cookie (UTMs, campaign_id, landing, referrer).
@@ -299,5 +317,52 @@ export async function syncInquiryToZoho({ name, email, phone, source, notes, gcl
     return { ok: true, leadId: id, droppedAttribution: dropped }
   } catch (e) {
     return { ok: false, error: e?.message || "Zoho sync failed" }
+  }
+}
+
+// Read-only production diagnostic: proves the deployed environment can mint a
+// token AND read the Leads module. Deliberately never writes a record, so it is
+// safe to call at any time. Exposed via /api/zoho-health.
+export async function zohoHealth() {
+  const missing = missingZohoEnv()
+  const dc = process.env.ZOHO_DC || "com"
+  if (missing.length) return { ok: false, configured: false, dc, missing }
+
+  const signal =
+    typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function"
+      ? AbortSignal.timeout(10000)
+      : undefined
+
+  try {
+    const token = await getAccessToken()
+    const r = await fetch(`${base().api}/crm/v8/Leads?fields=Last_Name&per_page=1`, {
+      headers: { Authorization: `Zoho-oauthtoken ${token}` },
+      signal,
+    })
+    const text = await r.text()
+    let parsed = null
+    try { parsed = text ? JSON.parse(text) : null } catch { /* non-JSON body */ }
+    if (!r.ok) {
+      return {
+        ok: false,
+        configured: true,
+        dc,
+        token: true,
+        leads: false,
+        status: r.status,
+        code: parsed?.code || null,
+        message: String(parsed?.message || text.slice(0, 200) || r.statusText).slice(0, 300),
+      }
+    }
+    return { ok: true, configured: true, dc, token: true, leads: true, status: r.status }
+  } catch (e) {
+    return {
+      ok: false,
+      configured: true,
+      dc,
+      token: false,
+      leads: false,
+      message: String(e?.message || e).slice(0, 300),
+    }
   }
 }
