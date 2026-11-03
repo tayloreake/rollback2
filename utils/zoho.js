@@ -100,6 +100,9 @@ const SACRIFICE_ORDER = [
   "UTM_Campaign",
   "UTM_Source",
   "Campaign_ID",
+  // The custom `GCLID` field on this org is accepted by the API but stored as
+  // null (verified live). `Google_Click_ID` is the field Zoho actually persists,
+  // so it is sacrificed last — T15 (Ads offline conversions) depends on it.
   "GCLID",
   "How_did_you_hear_about_us",
   "Property_Size",
@@ -107,6 +110,7 @@ const SACRIFICE_ORDER = [
   "Destination_Address_Street_Address",
   "Origin_Address_Street_Address",
   "Proposed_Move_Date",
+  "Lead_Status",
 ]
 const isDroppable = (name) => !CORE_FIELDS.has(name)
 
@@ -198,6 +202,10 @@ const attributionRecord = (attribution = {}, rawReferral = "") => ({
   UTM_Campaign: clean(attribution.utm_campaign),
   UTM_Term: clean(attribution.utm_term),
   GCLID: clean(attribution.gclid),
+  // Zoho ignores the custom `GCLID` field on write (returns it as null), but
+  // the standard Google Click ID field persists. Send both so offline
+  // conversions work regardless of which field the org uses.
+  Google_Click_ID: clean(attribution.gclid),
   // Normalised channel (playbook T3): Google Ads | Meta Ads | WhatsApp | ...
   Lead_Source: clean(deriveLeadSource(attribution, rawReferral)),
 })
@@ -243,6 +251,10 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
       Destination_Address_Street_Address: String(quote.destination || "").slice(0, 255) || undefined,
       Property_Size: String(quote.bedrooms || "").slice(0, 100) || undefined,
       Proposed_Move_Date: String(quote.moveDate || "").slice(0, 50) || undefined,
+      // Zoho leaves this null on API-created leads, which hides them from
+      // status-filtered views ("My Open Leads" etc.). Set the standard
+      // starting status explicitly.
+      Lead_Status: "Not Contacted",
       // T7 — campaign attribution (playbook §4 field mapping)
       ...attributionRecord(attribution, quote.referrals || quote.ref || ""),
     }
@@ -279,6 +291,8 @@ export async function syncInquiryToZoho({ name, email, phone, source, notes, gcl
       Phone: String(phone || "").slice(0, 30) || undefined,
       How_did_you_hear_about_us: String(source || "Website").slice(0, 100),
       Description: String(notes || "").slice(0, 500) || undefined,
+      // Without a status, API-created leads are hidden by status-filtered views.
+      Lead_Status: "Not Contacted",
       ...attributionRecord({ ...att, ...(g ? { gclid: g } : {}) }, source || ""),
     }
     const { id, dropped } = await writeLead(record, null)
