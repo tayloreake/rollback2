@@ -4,6 +4,7 @@ import ReCAPTCHA from "../SafeRecaptcha"
 import useFormPersistence from "../../hooks/useFormPersistence"
 import AttributionHiddenFields from "../AttributionHiddenFields"
 import { getFormAttribution } from "../../utils/attribution"
+import { newEventId, getMetaContext } from "../../utils/metaTracking"
 import { gtmPushLead } from "../../utils/gtm"
 
 // Split a "Full Name" input into Zoho's required First_Name / Last_Name pair.
@@ -85,6 +86,7 @@ const QuoteForm = () => {
   const [showPersistedDataNotice, setShowPersistedDataNotice] = useState(false)
   const recaptchaRef = useRef(null)
   const formRef = useRef(null)
+  const leadEventIdRef = useRef(null)
 
   // Show notice if persisted data was loaded
   useEffect(() => {
@@ -123,6 +125,7 @@ const QuoteForm = () => {
       // GTM fire off `generate_lead`; it now carries campaign_id/gclid/utm_*).
       gtmPushLead({
         formId: "quote",
+        eventId: leadEventIdRef.current || undefined,
         move_type: formData.moveType,
         bedrooms: formData.bedrooms,
         referral: formData.ref,
@@ -178,6 +181,9 @@ const QuoteForm = () => {
         throw new Error('Failed to verify reCAPTCHA');
       }
 
+      // One event_id shared by browser pixel and server CAPI (dedupe)
+      leadEventIdRef.current = newEventId();
+
       // Prepare quote data for the server
       const nameParts = splitName(formData.fname)
       const quoteDataForLogging = {
@@ -203,7 +209,8 @@ const QuoteForm = () => {
           body: JSON.stringify({
             message: tayloreaMessageContent,
             recaptchaToken: token,
-            quoteData: quoteDataForLogging
+            quoteData: quoteDataForLogging,
+            meta: getMetaContext(leadEventIdRef.current),
           }),
         }),
         createTimeoutPromise(30000) // 30 second timeout

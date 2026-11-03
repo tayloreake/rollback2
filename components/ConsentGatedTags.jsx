@@ -51,15 +51,20 @@ const ConsentGatedTags = () => {
           loadLinkedIn()
           if (!hasPixels) return
           window.dataLayer = window.dataLayer || []
-          // Forward generate_lead to Meta (event_id reserved for future CAPI dedupe)
-          const push = window.dataLayer.push.bind(window.dataLayer)
-          window.dataLayer.push = (e) => {
-            try {
-              if (e?.event === "generate_lead" && window.fbq) {
-                window.fbq("track", "Lead", {}, { eventID: `lead-${Date.now()}` })
-              }
-            } catch {}
-            return push(e)
+          // Forward generate_lead to Meta. The event_id comes from the form so the
+          // server-side CAPI call (utils/metaCapi.js) dedupes against this event.
+          // Hook once only: consent changes must not stack wrappers (duplicate Leads).
+          if (!window.__tmMetaLeadHook) {
+            window.__tmMetaLeadHook = true
+            const push = window.dataLayer.push.bind(window.dataLayer)
+            window.dataLayer.push = (e) => {
+              try {
+                if (e?.event === "generate_lead" && window.fbq && e?.event_id) {
+                  window.fbq("track", "Lead", { content_category: e.move_type, form_id: e.form_id }, { eventID: e.event_id })
+                }
+              } catch {}
+              return push(e)
+            }
           }
         }
       } catch { /* no-op */ }

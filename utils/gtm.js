@@ -100,6 +100,8 @@ export const gtmPushLead = (leadData = {}) => {
     user_id: leadData.userId || '',
     value: leadData.value === undefined ? 1 : leadData.value,
     currency: 'KES',
+    // Shared with the server-side Meta CAPI call so Meta dedupes browser + server (T15b)
+    ...(leadData.eventId ? { event_id: leadData.eventId } : {}),
     ...(leadData.move_type ? { move_type: leadData.move_type } : {}),
     ...(leadData.bedrooms ? { bedrooms: leadData.bedrooms } : {}),
     timestamp: new Date().toISOString(),
