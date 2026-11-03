@@ -96,6 +96,37 @@ check `zohoDroppedFields` in the `POST /api/submitQuote` response (must be
 `[]` once the custom fields are created) and the server log line
 `Zoho rejected field "..."`.
 
+### Deployment requirement — Zoho env vars
+`taylorea.com` is served by the **`rollback2`** Vercel project (the
+`taylor-movers-kenya` project is a separate, older project). The live project
+must have these variables in **Production** (and **Preview** / **Development**
+if preview forms should also write leads):
+
+```
+ZOHO_CLIENT_ID
+ZOHO_CLIENT_SECRET
+ZOHO_REFRESH_TOKEN
+ZOHO_DC=com
+ZOHO_CAMPAIGNS_CLIENT_ID
+ZOHO_CAMPAIGNS_CLIENT_SECRET
+ZOHO_CAMPAIGNS_REFRESH_TOKEN
+ZOHO_CAMPAIGNS_LISTKEY
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY   (Production + Preview + Development)
+RECAPTCHA_SECRET_KEY             (Production + Preview + Development)
+```
+
+If the Zoho variables are missing, the form still returns success (the email
+sends) but the lead is **not** written. The server log now says
+`[zoho] syncInquiryToZoho: CRM sync SKIPPED — missing runtime env …`.
+Changing env vars requires a **new deployment** before they take effect.
+
+Verify the running deployment at any time (read-only, creates nothing):
+
+```bash
+curl -s https://taylorea.com/api/zoho-health
+# {"ok":true,"configured":true,"dc":"com","token":true,"leads":true,...}
+```
+
 ### Test plan (3 records, then delete them)
 1. `taylorea.com/?campaign_id=CAM-GOOGLE-20261012-001&gclid=TEST&utmsource…` →
    submit Quote form → Zoho lead with `Campaign_ID`, `GCLID`, `Lead_Source=Google Ads`,
