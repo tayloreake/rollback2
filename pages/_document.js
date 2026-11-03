@@ -59,6 +59,9 @@ export default function Document() {
                 
                 <Main />
                 <NextScript />
+                {/* Zoho CRM Google Ads tracking (zcga.js): fills the hidden #zc_gad field
+                    in site forms with the Google Ads click id. */}
+                <script type="text/javascript" src='https://crm.zoho.com/crm/javascript/zcga.js' id="zoho-zcga" async></script>
             </body>
         </Html>
     );

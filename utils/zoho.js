@@ -4,7 +4,7 @@
 // optional ZOHO_DC ("com" | "eu" | "in", default "com").
 // recaptchaScore is intentionally never sent. Failures returned, never thrown.
 
-import { deriveLeadSource } from "./attribution"
+import { deriveLeadSource, derivePlatform } from "./attribution"
 
 const DC = {
   com: { accounts: "https://accounts.zoho.com", api: "https://www.zohoapis.com" },
@@ -100,7 +100,28 @@ const leadSearch = async (email) => {
 // They are therefore sent as OPTIONAL extras: if a field doesn't exist yet in
 // this CRM org (or is a restricted picklist), Zoho rejects it and we drop
 // just that field — a missing custom field must never cost a lead.
-const ATTRIBUTION_FIELDS = ["Campaign_ID", "UTM_Source", "UTM_Medium", "UTM_Campaign", "UTM_Term", "Lead_Source"]
+const ATTRIBUTION_FIELDS = [
+  "Campaign_ID",
+  "Campaign_Name",
+  "Advert_ID",
+  "Advert_Name",
+  "Ad_Account_Name",
+  "Platform",
+  "Keyword",
+  "Form_Name",
+  "Form_ID",
+  "Page_Name",
+  "UTM_Source",
+  "UTM_Medium",
+  "UTM_Campaign",
+  "UTM_Term",
+  "UTM_Content",
+  "GCLID",
+  "Google_Click_ID",
+  "FB_Click_ID",
+  "Referrer_URL",
+  "Lead_Source",
+]
 // Fields that identify the lead itself. Zoho's Leads module mandates
 // Last_Name; everything else is optional and may be dropped, so a CRM schema
 // mismatch can never cost us a lead.
@@ -110,12 +131,24 @@ const CORE_FIELDS = new Set(["First_Name", "Last_Name", "Email", "Phone"])
 // the one T15 (Google Ads offline conversions) cannot work without.
 const SACRIFICE_ORDER = [
   "Description",
+  // Lead_Source is the coarse channel; Platform carries the granular source
+  // (Google Ads vs Google Organic vs Facebook Organic). If Zoho rejects a new
+  // picklist value, drop the coarse field first so the granular one survives.
   "Lead_Source",
+  "Form_ID",
+  "Form_Name",
+  "Page_Name",
+  "Referrer_URL",
+  "UTM_Content",
   "UTM_Term",
   "UTM_Medium",
   "UTM_Campaign",
   "UTM_Source",
-  "Campaign_ID",
+  "Ad_Account_Name",
+  "Platform",
+  "Advert_Name",
+  "Keyword",
+  "Campaign_Name",
   // The custom `GCLID` field on this org is accepted by the API but stored as
   // null (verified live). `Google_Click_ID` is the field Zoho actually persists,
   // so it is sacrificed last — T15 (Ads offline conversions) depends on it.
@@ -126,6 +159,10 @@ const SACRIFICE_ORDER = [
   "Destination_Address_Street_Address",
   "Origin_Address_Street_Address",
   "Proposed_Move_Date",
+  "Advert_ID",
+  "Campaign_ID",
+  "FB_Click_ID",
+  "Google_Click_ID",
   "Lead_Status",
 ]
 const isDroppable = (name) => !CORE_FIELDS.has(name)
@@ -210,21 +247,59 @@ async function writeLead(record, existingId) {
   throw new Error("Zoho lead write failed after dropping attribution fields")
 }
 
-// The 5 attribution values every website lead carries into CRM.
-const attributionRecord = (attribution = {}, rawReferral = "") => ({
-  Campaign_ID: clean(attribution.campaign_id),
-  UTM_Source: clean(attribution.utm_source),
-  UTM_Medium: clean(attribution.utm_medium),
-  UTM_Campaign: clean(attribution.utm_campaign),
-  UTM_Term: clean(attribution.utm_term),
-  GCLID: clean(attribution.gclid),
-  // Zoho ignores the custom `GCLID` field on write (returns it as null), but
-  // the standard Google Click ID field persists. Send both so offline
-  // conversions work regardless of which field the org uses.
-  Google_Click_ID: clean(attribution.gclid),
-  // Normalised channel (playbook T3): Google Ads | Meta Ads | WhatsApp | ...
-  Lead_Source: clean(deriveLeadSource(attribution, rawReferral)),
-})
+// Every attribution value a website lead carries into CRM. Fields are
+// optional extras: a schema mismatch drops only the offending field.
+const attributionRecord = (attribution = {}, rawReferral = "", form = {}) => {
+  const utmContent = String(attribution.utm_content || "").trim()
+  // For Meta, utm_content is usually the ad id/name; store a numeric value in
+  // Advert_ID as well as the human-readable Advert_Name.
+  const advertId =
+    attribution.ad_id ||
+    attribution.creative ||
+    (/^\d+$/.test(utmContent) ? utmContent : "")
+  const clickId =
+    attribution.gclid ||
+    attribution.gbraid ||
+    attribution.wbraid ||
+    attribution.dclid ||
+    ""
+  const referrer = String(attribution.referrer || "").trim()
+  const externalReferrer = referrer && !/taylorea\.com/i.test(referrer) ? referrer : ""
+  const platform = derivePlatform(attribution)
+
+  return {
+    // The actual ad/campaign identity. Google Ads ValueTrack params
+    // ({campaignid}, {creative}, {keyword}) and Meta dynamic params both land
+    // in these fields.
+    Campaign_ID: clean(attribution.campaign_id || attribution.utm_id, 255),
+    Campaign_Name: clean(attribution.campaign_name || attribution.utm_campaign, 255),
+    Advert_ID: clean(advertId, 255),
+    Advert_Name: clean(attribution.ad_name || utmContent, 255),
+    // Ad_Account_Name is only meaningful for paid platforms; Platform always
+    // carries the granular source (including organic/direct/referral).
+    Ad_Account_Name: clean(/(^| )Ads$/.test(platform) ? platform : "", 255),
+    Platform: clean(platform, 255),
+    Keyword: clean(attribution.keyword || attribution.utm_term, 250),
+    // Which form produced the lead and where it was submitted.
+    Form_Name: clean(form.name, 255),
+    Form_ID: clean(form.id, 255),
+    Page_Name: clean(attribution.landing_page, 255),
+    // Standard UTMs.
+    UTM_Source: clean(attribution.utm_source, 100),
+    UTM_Medium: clean(attribution.utm_medium, 100),
+    UTM_Campaign: clean(attribution.utm_campaign, 255),
+    UTM_Term: clean(attribution.utm_term, 255),
+    UTM_Content: clean(attribution.utm_content, 255),
+    // Click ids used for offline conversion matching. GCLID is the legacy
+    // custom field (Zoho stores it null); Google_Click_ID is the durable one.
+    GCLID: clean(attribution.gclid, 150),
+    Google_Click_ID: clean(clickId, 255),
+    FB_Click_ID: clean(attribution.fbclid, 255),
+    Referrer_URL: clean(externalReferrer, 255),
+    // Coarse channel (playbook T3) plus the granular Platform above.
+    Lead_Source: clean(deriveLeadSource(attribution, rawReferral), 100),
+  }
+}
 
 export async function syncQuoteToZoho(quote = {}, attribution = {}) {
   if (!zohoConfigured()) {
@@ -253,10 +328,9 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
         console.warn("Zoho lead dedupe search failed (creating anyway):", e?.message)
       }
     }
-    // Only fields that exist on this CRM's Leads module are sent. Name,
-    // SalesIQ_Visitor_ID, UTM_Content, Landing_Page, Referrer_URL and
-    // Quote_Notes do not exist there — sending them made Zoho reject every
-    // lead (the real cause of "inquiries missing from the CRM").
+    // Every field below exists on this org's Leads module. Attribution fields
+    // are still treated as optional extras by writeLead(), so a future CRM
+    // schema change drops one field instead of the whole lead.
     const record = {
       First_Name: firstName || undefined,
       Last_Name: lastName || firstName || "Website Lead",
@@ -272,8 +346,11 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
       // status-filtered views ("My Open Leads" etc.). Set the standard
       // starting status explicitly.
       Lead_Status: "Not Contacted",
-      // T7 — campaign attribution (playbook §4 field mapping)
-      ...attributionRecord(attribution, quote.referrals || quote.ref || ""),
+      // T7 — campaign + ad attribution (playbook §4 field mapping)
+      ...attributionRecord(attribution, quote.referrals || quote.ref || "", {
+        name: "Quote Form",
+        id: "quote",
+      }),
     }
     const { id, dropped } = await writeLead(record, recordId)
     return { ok: true, leadId: id, droppedAttribution: dropped }
@@ -297,10 +374,15 @@ export async function syncInquiryToZoho({ name, email, phone, source, notes, gcl
     const g = gclid || att.gclid || ""
     const full = String(name || "").trim()
     const split = splitName(full)
-    // Only fields that exist on this CRM's Leads module are sent. Name,
-    // SalesIQ_Visitor_ID, UTM_Content, Landing_Page, Referrer_URL and
-    // Quote_Notes do not exist there — sending them made Zoho reject every
-    // inquiry. Description is the standard notes field.
+    const formName = String(source || "Website Inquiry").slice(0, 255)
+    const formId = formName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80) || "inquiry"
+    // Every field below exists on this org's Leads module. Description is the
+    // standard notes field; attribution extras are dropped individually if a
+    // future schema change rejects one.
     const record = {
       First_Name: split.firstName || undefined,
       // Zoho Leads mandates Last_Name.
@@ -311,7 +393,10 @@ export async function syncInquiryToZoho({ name, email, phone, source, notes, gcl
       Description: String(notes || "").slice(0, 500) || undefined,
       // Without a status, API-created leads are hidden by status-filtered views.
       Lead_Status: "Not Contacted",
-      ...attributionRecord({ ...att, ...(g ? { gclid: g } : {}) }, source || ""),
+      ...attributionRecord({ ...att, ...(g ? { gclid: g } : {}) }, source || "", {
+        name: formName,
+        id: formId,
+      }),
     }
     const { id, dropped } = await writeLead(record, null)
     return { ok: true, leadId: id, droppedAttribution: dropped }

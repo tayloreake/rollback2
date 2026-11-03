@@ -5,6 +5,7 @@ import getPageMetadata from "../SEO/seo"
 import { BsCheckCircle, BsPeople, BsClock, BsGeoAlt } from "react-icons/bs"
 import { FaTruck, FaBoxes, FaUsers, FaHeadset } from "react-icons/fa"
 import ReCAPTCHA from "../components/SafeRecaptcha"
+import { getFormAttribution } from "../utils/attribution"
 
 const Jobs = ({ jobs }) => {
   // Get SEO metadata
@@ -426,6 +427,8 @@ reCAPTCHA: ${recaptchaToken ? 'verified' : 'not provided'}
             phone: formData.phone,
             source: 'Job Application',
             notes: `${formData.position} | ${formData.experience} yrs exp`,
+             // T7 — first-touch attribution (UTM/GCLID/Campaign_ID)
+             attribution: getFormAttribution(),
           },
         })
       })
@@ -462,6 +465,8 @@ reCAPTCHA: ${recaptchaToken ? 'verified' : 'not provided'}
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Filled by Zoho zcga.js with the Google Ads click id */}
+      <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
       <h3 className="text-xl font-bold text-[#FF5000] mb-4">Apply for this Position</h3>
       
       <div>

@@ -65,9 +65,13 @@ const isDuplicate = (key) => {
 export const getCampaignIdFromUrl = () => {
   if (typeof window === 'undefined') return '';
   try {
-    const fromUrl = new URLSearchParams(window.location.search).get('campaign_id');
+    const params = new URLSearchParams(window.location.search);
+    // Google Ads auto-tagging uses utm_id for the campaign id; paid social
+    // links usually carry campaign_id explicitly.
+    const fromUrl = params.get('campaign_id') || params.get('utm_id');
     if (fromUrl) return fromUrl;
-    return getAttribution().campaign_id || '';
+    const stored = getAttribution();
+    return stored.campaign_id || stored.utm_id || '';
   } catch {
     return '';
   }
@@ -75,13 +79,24 @@ export const getCampaignIdFromUrl = () => {
 
 const attributionFields = (attribution = {}) => ({
   // Cookie first, URL second — the CRM record is built from the same cookie,
-  // so GA4 and Zoho must agree on which campaign produced the lead.
+  // so GA4 and Zoho must agree on which campaign/ad produced the lead.
   // (getCampaignIdFromUrl still exists for click events, which have no CRM row.)
-  campaign_id: String(attribution.campaign_id || '') || getCampaignIdFromUrl(),
+  campaign_id: String(attribution.campaign_id || attribution.utm_id || '') || getCampaignIdFromUrl(),
+  campaign_name: String(attribution.campaign_name || attribution.utm_campaign || ''),
   gclid: String(attribution.gclid || ''),
+  gbraid: String(attribution.gbraid || ''),
+  wbraid: String(attribution.wbraid || ''),
+  fbclid: String(attribution.fbclid || ''),
+  msclkid: String(attribution.msclkid || ''),
   utm_source: String(attribution.utm_source || ''),
   utm_medium: String(attribution.utm_medium || ''),
   utm_campaign: String(attribution.utm_campaign || ''),
+  utm_term: String(attribution.utm_term || ''),
+  utm_content: String(attribution.utm_content || ''),
+  ad_id: String(attribution.ad_id || ''),
+  ad_name: String(attribution.ad_name || ''),
+  keyword: String(attribution.keyword || ''),
+  platform: String(attribution.platform || ''),
 });
 
 // 1. Lead form submission — fires when the user submits the Quote or Contact

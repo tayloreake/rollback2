@@ -176,6 +176,8 @@ const FeedbackForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
+      {/* Filled by Zoho zcga.js with the Google Ads click id */}
+      <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
       <div className="grid grid-cols-1 gap-6">
         <div>
           <h3 className="text-xl font-bold text-[#FF5000] mb-2">About Your Move</h3>
