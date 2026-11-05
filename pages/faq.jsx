@@ -4,6 +4,7 @@ import getPageMetadata from "../SEO/seo"
 import Jumbotron from "../components/jumbotron"
 import { FaChevronDown, FaChevronUp, FaSearch } from "react-icons/fa"
 import { getFaqs } from "../sanity/sanity-utils"
+import WhatsAppButton from "../components/WhatsAppButton"
 
 const FAQ = ({ faqs }) => {
   const [openQuestions, setOpenQuestions] = useState({})
@@ -363,8 +364,8 @@ Sea Freight: This is the most cost-effective option for a full household move. O
                     <span className="text-sm opacity-75 group-hover:opacity-90">Send email</span>
                     <span className="font-bold text-sm">info@taylorea.com</span>
                   </a>
-                  <a 
-                    href="https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20%28ref%3A%20FAQ%29" 
+                  <WhatsAppButton
+                    placement="faq"
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="group bg-[#25D366] hover:bg-[#128C7E] text-white px-8 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl flex flex-col items-center space-y-2"
@@ -372,7 +373,7 @@ Sea Freight: This is the most cost-effective option for a full household move. O
                     <span className="text-2xl group-hover:scale-110 transition-transform duration-300">💬</span>
                     <span className="text-sm opacity-90">WhatsApp us</span>
                     <span className="font-bold">Chat Now</span>
-                  </a>
+                  </WhatsAppButton>
                 </div>
                 
                 {/* Quick Stats */}

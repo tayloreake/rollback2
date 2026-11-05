@@ -6,6 +6,7 @@ import AttributionHiddenFields from "../AttributionHiddenFields"
 import { getFormAttribution } from "../../utils/attribution"
 import { newEventId, getMetaContext } from "../../utils/metaTracking"
 import { gtmPushLead } from "../../utils/gtm"
+import WhatsAppButton from "../WhatsAppButton"
 
 // Split a "Full Name" input into Zoho's required First_Name / Last_Name pair.
 const splitName = (raw) => {
@@ -452,7 +453,7 @@ const QuoteForm = () => {
         <button type='submit' onClick={(e) => { e.preventDefault(); if (formRef.current) { formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); } }} disabled={isSubmitting} className='w-full bg-[#FF5000] text-white px-6 py-4 rounded-xl hover:bg-[#D94300] transition-all font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_10px_25px_-8px_rgba(255,80,0,0.7)]'>
           {isSubmitting ? (<span className='flex items-center justify-center gap-2'><span className='animate-spin rounded-full h-5 w-5 border-b-2 border-white' />Submitting secure request…</span>) : (<span>Request My Free Quote →</span>)}
         </button>
-        <p className='text-center text-[12px] text-slate-500 mt-3'>🔒 Your details are encrypted & never shared. Prefer chat? <a href='https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20(ref%3A%20WEB)' target='_blank' rel='noreferrer' className='font-semibold text-[#0B1B33] underline'>WhatsApp us</a> • <a href='tel:+254721410517' className='font-semibold text-[#0B1B33] underline'>Call 0721 410 517</a></p>
+        <p className='text-center text-[12px] text-slate-500 mt-3'>🔒 Your details are encrypted & never shared. Prefer chat? <WhatsAppButton placement="quote-form" target='_blank' rel='noreferrer' className='font-semibold text-[#0B1B33] underline'>WhatsApp us</WhatsAppButton> • <a href='tel:+254721410517' className='font-semibold text-[#0B1B33] underline'>Call 0721 410 517</a></p>
       </div>
     </div>
   )

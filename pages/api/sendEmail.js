@@ -88,9 +88,10 @@ export default async function handler(req, res) {
     // Non-quote inquiries (contact / feedback / job) → Zoho Website Inquiries.
     // Awaited (not fire-and-forget) so a Zoho failure is logged instead of
     // being swallowed by a bare .catch(() => {}).
+    let zoho = { ok: false, skipped: true, reason: "no_inquiry" }
     if (inquiry) {
       try {
-        const zoho = await syncInquiryToZoho(inquiry)
+        zoho = await syncInquiryToZoho(inquiry)
         if (!zoho?.ok && !zoho?.skipped) {
           console.error("Zoho inquiry sync failed:", zoho?.error || "unknown")
         } else if (zoho?.droppedAttribution?.length) {
@@ -106,6 +107,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       message: "Email sent successfully",
+      zoho: zoho?.ok ? "synced" : zoho?.skipped ? "skipped" : "pending",
+      zohoDroppedFields: zoho?.droppedAttribution || [],
     });
 
   } catch (error) {

@@ -14,6 +14,7 @@ export default async function handler(req, res) {
   try {
     await limiter(req)
     const email = String(req.body?.email || "").trim().slice(0, 120)
+    const attribution = req.body?.attribution || {}
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ success: false, message: "Please enter a valid email address" })
     }
@@ -27,12 +28,19 @@ export default async function handler(req, res) {
       phone: "",
       source: "Newsletter",
       notes: "Website newsletter signup",
+      attribution,
     }).catch((e) => ({ ok: false, error: e?.message }));
     if (!crm?.ok) console.warn("Newsletter CRM sync failed:", crm?.error || "unavailable");
     const sub = await subscribeNewsletter(email).catch((e) => ({ ok: false, error: e?.message }));
     if (!sub?.ok && !sub?.skipped) console.warn("Newsletter Campaigns sync failed:", sub?.error || "unavailable");
     const synced = Boolean(sub?.ok || crm?.ok);
-    return res.status(200).json({ success: true, message: "Thanks for subscribing! You'll hear from us soon.", synced })
+    return res.status(200).json({
+      success: true,
+      message: "Thanks for subscribing! You'll hear from us soon.",
+      synced,
+      zoho: crm?.ok ? "synced" : crm?.skipped ? "skipped" : "pending",
+      zohoDroppedFields: crm?.droppedAttribution || [],
+    })
   } catch (e) {
     if (e?.message === "Too many requests") {
       return res.status(429).json({ success: false, message: "Too many requests. Please try again later." })

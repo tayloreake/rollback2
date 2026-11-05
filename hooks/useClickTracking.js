@@ -47,6 +47,7 @@ export const useClickTracking = () => {
           return
         }
         if (/wa\.me\//i.test(href)) {
+          if (anchor.hasAttribute("data-wa-click-tracked")) return
           const { ref, channel } = parseWhatsApp(href)
           gtmPushWhatsAppClick(ref, channel)
         }

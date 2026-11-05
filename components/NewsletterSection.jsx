@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { getFormAttribution } from '../utils/attribution'
 
 const NewsletterSection = ({ 
   title = "Stay Connected With Taylor Movers", 
@@ -15,7 +16,7 @@ const NewsletterSection = ({
       const r = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newsletterEmail }),
+        body: JSON.stringify({ email: newsletterEmail, attribution: getFormAttribution() }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.message || 'Subscription failed');

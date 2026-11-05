@@ -1,6 +1,7 @@
 import Image from "next/image"
 import React, { useState, useRef } from "react"
 import ReCAPTCHA from "../SafeRecaptcha"
+import { getFormAttribution } from "../../utils/attribution"
 
 
 const ratingQuestions = [
@@ -90,6 +91,7 @@ const ReviewForm = ({setIsModalOpen}) => {
               sentiment: selectedEmoji,
               review: review.trim(),
               recaptchaToken: recaptchaValue,
+              attribution: getFormAttribution(),
             }),
           });
     

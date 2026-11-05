@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     // Apply rate limiting
     await limiter(req);
 
-    const { sentiment, review, name, email, recaptchaToken } = req.body;
+    const { sentiment, review, name, email, recaptchaToken, attribution = {} } = req.body;
 
     if (!sentiment || !review || !name || !email || !recaptchaToken) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -61,12 +61,22 @@ export default async function handler(req, res) {
       phone: "",
       source: "Review",
       notes: `[${sentiment}] ${review}`.slice(0, 255),
+      attribution,
     });
+    if (!zoho?.ok && !zoho?.skipped) {
+      console.error("Zoho review lead sync failed:", zoho?.error || "unknown")
+    }
+    if (zoho?.droppedAttribution?.length) {
+      console.warn("Zoho dropped review attribution field(s):", zoho.droppedAttribution.join(", "))
+    }
 
     return res.status(200).json({
       success: true,
       message: 'Review submitted successfully',
-      data: { zoho: zoho?.ok ? "synced" : "pending" }
+      data: {
+        zoho: zoho?.ok ? "synced" : zoho?.skipped ? "skipped" : "pending",
+        zohoDroppedFields: zoho?.droppedAttribution || [],
+      }
     });
   } catch (error) {
     console.error('Error submitting review:', error);

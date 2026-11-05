@@ -11,6 +11,7 @@ import ContactForm from "../components/Contacts/ContactForm"
 import getPageMetadata from "../SEO/seo"
 import { BsEnvelope, BsPhone, BsWhatsapp, BsClock } from "react-icons/bs"
 import { FaMapMarkerAlt } from "react-icons/fa"
+import WhatsAppButton from "../components/WhatsAppButton"
 
 const Contacts = () => {
   // Get SEO metadata
@@ -77,9 +78,9 @@ const Contacts = () => {
             <div className="text-center p-4 bg-gray-50 rounded-lg hover:shadow-lg transition-shadow">
               <BsWhatsapp className="text-[#FF5000] text-3xl mx-auto mb-3" />
               <h3 className="font-bold text-sm mb-2">WhatsApp</h3>
-              <a href="https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20%28ref%3A%20CONTACT%29" target="_blank" rel="noreferrer" className="text-[#FF5000] hover:underline text-sm">
+              <WhatsAppButton placement="contact-card" target="_blank" rel="noreferrer" className="text-[#FF5000] hover:underline text-sm">
                 Chat with us
-              </a>
+              </WhatsAppButton>
             </div>
           </div>
           <div className="col-md-3 col-6 mb-4">
@@ -142,13 +143,13 @@ const Contacts = () => {
               >
                 Call Now: +254 721 410 517
               </a>
-              <a 
-                href="https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20%28ref%3A%20CONTACT%29" 
+              <WhatsAppButton
+                placement="contact-cta"
                 target="_blank"
                 className="px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:shadow-2xl transition-all"
               >
                 WhatsApp Us
-              </a>
+              </WhatsAppButton>
               <a 
                 href="/feedback" 
                 className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-[#FF5000] transition-all"

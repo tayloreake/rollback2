@@ -13,6 +13,7 @@ import { FaFacebook, FaLinkedin } from "react-icons/fa";
 import { RiTwitterXLine } from "react-icons/ri";
 import { urlFor } from '../lib/sanity';
 import { getCaseStudyBlogs, getRecentBlogs } from '../sanity/sanity-utils';
+import WhatsAppButton from "./WhatsAppButton"
 
 const Footer = ({ caseStudies = [] }) => {
   const timestamp = new Date().getTime();
@@ -264,7 +265,7 @@ const Footer = ({ caseStudies = [] }) => {
                 <div className='bg-gray-50 rounded-lg p-4'>
                   <p className='text-gray-700 text-sm leading-relaxed'>
                     <span className='font-semibold'>WhatsApp:</span><br/>
-                    <a href='https://wa.me/254721410517?text=Hi%20Taylor%2C%20I%27d%20like%20a%20quote%20%28ref%3A%20FOOTER%29' target='_blank' rel='noreferrer' className='text-[#FF5000] hover:text-[#FF8A50] transition-colors'>0721 410 517</a>
+                    <WhatsAppButton placement="footer" target='_blank' rel='noreferrer' className='text-[#FF5000] hover:text-[#FF8A50] transition-colors'>0721 410 517</WhatsAppButton>
                   </p>
                 </div>
               </div>
