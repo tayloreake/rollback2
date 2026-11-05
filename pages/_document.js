@@ -1,4 +1,5 @@
 import { Html, Head, Main, NextScript } from "next/document";
+import Script from "next/script";
 
 export default function Document() {
     return (
@@ -6,7 +7,9 @@ export default function Document() {
             <Head>
             {/* Consent Mode v2 defaults: deny everything until the visitor
                 chooses in ConsentBanner (audit §1 P1). Must run before GTM. */}
-            <script
+            <Script
+                id="consent-mode-defaults"
+                strategy="beforeInteractive"
                 dangerouslySetInnerHTML={{
                     __html: `window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments)};window.gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});try{var c=JSON.parse(localStorage.getItem('tm-consent-v1')||'null');if(c){var a=c.analytics?'granted':'denied',d=c.ads?'granted':'denied';window.gtag('consent','update',{analytics_storage:a,ad_storage:d,ad_user_data:d,ad_personalization:d});}}catch(e){}`,
                 }}
@@ -16,7 +19,9 @@ export default function Document() {
                 double-counts every page_view with the GTM Google tag.
                 GTM fires GA4 page_view off the dataLayer 'page_view' event
                 pushed by useGTM (history-change auto page-views OFF). */}
-            <script
+            <Script
+                   id="google-tag-manager"
+                   strategy="beforeInteractive"
                    dangerouslySetInnerHTML={{
                     __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
                 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -61,7 +66,7 @@ export default function Document() {
                 <NextScript />
                 {/* Zoho CRM Google Ads tracking (zcga.js): fills the hidden #zc_gad field
                     in site forms with the Google Ads click id. */}
-                <script type="text/javascript" src='https://crm.zoho.com/crm/javascript/zcga.js' id="zoho-zcga" async></script>
+                <Script src="https://crm.zoho.com/crm/javascript/zcga.js" id="zoho-zcga" strategy="afterInteractive" />
             </body>
         </Html>
     );

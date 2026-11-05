@@ -11,11 +11,6 @@ const nextConfig = {
     unoptimized: process.env.NODE_ENV === 'development',
   },
   
-  // Experimental features
-  experimental: {
-    esmExternals: true,
-  },
-  
   // Webpack optimization for MUCH faster builds
   webpack: (config, { dev, isServer }) => {
     if (dev) {
@@ -129,11 +124,11 @@ const nextConfig = {
             key: 'Content-Security-Policy-Report-Only',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://cdn.pagesense.io https://*.zohopublic.com https://www.google.com https://www.gstatic.com https://connect.facebook.net https://snap.licdn.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.googleadservices.com https://cdn.pagesense.io https://*.zohopublic.com https://crm.zoho.com https://www.google.com https://www.gstatic.com https://connect.facebook.net https://snap.licdn.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://www.google-analytics.com https://www.facebook.com https://cdn.sanity.io",
               "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://stats.g.doubleclick.net https://cdn.sanity.io https://*.sanity.io",
+              "connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://stats.g.doubleclick.net https://cdn.sanity.io https://*.sanity.io https://crm.zoho.com",
               "frame-src https://www.googletagmanager.com https://www.google.com https://*.zohopublic.com",
               'report-uri /api/csp-report',
             ].join('; '),

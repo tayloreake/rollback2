@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { GetStaticProps } from 'next';
 import Head from 'next/head'
 import getPageMetadata from "../SEO/seo"
 import { getThankYouMessageData } from "../sanity/sanity-utils"

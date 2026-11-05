@@ -1,12 +1,9 @@
-// Server-side Google Ads offline conversion upload (groundwork).
-// Requires env: GOOGLE_ADS_DEVELOPER_TOKEN, GOOGLE_ADS_CLIENT_ID,
-// GOOGLE_ADS_CLIENT_SECRET, GOOGLE_ADS_REFRESH_TOKEN, GOOGLE_ADS_CUSTOMER_ID,
-// GOOGLE_ADS_CONVERSION_ACTION_ID. If any are missing, the endpoint returns
-// { skipped: true } so callers never fail a lead because of Ads.
+// Server-side Google Ads offline conversion upload via the Data Manager API.
+// Requires an OAuth refresh token authorized for the Data Manager API scope,
+// plus advertiser and conversion-action IDs. Missing config skips cleanly.
 import { rateLimiter } from "./middleware/rateLimiter"
 
 const REQUIRED = [
-  "GOOGLE_ADS_DEVELOPER_TOKEN",
   "GOOGLE_ADS_CLIENT_ID",
   "GOOGLE_ADS_CLIENT_SECRET",
   "GOOGLE_ADS_REFRESH_TOKEN",
@@ -29,7 +26,7 @@ async function accessToken() {
     body: params.toString(),
   })
   const j = await r.json()
-  if (!j?.access_token) throw new Error("Google Ads token refresh failed")
+  if (!j?.access_token) throw new Error("Google Data Manager token refresh failed; verify OAuth credentials and datamanager scope")
   return j.access_token
 }
 
@@ -44,9 +41,13 @@ export default async function handler(req, res) {
     return res.status(429).json({ success: false, message: "Too many requests" })
   }
 
-  const { gclid, conversionDateTime, value, currency } = req.body || {}
-  if (!gclid) {
-    return res.status(400).json({ success: false, message: "gclid is required" })
+  const { gclid, gbraid, wbraid, conversionDateTime, value, currency, orderId } = req.body || {}
+  if (!gclid && !gbraid && !wbraid) {
+    return res.status(400).json({ success: false, message: "gclid, gbraid, or wbraid is required" })
+  }
+  const occurredAt = new Date(conversionDateTime || Date.now())
+  if (!Number.isFinite(occurredAt.getTime())) {
+    return res.status(400).json({ success: false, message: "conversionDateTime must be a valid date" })
   }
   const miss = missing()
   if (miss.length) {
@@ -57,24 +58,38 @@ export default async function handler(req, res) {
   try {
     const token = await accessToken()
     const customerId = process.env.GOOGLE_ADS_CUSTOMER_ID.replace(/-/g, "")
-    const url = `https://googleads.googleapis.com/v16/customers/${customerId}:uploadClickConversions`
+    const loginCustomerId = (process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || customerId).replace(/-/g, "")
+    const url = "https://datamanager.googleapis.com/v1/events:ingest"
+    const googleDateTime = occurredAt.toISOString().replace(/\.\d{3}Z$/, "Z")
+    const numericValue = Number(value)
     const body = {
-      conversions: [
+      destinations: [
         {
-          gclid,
-          conversionAction: `customers/${customerId}/conversionActions/${process.env.GOOGLE_ADS_CONVERSION_ACTION_ID}`,
-          conversionDateTime: conversionDateTime || new Date().toISOString().replace("T", " ").slice(0, 19) + "+00:00",
-          conversionValue: value ? Number(value) : 1,
-          currencyCode: currency || "KES",
+          operatingAccount: { accountType: "GOOGLE_ADS", accountId: customerId },
+          loginAccount: { accountType: "GOOGLE_ADS", accountId: loginCustomerId },
+          productDestinationId: String(process.env.GOOGLE_ADS_CONVERSION_ACTION_ID),
         },
       ],
-      partialFailure: true,
+      encoding: "HEX",
+      events: [
+        {
+          adIdentifiers: {
+            ...(gclid ? { gclid: String(gclid).slice(0, 512) } : {}),
+            ...(gbraid ? { gbraid: String(gbraid).slice(0, 512) } : {}),
+            ...(wbraid ? { wbraid: String(wbraid).slice(0, 512) } : {}),
+          },
+          eventTimestamp: googleDateTime,
+          eventSource: "WEB",
+          conversionValue: Number.isFinite(numericValue) ? numericValue : 1,
+          currency: String(currency || "KES").toUpperCase(),
+          ...(orderId ? { transactionId: String(orderId).slice(0, 64) } : {}),
+        },
+      ],
     }
     const r = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "developer-token": process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),

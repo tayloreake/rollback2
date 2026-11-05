@@ -51,16 +51,6 @@ export async function getBlogs() {
         },
         blogTags[]->{
           tag
-        },
-        content[]{
-          ...,
-          _type == "image" => {
-            ...,
-            asset->{
-              _id,
-              url
-            }
-          }
         }
       } | order(date desc)`
   )

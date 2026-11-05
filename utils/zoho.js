@@ -105,6 +105,10 @@ const ATTRIBUTION_FIELDS = [
   "Campaign_Name",
   "Advert_ID",
   "Advert_Name",
+  "AdGroup_Name",
+  "Click_Type",
+  "Device_Type",
+  "Ad_Network",
   "Ad_Account_Name",
   "Platform",
   "Keyword",
@@ -127,8 +131,8 @@ const ATTRIBUTION_FIELDS = [
 // mismatch can never cost us a lead.
 const CORE_FIELDS = new Set(["First_Name", "Last_Name", "Email", "Phone"])
 // Least critical first: the order we sacrifice optional fields when Zoho
-// rejects the record without naming the field. GCLID goes near the end — it is
-// the one T15 (Google Ads offline conversions) cannot work without.
+// rejects the record without naming the field. Keep the Zoho `$gclid` property
+// and Google_Click_ID until last because Google Ads attribution depends on them.
 const SACRIFICE_ORDER = [
   "Description",
   // Lead_Source is the coarse channel; Platform carries the granular source
@@ -147,11 +151,15 @@ const SACRIFICE_ORDER = [
   "Ad_Account_Name",
   "Platform",
   "Advert_Name",
+  "AdGroup_Name",
+  "Click_Type",
+  "Device_Type",
+  "Ad_Network",
   "Keyword",
   "Campaign_Name",
-  // The custom `GCLID` field on this org is accepted by the API but stored as
-  // null (verified live). `Google_Click_ID` is the field Zoho actually persists,
-  // so it is sacrificed last — T15 (Ads offline conversions) depends on it.
+  // The legacy custom `GCLID` field is accepted by this org's API but stored
+  // as null. Zoho's Google Ads integration reads the special `$gclid` API
+  // property; preserve it and the durable custom field as long as possible.
   "GCLID",
   "How_did_you_hear_about_us",
   "Property_Size",
@@ -162,6 +170,7 @@ const SACRIFICE_ORDER = [
   "Advert_ID",
   "Campaign_ID",
   "FB_Click_ID",
+  "$gclid",
   "Google_Click_ID",
   "Lead_Status",
 ]
@@ -266,15 +275,18 @@ const attributionRecord = (attribution = {}, rawReferral = "", form = {}) => {
   const referrer = String(attribution.referrer || "").trim()
   const externalReferrer = referrer && !/taylorea\.com/i.test(referrer) ? referrer : ""
   const platform = derivePlatform(attribution)
-
   return {
     // The actual ad/campaign identity. Google Ads ValueTrack params
     // ({campaignid}, {creative}, {keyword}) and Meta dynamic params both land
     // in these fields.
-    Campaign_ID: clean(attribution.campaign_id || attribution.utm_id, 255),
-    Campaign_Name: clean(attribution.campaign_name || attribution.utm_campaign, 255),
+    Campaign_ID: clean(attribution.campaign_id || attribution.campaignid || attribution.utm_id, 255),
+    Campaign_Name: clean(attribution.campaign_name || attribution.utm_campaign || attribution.campaign, 255),
     Advert_ID: clean(advertId, 255),
     Advert_Name: clean(attribution.ad_name || utmContent, 255),
+    AdGroup_Name: clean(attribution.adgroup_name || attribution.ad_group_name, 255),
+    Click_Type: clean(attribution.click_type, 100),
+    Device_Type: clean(attribution.device, 100),
+    Ad_Network: clean(attribution.network, 100),
     // Ad_Account_Name is only meaningful for paid platforms; Platform always
     // carries the granular source (including organic/direct/referral).
     Ad_Account_Name: clean(/(^| )Ads$/.test(platform) ? platform : "", 255),
@@ -291,8 +303,10 @@ const attributionRecord = (attribution = {}, rawReferral = "", form = {}) => {
     UTM_Term: clean(attribution.utm_term, 255),
     UTM_Content: clean(attribution.utm_content, 255),
     // Click ids used for offline conversion matching. GCLID is the legacy
-    // custom field (Zoho stores it null); Google_Click_ID is the durable one.
+    // custom field (Zoho stores it null); `$gclid` feeds the Zoho Google Ads
+    // integration, while Google_Click_ID is our durable custom copy.
     GCLID: clean(attribution.gclid, 150),
+    "$gclid": clean(attribution.gclid, 255),
     Google_Click_ID: clean(clickId, 255),
     FB_Click_ID: clean(attribution.fbclid, 255),
     Referrer_URL: clean(externalReferrer, 255),

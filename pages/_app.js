@@ -14,19 +14,21 @@ import WebVitals from '../components/SEO/WebVitals'
 import PageTransitionLoader from '../components/PageTransitionLoader'
 import { ToastContainer } from 'react-toastify'
 import Script from 'next/script'
-import Head from 'next/head'
-import { Montserrat } from 'next/font/google'
+import localFont from 'next/font/local'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useGTM, useScrollTracking } from '../hooks/useGTM'
 import { useClickTracking } from '../hooks/useClickTracking'
 
 // GA4 is managed in GTM (container GTM-W6T72F2Z), NOT hard-coded here.
-// Single WOFF2 font loading (audit §2 P1) — replaces local OTF/TTF,
-// Google Fonts <link> tags and the Typekit reference.
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
+// Load the bundled Montserrat files locally so production builds do not depend
+// on a Google Fonts network request.
+const montserrat = localFont({
+  src: [
+    { path: '../fonts/Montserrat-Regular.otf', weight: '400', style: 'normal' },
+    { path: '../fonts/Montserrat-SemiBold.ttf', weight: '600', style: 'normal' },
+    { path: '../fonts/Montserrat-Bold.otf', weight: '700', style: 'normal' },
+  ],
   display: 'swap',
 })
 // GTM setup required (outside code):
@@ -93,9 +95,6 @@ function MyApp({ Component, pageProps }) {
   if (isAdminRoute) {
     return (
       <>
-        <Head>
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-        </Head>
         <Component {...pageProps} />
       </>
     )
@@ -103,10 +102,6 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <>
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
-      
       {/* Page transition loader */}
       <PageTransitionLoader />
       <div className={montserrat.className}>

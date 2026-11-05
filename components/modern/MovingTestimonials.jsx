@@ -107,7 +107,7 @@ const MovingTestimonials = ({
         console.log('Error loading reviews from localStorage:', error);
       }
     }
-  }, []); // Empty dependencies - only run once on mount
+  }, [urlFor]); // urlFor is stable and the effect still runs once on mount
 
   // Auto-play functionality
   useEffect(() => {

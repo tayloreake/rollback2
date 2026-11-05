@@ -88,13 +88,31 @@ triggers; they now receive campaign attribution automatically.
 `Google Ads | Meta Ads | WhatsApp | Google Business Profile | Referral | Email | Other`.
 
 ### Zoho CRM (Leads module)
-`Campaign_ID`, `UTM_Source`, `UTM_Medium`, `UTM_Campaign`, `GCLID`,
-`Lead_Source` are written with every website lead (quotes *and* inquiries).
+Campaign, UTM, and source fields are sent with every website lead (quotes *and*
+inquiries), when values are available. The server passes the click ID to Zoho's
+Google Ads integration using the special `$gclid` API property, and also keeps a
+copy in `Google_Click_ID`; this org's legacy custom `GCLID` field remains null.
+Zoho matches click IDs to Ads data on a schedule, so the Google Ads Information
+section may take 48–72 hours to fill after a valid ad click.
 If one of those fields does not exist yet in the CRM org (or is a restricted
 picklist), Zoho rejects **only that field** and the write still succeeds —
 check `zohoDroppedFields` in the `POST /api/submitQuote` response (must be
 `[]` once the custom fields are created) and the server log line
 `Zoho rejected field "..."`.
+
+To send Google Ads ValueTrack details through to the lead, enable auto-tagging
+and add this as the Google Ads account-level Final URL suffix (without a `?`):
+
+```
+utm_source=google&utm_medium=cpc&campaignid={campaignid}&adgroupid={adgroupid}&creative={creative}&keyword={keyword}&matchtype={matchtype}&network={network}&device={device}
+```
+
+Google Ads fills those macros on eligible clicks; its ValueTrack documentation
+lists the current values for device and network parameters. The app retains
+these first-touch values for its own campaign attribution. The read-only Google
+Ads Information section is populated by Zoho's Google Ads integration from the
+GCLID match, not by writing those values directly. Auto-tagging must be enabled
+in the Zoho Google Ads integration as well as in Google Ads.
 
 ### Deployment requirement — Zoho env vars
 `taylorea.com` is served by the **`rollback2`** Vercel project (the
