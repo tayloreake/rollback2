@@ -6,6 +6,7 @@ import PageTitle from "../components/PageTitle"
 import getPageMetadata from "../SEO/seo"
 import Head from 'next/head'
 import { getFormAttribution } from '../utils/attribution'
+import { newEventId, getMetaContext } from '../utils/metaTracking'
 import { gtmPushLead } from '../utils/gtm'
 import AttributionHiddenFields from '../components/AttributionHiddenFields'
 
@@ -75,6 +76,7 @@ const Quote = () => {
         throw new Error('Failed to verify reCAPTCHA');
       }
 
+      const leadEventId = newEventId();
       const response = await fetch("/api/submitQuote", {
         method: "POST",
         headers: {
@@ -83,6 +85,7 @@ const Quote = () => {
         body: JSON.stringify({
           message: tayloreaMessageContent,
           recaptchaToken: token,
+          meta: getMetaContext(leadEventId),
           quoteData: {
             ...splitName(fname),
             email: email,
@@ -111,6 +114,7 @@ const Quote = () => {
       // the GA4 key event + Google Ads conversion off `generate_lead`).
       gtmPushLead({
         formId: 'quote',
+        eventId: leadEventId,
         move_type: moveType,
         bedrooms: bedrooms,
         referral: ref,
