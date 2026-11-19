@@ -1,3 +1,4 @@
+import useBotTrap from "../../hooks/useBotTrap"
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { toast } from "react-toastify"
 import ReCAPTCHA from "../SafeRecaptcha"
@@ -87,6 +88,7 @@ const QuoteForm = () => {
   const [showPersistedDataNotice, setShowPersistedDataNotice] = useState(false)
   const recaptchaRef = useRef(null)
   const formRef = useRef(null)
+  const { trap, getBotFields } = useBotTrap()
   const leadEventIdRef = useRef(null)
 
   // Show notice if persisted data was loaded
@@ -210,6 +212,7 @@ const QuoteForm = () => {
           body: JSON.stringify({
             message: tayloreaMessageContent,
             recaptchaToken: token,
+            ...getBotFields(),
             quoteData: quoteDataForLogging,
             meta: getMetaContext(leadEventIdRef.current),
           }),
@@ -374,6 +377,7 @@ const QuoteForm = () => {
 
       <div className='px-6 py-5'>
         <form ref={formRef} onSubmit={handleSubmit} className='w-full flex flex-col gap-5'>
+          {trap}
           {/* Filled by Zoho zcga.js with the Google Ads click id */}
           <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
           <div>

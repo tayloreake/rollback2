@@ -1,3 +1,4 @@
+import useBotTrap from "../../hooks/useBotTrap"
 // ContactForm.jsx
 import React, { useState, useRef } from "react";
 import { toast } from "react-toastify";
@@ -14,6 +15,7 @@ const ContactForm = () => {
     const [number, setNumber] = useState("")
     const [message, setMessage] = useState("")
     const recaptchaRef = useRef(null)
+    const { trap, getBotFields } = useBotTrap()
     const router = useRouter()
 
     const isValidPhoneNumber = (phoneNumber) => {
@@ -41,6 +43,7 @@ const ContactForm = () => {
             const emailOptions = {
                 message: messageContent,
                 recaptchaToken: emailToken,
+                ...getBotFields(),
                 confirmTo: email,
                 inquiry: {
                   name: `${fname} ${lname}`.trim(),
@@ -144,6 +147,7 @@ const ContactForm = () => {
         <form
             onSubmit={(e) => handleSubmit(e)}
             className='flex-col'>
+          {trap}
           {/* Filled by Zoho zcga.js with the Google Ads click id */}
           <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
             <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>

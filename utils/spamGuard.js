@@ -93,13 +93,13 @@ export function recaptchaVerdict(result, { allowNoScore = false, min = MIN_RECAP
 }
 
 // Honeypot + too-fast submission. `hp` must be empty; `elapsedMs` (when sent)
-// must be at least 2.5s.
+// must be at least 1.5s.
 export function botSignals(body = {}) {
   const reasons = []
   const hp = body.website || body.hp || body.company_url || body?.quoteData?.website || body?.quoteData?.hp
   if (hp) reasons.push("honeypot")
   const elapsed = Number(body.elapsedMs ?? body?.quoteData?.elapsedMs)
-  if (Number.isFinite(elapsed) && elapsed >= 0 && elapsed < 2500) reasons.push("too_fast")
+  if (Number.isFinite(elapsed) && elapsed >= 0 && elapsed < 1500) reasons.push("too_fast")
   return reasons
 }
 
