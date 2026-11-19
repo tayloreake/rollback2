@@ -457,3 +457,20 @@ After getting Sanity access:
 **Last Updated**: 2025-10-11  
 **For**: Taylor Movers Website Management  
 **Sanity Studio**: taylorea.com/admin
+
+---
+
+## Gallery: how to add photos
+
+The website gallery has six categories: **Household Moves, Office Moves, Staff Relocation, Cross-Border Moves, International Moves, Crating Services**.
+
+1. Open the Studio at `https://taylorea.com/admin` and click **Gallery** in the left menu.
+2. Click the category the photos belong to (for example **Household Moves**).
+3. Click the **+** (new album) button. The category is already selected for you.
+4. Type an album name (for example "Karen villa move, March 2026").
+5. Drag as many photos as you like onto the **Photos** box in one go. Drag them to reorder. A description or caption is optional.
+6. Click **Publish**. The photos appear on `/gallery` within about a minute.
+
+To add more photos later, open the album, drop in more photos and Publish again. To move photos to a different category, change the album's **Category**. To remove a photo, hover over it and delete it, then Publish.
+
+**Developers:** the one-time import of the original office-move photos is `scripts/import-gallery-to-sanity.mjs` (needs an Editor `SANITY_API_TOKEN`). Categories live in `utils/galleryCategories.js`; adding one there updates the Studio dropdown, the Studio menu and the website tabs.
