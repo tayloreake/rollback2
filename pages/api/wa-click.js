@@ -105,14 +105,16 @@ const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm }) => {
   const zohoDomain = ZOHO_DATA_CENTERS[process.env.ZOHO_DC || "com"] || ZOHO_DATA_CENTERS.com
   const apiUrl = (process.env.ZOHO_API_URL || zohoDomain.api).replace(/\/+$/, "")
   const token = await getZohoToken()
-  // WhatsApp clicks are website activity, not leads: Website_Quotes (Website
-  // Inquiries). WA ref/placement have no dedicated columns, so they ride in
-  // Quote_Notes; attribution uses the Website_Quotes API names.
+  // Routing rule: quote forms AND WhatsApp inquiries go to the Leads module;
+  // every other website interaction goes to Website_Quotes (Website Inquiries).
+  // WA ref/placement have no Leads columns (Zoho ignored them), so they ride in
+  // Description. Field names below all exist on the Leads module.
   const fields = {
-    Name: `WhatsApp visitor ${ref}`,
+    Last_Name: `WhatsApp visitor ${ref}`,
     Lead_Source: "Web - WhatsApp",
-    Quote_Notes: `WA_Ref ${ref} | ${placement}`.slice(0, 255),
-    Landing_Page: (utm.landing_page || page || "").slice(0, 255),
+    Lead_Status: "Unverified",
+    Description: `WA_Ref ${ref} | ${placement}`.slice(0, 500),
+    Page_Name: (utm.landing_page || page || "").slice(0, 255),
     Referrer_URL: (utm.referrer || referrer || "").slice(0, 255),
     UTM_Source: (utm.utm_source || "").slice(0, 100),
     UTM_Medium: (utm.utm_medium || "").slice(0, 100),
@@ -120,9 +122,10 @@ const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm }) => {
     UTM_Term: (utm.utm_term || "").slice(0, 255),
     UTM_Content: (utm.utm_content || "").slice(0, 255),
     Campaign_ID: (utm.campaign_id || utm.campaignid || "").slice(0, 100),
-    GCLID: (utm.gclid || "").slice(0, 100),
+    GCLID: (utm.gclid || "").slice(0, 150),
+    "$gclid": (utm.gclid || "").slice(0, 255),
   }
-  const response = await fetch(`${apiUrl}/crm/v6/Website_Quotes`, {
+  const response = await fetch(`${apiUrl}/crm/v6/Leads`, {
     method: "POST",
     headers: {
       Authorization: `Zoho-oauthtoken ${token}`,
