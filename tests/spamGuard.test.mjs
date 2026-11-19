@@ -2,7 +2,7 @@ import test from "node:test"
 import assert from "node:assert/strict"
 import {
   looksLikeToken, suspiciousName, suspiciousAddress, assessQuote,
-  recaptchaVerdict, botSignals, repeatedAcrossFields,
+  recaptchaVerdict, botSignals, repeatedAcrossFields, captchaOptions,
 } from "../utils/spamGuard.js"
 
 const REAL_ADDRESSES = [
@@ -73,4 +73,26 @@ test("botSignals: honeypot and too-fast", () => {
 
 test("repeatedAcrossFields ignores short repeats", () => {
   assert.equal(repeatedAcrossFields(["Karen", "Karen"]), false)
+})
+
+const NOW = Date.parse("2026-11-19T12:00:00Z")
+const ok = (extra = {}) => ({ success: true, score: null, hostname: "taylorea.com", challengeTs: "2026-11-19T11:59:00Z", ...extra })
+
+test("recaptcha: token minted on another site is rejected", () => {
+  assert.equal(recaptchaVerdict(ok({ hostname: "evil.example" }), { allowNoScore: true, now: NOW }).reason, "recaptcha_bad_hostname")
+})
+test("recaptcha: real hostnames and previews pass", () => {
+  for (const h of ["taylorea.com", "www.taylorea.com", "rollback2-abc.vercel.app", "localhost"]) {
+    assert.equal(recaptchaVerdict(ok({ hostname: h }), { allowNoScore: true, now: NOW }).ok, true, h)
+  }
+})
+test("recaptcha: stale (replayed) token is rejected", () => {
+  assert.equal(recaptchaVerdict(ok({ challengeTs: "2026-11-19T10:00:00Z" }), { allowNoScore: true, now: NOW }).reason, "recaptcha_stale_token")
+})
+test("recaptcha: RECAPTCHA_ALLOWED_HOSTS extends the allowlist", () => {
+  assert.equal(recaptchaVerdict(ok({ hostname: "staging.taylorea.com" }), { allowNoScore: true, now: NOW, env: { RECAPTCHA_ALLOWED_HOSTS: "staging.taylorea.com" } }).ok, true)
+})
+test("recaptcha: captchaOptions requires score only when flagged", () => {
+  assert.equal(captchaOptions({}).allowNoScore, true)
+  assert.equal(captchaOptions({ RECAPTCHA_REQUIRE_SCORE: "true" }).allowNoScore, false)
 })

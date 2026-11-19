@@ -1,5 +1,6 @@
 import { rateLimiter } from "./middleware/rateLimiter"
 import { syncInquiryToZoho } from "../../utils/zoho"
+import { verifyRecaptcha as verifyRecaptchaShared } from "../../utils/leadNotify"
 import { recaptchaVerdict, captchaOptions, suspiciousName, botSignals } from "../../utils/spamGuard"
 
 const limiter = rateLimiter({
@@ -8,24 +9,8 @@ const limiter = rateLimiter({
 });
 
 async function verifyRecaptcha(token) {
-  try {
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
-    });
-
-    const data = await response.json();
-    return recaptchaVerdict(
-      { success: Boolean(data.success), score: typeof data.score === 'number' ? data.score : null },
-      captchaOptions()
-    ).ok;
-  } catch (error) {
-    console.error('reCAPTCHA verification error:', error);
-    return false;
-  }
+  const result = await verifyRecaptchaShared(token);
+  return recaptchaVerdict(result, captchaOptions()).ok;
 }
 
 export default async function handler(req, res) {

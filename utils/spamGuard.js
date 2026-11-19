@@ -83,8 +83,27 @@ export const captchaOptions = (env = process.env) => ({
   allowNoScore: String(env.RECAPTCHA_REQUIRE_SCORE || "").toLowerCase() !== "true",
 })
 
-export function recaptchaVerdict(result, { allowNoScore = false, min = MIN_RECAPTCHA_SCORE } = {}) {
+const DEFAULT_HOSTS = ["taylorea.com", "www.taylorea.com", "localhost"]
+const MAX_TOKEN_AGE_MS = 5 * 60 * 1000
+
+// Tokens minted on someone else's site (or replayed hours later) are bot
+// traffic even when Google says success. Works for v2 and v3 responses.
+export function hostAllowed(hostname, env = process.env) {
+  if (!hostname) return false
+  const h = String(hostname).toLowerCase()
+  const extra = String(env.RECAPTCHA_ALLOWED_HOSTS || "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean)
+  return [...DEFAULT_HOSTS, ...extra].includes(h) || h.endsWith(".vercel.app")
+}
+
+export function recaptchaVerdict(result, { allowNoScore = false, min = MIN_RECAPTCHA_SCORE, env = process.env, now = Date.now() } = {}) {
   if (!result || !result.success) return { ok: false, reason: "recaptcha_failed" }
+  if (result.hostname !== undefined && result.hostname !== null && !hostAllowed(result.hostname, env)) {
+    return { ok: false, reason: "recaptcha_bad_hostname" }
+  }
+  if (result.challengeTs) {
+    const age = now - Date.parse(result.challengeTs)
+    if (Number.isFinite(age) && age > MAX_TOKEN_AGE_MS) return { ok: false, reason: "recaptcha_stale_token" }
+  }
   if (result.score === null || result.score === undefined) {
     return allowNoScore ? { ok: true } : { ok: false, reason: "recaptcha_no_score" }
   }

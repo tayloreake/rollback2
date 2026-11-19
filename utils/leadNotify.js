@@ -9,13 +9,21 @@ import { assessQuote } from "./spamGuard.js"
 
 export async function verifyRecaptcha(token) {
   try {
+    // Env values pasted into Vercel often carry a trailing newline; trim it.
+    const secret = String(process.env.RECAPTCHA_SECRET_KEY || "").trim()
     const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
+      body: new URLSearchParams({ secret, response: String(token || "") }).toString(),
     })
     const data = await response.json()
-    return { success: Boolean(data.success), score: typeof data.score === "number" ? data.score : null, action: data.action || null }
+    return {
+      success: Boolean(data.success),
+      score: typeof data.score === "number" ? data.score : null,
+      action: data.action || null,
+      hostname: data.hostname || null,
+      challengeTs: data.challenge_ts || null,
+    }
   } catch (error) {
     console.error("reCAPTCHA verification error:", error)
     return { success: false, score: null }
