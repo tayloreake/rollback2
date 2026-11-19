@@ -298,3 +298,26 @@ export async function createReview(sentiment, review, name, email) {
     throw new Error("Failed to create review")
   }
 }
+
+
+// Gallery albums (published only). Each image carries its Sanity CDN url and
+// dimensions so the page can render responsive, layout-stable thumbnails.
+export async function getGalleryAlbums() {
+  return createClient(clientConfig).fetch(
+    groq`*[_type == "galleryAlbum" && !(_id in path('drafts.**')) && count(images) > 0]
+      | order(coalesce(order, 9999) asc, _createdAt desc){
+        _id,
+        title,
+        category,
+        "images": images[defined(asset)]{
+          _key,
+          alt,
+          caption,
+          "url": asset->url,
+          "width": asset->metadata.dimensions.width,
+          "height": asset->metadata.dimensions.height,
+          "lqip": asset->metadata.lqip
+        }
+      }`
+  )
+}
