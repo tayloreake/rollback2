@@ -22,6 +22,40 @@ export default {
             validation: Rule => Rule.required(),
         },
         {
+            name: "category",
+            title: "Category",
+            type: 'reference',
+            to: [{ type: 'categories' }]
+        },
+        {
+            name: "description",
+            title: "Service Description",
+            type: 'array',
+            of: [{
+                type: 'block'
+            }],
+            description: 'Main description of the service that appears on the individual service page'
+        },
+        {
+            name: "videoUrl",
+            title: "YouTube Video URL",
+            type: 'url',
+            description: 'Optional YouTube URL to embed on the service page'
+        },
+        {
+            name: "featuresLinks",
+            title: "Features Links",
+            type: 'array',
+            of: [{
+                type: 'object',
+                name: 'featureLink',
+                fields: [
+                    { name: 'label', title: 'Label', type: 'string' },
+                    { name: 'href', title: 'URL', type: 'string' }
+                ]
+            }]
+        },
+        {
             name: "titlePos",
             title: "Title Position",
             type: "string",
@@ -52,7 +86,8 @@ export default {
         },
         {
             name: "others",
-            title: "More",
+            title: "Pre-move Process (field name: others)",
+            description: "Rich text describing the pre-move process.",
             type: 'array',
             of: [
                 {
@@ -63,7 +98,8 @@ export default {
         },
         {
             name: "local",
-            title: "Local",
+            title: "Overview — household moving (field name: local)",
+            description: "Rich text: household-moving overview and service pillars.",
             type: 'array',
             of: [
                 {
@@ -74,7 +110,8 @@ export default {
         },
         {
             name: "international",
-            title: "International",
+            title: "Why Choose Us (field name: international)",
+            description: "Rich text: Taylor Movers service pillars.",
             type: 'array',
             of: [
                 {
@@ -82,6 +119,24 @@ export default {
                 },
             ],
             validation: Rule => Rule.required(),
+        },
+        {
+            name: "metaTitle",
+            title: "SEO Meta Title (optional — falls back to title)",
+            type: "string",
+            validation: Rule => Rule.max(60),
+        },
+        {
+            name: "metaDescription",
+            title: "SEO Meta Description (optional — falls back to excerpt)",
+            type: "text",
+            validation: Rule => Rule.max(160),
+        },
+        {
+            name: "ogImage",
+            title: "Social Share Image (optional — falls back to main image)",
+            type: "image",
+            options: { hotspot: true },
         },
         {
             name: "slug",

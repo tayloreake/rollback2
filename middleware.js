@@ -1,34 +1,36 @@
-// middleware.js
-import { NextResponse } from 'next/server'
-import { createClient } from '@sanity/client'
+import { NextResponse } from "next/server"
 
-// Create an Edge-compatible Sanity client
-const sanity = createClient({
-    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
-    apiVersion: new Date().toISOString().split('T')[0],
-    token: process.env.NEXT_SANITY_API_TOKEN,
-    useCdn: false,
-})
-
-export async function middleware(req) {
-    const ip =
-        req.ip ||
-        req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-        req.headers.get('remote-addr')
-
-    // Fetch the blacklisted IPs from Sanity
-    const blacklistedIps = await sanity.fetch(`*[_type == "blacklistedips"].ip`)
-
-
-    if (blacklistedIps.includes(ip)) {
-        return new NextResponse('Access Denied.', { status: 403 })
-    }
-
-    return NextResponse.next()
+// Exact-case 301s for the mixed-case → lowercase URL migration (audit §4 P2).
+// These MUST live here and not in next.config.js redirects: redirect sources
+// match case-insensitively, so '/About' → '/about' would also match '/about'
+// itself and loop forever. JS string comparison is case-sensitive, so this
+// only fires on the exact legacy casing.
+const CASE_MAP = {
+  "/About": "/about",
+  "/Contacts": "/contact",
+  "/Feedback": "/feedback",
+  "/Gallery": "/gallery",
+  "/Jobs": "/jobs",
+  "/Privacy": "/privacy",
+  "/Quote": "/quote",
+  "/ServicesPage": "/services",
+  "/Services": "/services",
 }
 
-// Apply middleware to all routes
+export function middleware(req) {
+  const { pathname, search } = req.nextUrl
+  if (CASE_MAP[pathname]) {
+    return NextResponse.redirect(new URL(CASE_MAP[pathname] + search, req.url), 308)
+  }
+  if (pathname === "/Blog" || pathname.startsWith("/Blog/")) {
+    return NextResponse.redirect(
+      new URL(pathname.replace("/Blog", "/blog") + search, req.url),
+      308
+    )
+  }
+  return NextResponse.next()
+}
+
 export const config = {
-    matcher: '/:path*',
+  matcher: ["/About", "/Contacts", "/Feedback", "/Gallery", "/Jobs", "/Privacy", "/Quote", "/ServicesPage", "/Services", "/Blog", "/Blog/:slug*"],
 }

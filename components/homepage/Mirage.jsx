@@ -14,7 +14,7 @@ const Mirage = ({ content, urlFor }) => {
         icon: "truck",
       }))
     )
-  }, [content.aboutCards, urlFor])
+  }, [content.servicesCards, urlFor])
 
   return (
     <div className='w-full h-full my-12 py-12 px-4 flex items-center justify-center'>

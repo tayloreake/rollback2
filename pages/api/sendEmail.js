@@ -1,25 +1,36 @@
-import nodemailer from "nodemailer";
+// Plain sales-email sender (contact / feedback / jobs forms + legacy callers).
+// Quote intake goes through /api/submitQuote (ledger → SMS/email → Zoho).
+// This route sends email ONLY — no Sanity writes.
+// Recipients are allowlisted (no open relay): any client-supplied address
+// outside the list falls back to sales@taylorea.com.
 import { rateLimiter } from "./middleware/rateLimiter";
+import { verifyRecaptcha, sendSalesEmail } from "../../utils/leadNotify";
+import { syncInquiryToZoho } from "../../utils/zoho";
 
 const limiter = rateLimiter({
   windowMs: 15 * 60 * 1000,
   max: 5
 });
 
-async function verifyRecaptcha(token) {
-  try {
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
-    });
-    const data = await response.json();
-    return data.success;
-  } catch (error) {
-    console.error('reCAPTCHA verification error:', error);
-    return false;
-  }
-}
+const ALLOWED_TO = new Set([
+  "sales@taylorea.com",
+  "hradmin@taylorea.com",
+  "marykc@taylorea.com",
+  "stephaniem@taylorea.com",
+]);
+
+const pickRecipients = (raw) => {
+  const list = String(raw || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter((s) => ALLOWED_TO.has(s));
+  return list.length ? list : ["sales@taylorea.com"];
+};
+
+const cleanSubject = (raw, fallback) => {
+  const s = String(raw || "").replace(/[\r\n]+/g, " ").trim().slice(0, 120);
+  return s || fallback;
+};
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -29,54 +40,75 @@ export default async function handler(req, res) {
   try {
     await limiter(req);
 
-    const { to, message, recaptchaToken } = req.body;
+    const { message, recaptchaToken, inquiry } = req.body;
 
-    // ✅ Validate fields
     if (!recaptchaToken) {
       return res.status(400).json({ success: false, message: 'reCAPTCHA token is required' });
     }
 
-    const isHuman = await verifyRecaptcha(recaptchaToken);
-    if (!isHuman) {
+    const recaptchaResult = await verifyRecaptcha(recaptchaToken);
+    if (!recaptchaResult.success) {
       return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
     }
 
-    if (!to) {
-      return res.status(400).json({ success: false, message: "'to' field (recipient email) is required" });
+    if (recaptchaResult.score !== null && recaptchaResult.score < 0.5) {
+      console.warn(`Low reCAPTCHA score detected: ${recaptchaResult.score}`);
     }
+
     if (!message) {
       return res.status(400).json({ success: false, message: "'message' field is required" });
     }
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.NEXT_PUBLIC_GMAIL_USERNAME,
-        pass: process.env.NEXT_PUBLIC_GMAIL_APP_PASSWORD,
-      },
+    const result = await sendSalesEmail(message, inquiry?.attribution || {}, {
+      to: pickRecipients(req.body.to),
+      subject: cleanSubject(req.body.subject, "Taylor Movers Website Message"),
     });
 
-    const mailOptions = {
-      from: process.env.NEXT_PUBLIC_GMAIL_USERNAME,
-      to,
-      subject: "Taylor Movers Quote Request",
-      text: message,
-    };
-
-    try {
-      await transporter.sendMail(mailOptions);
-    } catch (error) {
-      console.error("Nodemailer sendMail error:", error);
+    if (!result.ok) {
       return res.status(500).json({
         success: false,
         message: "Failed to send email via Nodemailer",
-        error: error?.message || error || "Unknown error during email send"
       });
+    }
+
+    // Optional visitor confirmation with a FIXED template (safe: no
+    // attacker-controlled recipients beyond the verified submitter, no
+    // attacker-controlled body).
+    const confirmTo = String(req.body.confirmTo || "").trim();
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(confirmTo)) {
+      try {
+        await sendSalesEmail(
+          "Thanks for contacting Taylor Movers Kenya — we received your message and will respond shortly. For urgent moves call +254 721 410 517.",
+          {},
+          { to: [confirmTo], subject: "We received your message — Taylor Movers" }
+        );
+      } catch {}
+    }
+
+    // Non-quote inquiries (contact / feedback / job) → Zoho Website Inquiries.
+    // Awaited (not fire-and-forget) so a Zoho failure is logged instead of
+    // being swallowed by a bare .catch(() => {}).
+    let zoho = { ok: false, skipped: true, reason: "no_inquiry" }
+    if (inquiry) {
+      try {
+        zoho = await syncInquiryToZoho(inquiry)
+        if (!zoho?.ok && !zoho?.skipped) {
+          console.error("Zoho inquiry sync failed:", zoho?.error || "unknown")
+        } else if (zoho?.droppedAttribution?.length) {
+          // A custom field is missing/invalid in this CRM org — visible in
+          // logs instead of silently losing campaign attribution.
+          console.warn("Zoho dropped attribution field(s):", zoho.droppedAttribution.join(", "))
+        }
+      } catch (e) {
+        console.error("Zoho inquiry sync threw:", e?.message)
+      }
     }
 
     return res.status(200).json({
       success: true,
-      message: "Email sent successfully"
+      message: "Email sent successfully",
+      zoho: zoho?.ok ? "synced" : zoho?.skipped ? "skipped" : "pending",
+      zohoDroppedFields: zoho?.droppedAttribution || [],
     });
 
   } catch (error) {
@@ -94,6 +126,3 @@ export default async function handler(req, res) {
     });
   }
 }
-// This API route handles sending emails using Nodemailer with rate limiting and reCAPTCHA verification.
-// It ensures that the request is a POST method, applies rate limiting, verifies reCAPTCHA,
-// validates the required fields, and sends the email using Gmail's SMTP service.

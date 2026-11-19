@@ -1,5 +1,14 @@
 import { createClient, groq } from "next-sanity"
+import imageUrlBuilder from "@sanity/image-url"
 import clientConfig from "./config/client-config"
+import serverConfig from "./config/server-client"
+
+// Reads use the public tokenless client.
+const getWriteClient = () => {
+  const token = process.env.SANITY_API_TOKEN || process.env.NEXT_SANITY_API_TOKEN
+  if (token && !token.startsWith("REVOKED")) return createClient({ ...serverConfig, token })
+  return createClient(clientConfig)
+}
 
 export async function getLandingPageData() {
   return createClient(clientConfig).fetch(
@@ -26,26 +35,32 @@ export async function getServicesPageData() {
 
 export async function getBlogs() {
   return createClient(clientConfig).fetch(
-    groq`*[_type == "blogs"]{
-        ...,
-        title,
-        content[]{
-          ...,
-          _type == "image" => {
-            ...,
-            asset->{
-              _id,
-              url
-            }
-          }
+    groq`*[_type == "blogs" && !(_id in path('drafts.**')) && defined(slug.current)]{
+        _id,
+        blogTitle,
+        blogExcerpt,
+        blogImage,
+        date,
+        slug,
+        author->{
+          authorName,
+          authorImage
+        },
+        blogCategories[]->{
+          category
+        },
+        blogTags[]->{
+          tag
         }
-      }`
+      } | order(date desc)`
   )
 }
 export async function getBlog(slug) {
-  return createClient(clientConfig).fetch(`
-  *[_type=="blogs" && slug.current == '${slug}'][0]
-`)
+  if (!slug || typeof slug !== "string") return null
+  return createClient(clientConfig).fetch(
+    `*[_type=="blogs" && slug.current == $slug][0]`,
+    { slug }
+  )
 }
 export async function getBlogsByCategory(key) {
   return createClient(clientConfig).fetch(`
@@ -80,12 +95,10 @@ export async function getClientLogos() {
 }
 
 export async function getClientReviews() {
-  return createClient(clientConfig).fetch(
-    groq`*[_type == "newreview"]{
-        ...,
-        
-      }`
-  )
+  // Reviews now originate from Zoho CRM (submitted via /api/reviews),
+  // not from Sanity. This function returns an empty result so the homepage
+  // can display a gated message without crashing on 0 Sanity records.
+  return [];
 }
 export async function getSiteLogos() {
   return createClient(clientConfig).fetch(
@@ -127,6 +140,45 @@ export async function getAboutData() {
   )
 }
 
+// CMS SEO override for a service page (Sanity `service` doc metaTitle /
+// metaDescription / ogImage, falling back to hardcoded values when empty).
+// Matches the doc whose slug equals the page's service key, with aliases for
+// legacy slug differences (e.g. office-relocation → office-moves).
+// Also returns the doc's rich-text `content` for CMS-driven body sections.
+const SERVICE_SLUG_ALIASES = {
+  "office-relocation": "office-moves",
+  "residential-moving": "residential-moves",
+  "international-moving": "international-moves",
+  "storage-services": "warehousing-and-storage",
+}
+
+export async function getServiceSEO(serviceKey) {
+  try {
+    const all = await getServicesData()
+    const slugs = [serviceKey, SERVICE_SLUG_ALIASES[serviceKey]].filter(Boolean)
+    const match = (all || []).find((s) => s?.slug?.current && slugs.includes(s.slug.current))
+    if (!match) return null
+    let ogImageUrl = null
+    try {
+      const src = match.ogImage || match.image
+      if (src) ogImageUrl = imageUrlBuilder(clientConfig).image(src).url()
+    } catch {}
+    const content = match.local || match.international || match.others ? {
+      overview: match.local || null,
+      whyChooseUs: match.international || null,
+      process: [...(match.others || []), ...(match.presurvey || [])] || null,
+      name: match.name || null,
+    } : null
+    if (!match.metaTitle && !match.metaDescription && !ogImageUrl && !content) return null
+    return {
+      metaTitle: match.metaTitle || null,
+      metaDescription: match.metaDescription || null,
+      ogImageUrl,
+      content,
+    }
+  } catch { return null }
+}
+
 export async function getThankYouMessageData() {
   return createClient(clientConfig).fetch(
     groq`*[_type == "thankYouMessage"][0]{
@@ -141,54 +193,108 @@ export async function getTags() {
       }`
   )
 }
-export async function getBlacklistedIps() {
-  return createClient(clientConfig).fetch(
-    groq`*[_type == "blacklistedips"]{
-        ...,
-      }`
-  )
+export async function getFaqs() {
+  try {
+    return createClient(clientConfig).fetch(
+      groq`*[_type == "faq"] | order(order asc) { _id, question, answer }`
+    )
+  } catch { return [] }
 }
 
-export async function createQuote(
-  firstName,
-  email,
-  phoneNumber,
-  location,
-  destination,
-  moveType,
-  bedrooms,
-  moveDate,
-  referrals
-) {
+export async function getJobs() {
   try {
-    return createClient(clientConfig).create({
-      _type: "quote",
+    return createClient(clientConfig).fetch(
+      groq`*[_type == "job" && isOpen != false] | order(order asc) { _id, title, department, location, type, description, requirements }`
+    )
+  } catch { return [] }
+}
 
-      firstName,
-      email,
-      phoneNumber,
-      location,
-      destination,
-      moveType,
-      bedrooms,
-      moveDate,
-      referrals
-    })
+export async function getAnnouncement() {
+  try {
+    return createClient(clientConfig).fetch(
+      groq`*[_type == "announcement" && isActive == true][0] { message, link }`
+    )
+  } catch { return null }
+}
+
+// Function to get case study blog posts filtered by "Case Studies" category
+export async function getCaseStudyBlogs(limit = 5) {
+  try {
+    const allBlogs = await createClient(clientConfig).fetch(
+      groq`*[_type == "blogs" && defined(blogTitle) && !(_id in path('drafts.**'))] | order(date desc) {
+        _id,
+        blogTitle,
+        slug,
+        blogExcerpt,
+        blogImage,
+        date,
+        author->{
+          authorName,
+          authorImage
+        },
+        blogCategories[]->{
+          category
+        }
+      }`
+    );
+    
+    // Filter blogs that have "Case Studies" category
+    const caseStudyBlogs = allBlogs.filter(blog => {
+      return blog.blogCategories?.some(cat => 
+        cat.category?.toLowerCase().includes('case stud')
+      );
+    });
+    
+    return caseStudyBlogs.slice(0, limit);
   } catch (error) {
-    console.log(error)
-    throw new Error("Failed to create quote");
+    console.error('Error fetching case study blogs:', error);
+    return [];
   }
 }
 
-export async function createReview(sentiment, review, name, email) {
-  const client = createClient(clientConfig)
+// Fallback function to get recent blog posts if no case studies found
+export async function getRecentBlogs(limit = 5) {
+  try {
+    return createClient(clientConfig).fetch(
+      groq`*[_type == "blogs" && defined(blogTitle)] | order(date desc) [0...${limit}] {
+        _id,
+        blogTitle,
+        slug,
+        blogExcerpt,
+        date
+      }`
+    )
+  } catch (error) {
+    console.error('Error fetching recent blogs:', error);
+    return [];
+  }
+}
 
-  return client.create({
-    _type: "review",
-    name,
-    email,
-    sentiment,
-    review,
-    createdAt: new Date().toISOString(),
-  })
+
+
+// ⚠️ DISABLED: Production review writes are controlled via Zoho CRM.
+// Set REVIEW_SANITY_WRITE_ENABLED=true only as a temporary fallback.
+export async function createReview(sentiment, review, name, email) {
+  if (process.env.REVIEW_SANITY_WRITE_ENABLED !== "true") {
+    console.warn("createReview blocked: production review writes are disabled (reviews go to Zoho)")
+    return null
+  }
+  try {
+    const client = getWriteClient()
+    if (!client) {
+      console.error("Write client not available")
+      return null
+    }
+    return client.create({
+      _type: "review",
+      name,
+      email,
+      sentiment,
+      review,
+      approved: true,
+    })
+  } catch (error) {
+    console.error("Error creating review in Sanity:", error)
+    throw new Error("Failed to create review")
+  }
 }

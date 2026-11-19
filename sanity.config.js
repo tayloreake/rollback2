@@ -7,7 +7,6 @@ import category from "./sanity/schemas/category-schema"
 import tag from "./sanity/schemas/tag-schema"
 import blog from "./sanity/schemas/blog-schema"
 import servicespage from "./sanity/schemas/servicespage-schema"
-import quote from "./sanity/schemas/quote_req-schema"
 import review from "./sanity/schemas/review-schema"
 import clientreview from "./sanity/schemas/new-review-schema"
 import clientlogo from "./sanity/schemas/client-logos-schema"
@@ -17,18 +16,20 @@ import landingAbout from "./sanity/schemas/landing-about-schema"
 import landingService from "./sanity/schemas/landing-services-schema"
 import siteLogos from "./sanity/schemas/site-logos-schema";
 import thankYouMessage from "./sanity/schemas/thankyou-schema";
-import blacklistedip from "./sanity/schemas/blacklisted-schema";
+import faq from "./sanity/schemas/faq-schema";
+import job from "./sanity/schemas/job-schema";
+import announcement from "./sanity/schemas/announcement-schema";
 const config = defineConfig({
   projectId: "bsg3746e",
   dataset: "production",
   title: "Taylor Website",
   apiVersion: new Date().toISOString().split('T')[0],
   basePath: "/admin",
-  token:
-    "skOIZWPqgTE6cFwT6u3RQ3r9f1eHfJ7CC1l29wlRsK0YyO21iUCuiZNuezGwIfNv7SHWq1vIxuYidCJJ06Xm140oeKv4Cp5zPaWc5ybkvJVczRsFH4mISePmqhDNqqiuOb3qhIRstZOeWfp2VVD7bg7xQlIovICLVHEKNNFoBQxEBM3u5fDH",
+  // No token here — Studio uses logged-in user auth.
+  // Server mutations must use SANITY_API_TOKEN env var (see sanity/config/server-client.js).
   plugins: [deskTool()],
   schema: {
-    types: [service, landingPage, aboutPage, servicespage, category, tag, blog, quote, review, clientcategory, clientlogo, clientreview, about, landingAbout, landingService, siteLogos, thankYouMessage, blacklistedip],
+    types: [service, landingPage, aboutPage, servicespage, category, tag, blog, review, clientcategory, clientlogo, clientreview, about, landingAbout, landingService, siteLogos, thankYouMessage, faq, job, announcement],
   },
 })
 

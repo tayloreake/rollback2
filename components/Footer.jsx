@@ -11,200 +11,354 @@ import {
 } from "react-icons/bs"
 import { FaFacebook, FaLinkedin } from "react-icons/fa";
 import { RiTwitterXLine } from "react-icons/ri";
-import QuoteModal from "./Quote/QuoteModal";
 import { urlFor } from '../lib/sanity';
+import { getCaseStudyBlogs, getRecentBlogs } from '../sanity/sanity-utils';
+import WhatsAppButton from "./WhatsAppButton"
 
-
-const Footer = () => {
+const Footer = ({ caseStudies = [] }) => {
   const timestamp = new Date().getTime();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [logoImage, setLogoImage] = useState(null)
+  const [dynamicCaseStudies, setDynamicCaseStudies] = useState(caseStudies)
 
   useEffect(() => {
     const handleManualStorageChange = () => {
-      const logos = localStorage.getItem("siteLogos");
-      setLogoImage(JSON.parse(logos)[0]?.footerLogo);
+      try {
+        const logos = localStorage.getItem("siteLogos");
+        if (logos) {
+          const parsedLogos = JSON.parse(logos);
+          setLogoImage(parsedLogos[0]?.footerLogo);
+        }
+      } catch (error) {
+        console.error('Error parsing site logos from localStorage:', error);
+      }
     };
+    
     window.addEventListener("site-logos", handleManualStorageChange);
-  }, [])
+
+    // Fetch case studies if none provided - with timeout and error handling
+    if (caseStudies.length === 0) {
+      const fetchCaseStudies = async () => {
+        try {
+          // Use Promise.race with timeout to prevent hanging
+          const fetchPromise = (async () => {
+            let studies = await getCaseStudyBlogs(3); // Fetch blogs with "Case Studies" category
+            return studies || [];
+          })();
+          
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Fetch timeout')), 5000); // 5 second timeout
+          });
+          
+          const studies = await Promise.race([fetchPromise, timeoutPromise]);
+          setDynamicCaseStudies(studies);
+        } catch (error) {
+          console.error('Error fetching blog posts for case studies:', error);
+          // Set empty array so we show "no case studies" message
+          setDynamicCaseStudies([]);
+        }
+      };
+      
+      // Use setTimeout to defer the fetch and not block the render
+      const timeoutId = setTimeout(() => {
+        fetchCaseStudies();
+      }, 1000); // 1 second delay to ensure UI loads first
+      
+      return () => {
+        clearTimeout(timeoutId);
+        window.removeEventListener("site-logos", handleManualStorageChange);
+      };
+    }
+    
+    return () => {
+      window.removeEventListener("site-logos", handleManualStorageChange);
+    };
+  }, [caseStudies])
 
   return (
     <>
-      <section className="bg-[#FF5000] text-white">
-        <div className="container py-8">
-          <div className="row py-5">
-            <h2 className="col-12 text-2xl my-1 text-center font-[600]">
-              Request a Quotation
-              <span className="block text-sm my-1 font-[500]">Feel Free to ask, or send your request via chat</span>
-            </h2>
-            <div className="col-12 items-center flex">
-              < QuoteModal quotebtn={"default"} />
+      <section className='bg-white text-gray-800 w-full px-2 flex flex-col items-center justify-center relative overflow-hidden'>
+        
+        <div className='pt-16 pb-8 container w-full relative z-10'>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+            {/* Got any queries on moving? */}
+            <div className='p-6 animate-fade-in-up'>
+              <h3 className='text-[#FF5000] font-bold text-xl mb-4'>
+                Got any queries on moving?
+              </h3>
+              <div className='space-y-3 mb-6'>
+                <Link prefetch={false} className="block" href='/faq'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Frequently asked questions</p>
+                  </div>
+                </Link>
+                <div className='flex items-center p-2'>
+                  <span className='text-gray-700'>Email: </span>
+                  <a href='mailto:info@taylorea.com' className='text-[#FF5000] hover:text-[#FF8A50] transition-colors duration-300 ml-2 font-semibold'>info@taylorea.com</a>
+                </div>
+              </div>
+              
+              <h3 className='text-[#FF5000] font-bold text-xl mb-4 mt-6'>
+                Associations
+              </h3>
+              <div className='bg-white rounded-lg p-4 flex justify-center items-center'>
+                <div className='text-center'>
+                  <Image
+                    src='/assets/badges/iam-trusted-badge.png'
+                    alt='IAM Trusted Moving Professional - International Association of Movers'
+                    width={150}
+                    height={180}
+                    className='mx-auto hover-scale transition-transform duration-300'
+                  />
+                  <p className='text-xs text-gray-600 mt-2'>Trusted Moving Professional</p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </section>
-      <section className='bg-[#6D6E71] text-white w-full h-full  px-2 flex flex-col items-center  justify-center'>
-        <div className='pt-12 pb-3 container w-full flex flex-col md:flex-row items-start md:justify-between'>
-          {/* About */}
-          <div className='flex flex-col items-start pb-6'>
-            <h3 className=' font-bold text-lg mb-3 w-full items-center justify-center text-cnter md:w-auto'>
-              About Us
-            </h3>
-            <p className='text-sm max-w-[390px]  mb-6 text-cente md:text-start'>
-              We specialize in local and international relocations. Taylor Movers
-              is a privately held firm committed to excellence through providing
-              relocations, transportation, warehousing, expatriate mobility
-              services and logistics services efficiently.
-            </p>
-
-          </div>
-          {/* Services */}
-          <div className='flex flex-col items-start pb-6'>
-            <h3 className=' font-bold text-lg mb-3 w-full items-center justify-center text-center md:w-auto'>
-              Our Services
-            </h3>
-            <div className='text-sm text-[#BECCC7] flex flex-col justify-between items-start'>
-              <Link className="my-1" href='/services/household-moving'>
-                <div className='flex flex-row items-center '>
-                  {/* <BsArrowRight size={20} className=' my-2 mr-2' /> */}
-                  <p className=''>Household Moving</p>
-                </div>
-              </Link>
-              <Link className="my-1" href='/services/office-moving'>
-                <div className='flex flex-row items-center'>
-                  {/* <BsArrowRight size={20} className='my-2 mr-2' /> */}
-                  <p className=''>Office Moving</p>
-                </div>
-              </Link>
-              <Link className="my-1" href='/services/corporate-moving'>
-                <div className='flex flex-row items-center'>
-                  {/* <BsArrowRight size={20} className='my-2 mr-2' /> */}
-                  <p className=''>Corporate Relocation Services</p>
-                </div>
-              </Link>
-              <Link className="my-1" href='/services/warehousing'>
-                <div className='flex flex-row items-center'>
-                  {/* <BsArrowRight size={20} className='my-2 mr-2' /> */}
-                  <p className=''>Warehousing</p>
-                </div>
-              </Link>
+            
+            {/* Our Services */}
+            <div className='p-6 animate-fade-in-up' style={{animationDelay: '0.1s'}}>
+              <h3 className='text-[#FF5000] font-bold text-xl mb-4'>
+                Our services
+              </h3>
+              <div className='space-y-3'>
+                <Link prefetch={false} className="block" href='/services/home'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Residential Moving</p>
+                  </div>
+                </Link>
+                <Link prefetch={false} className="block" href='/services/office'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Office Relocation</p>
+                  </div>
+                </Link>
+                <Link prefetch={false} className="block" href='/services/corporate'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Corporate Staff Relocation</p>
+                  </div>
+                </Link>
+                <Link prefetch={false} className="block" href='/services/intl'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>International Moving</p>
+                  </div>
+                </Link>
+                <Link prefetch={false} className="block" href='/services/storage'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Storage Services</p>
+                  </div>
+                </Link>
+                <Link prefetch={false} className="block" href='/services/special'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Special Services</p>
+                  </div>
+                </Link>
+              </div>
             </div>
-          </div>
-          {/* Quick Links */}
-          <div className='top-0 flex-col items-start pb-6'>
-            <h3 className='font-bold text-lg mb-3 w-full items-center justify-center text-center md:w-auto'>
-              Pages
-            </h3>
-            <div className='text-sm text-[#BECCC7] flex flex-col justify-between items-start w-full '>
-              <Link className="my-1" href='/'>
-                <div className='flex flex-row items-center'>
-                  {/* <BsArrowRight size={20} className='] my-2 mr-2' /> */}
-                  <p className=''>Home</p>
-                </div>
-              </Link>
-
-              <Link className="my-1" href='/About'>
-                <div className='flex flex-row items-center'>
-                  {/* <BsArrowRight size={20} className='text-[#] my-2 mr-2' /> */}
-                  <p className=''>About</p>
-                </div>
-              </Link>
-              <Link className="my-1" href='/Services'>
-                <div className='flex flex-row items-center'>
-                  {/* <BsArrowRight size={20} className='text-[#] my-2 mr-2' /> */}
-                  <p className=''>Our Services</p>
-                </div>
-              </Link>
-              <Link className="my-1" href='/Blog'>
-                <div className='flex flex-row items-center'>
-                  {/* <BsArrowRight size={20} className='text-[#] my-2 mr-2' /> */}
-                  <p className=''>Our Blog</p>
-                </div>
-              </Link>
-              <Link className="my-1" href='/Gallery'>
-                <div className='flex flex-row items-center'>
-                  {/* <BsArrowRight size={20} className='text-[#] my-2 mr-2' /> */}
-                  <p className=''>Our Gallery</p>
-                </div>
-              </Link>
+            
+            {/* About Us */}
+            <div className='p-6 animate-fade-in-up' style={{animationDelay: '0.15s'}}>
+              <h3 className='text-[#FF5000] font-bold text-xl mb-4'>
+                About Us
+              </h3>
+              <div className='space-y-3 mb-6'>
+                <Link prefetch={false} className="block" href='/about'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>About Taylor Movers</p>
+                  </div>
+                </Link>
+                <Link prefetch={false} className="block" href='/gallery'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Gallery</p>
+                  </div>
+                </Link>
+                <Link prefetch={false} className="block" href='/contact'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Contact Us</p>
+                  </div>
+                </Link>
+                <Link prefetch={false} className="block" href='/jobs'>
+                  <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                    <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                    <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300'>Jobs</p>
+                  </div>
+                </Link>
+              </div>
+              
+              <h3 className='text-[#FF5000] font-bold text-xl mb-4 mt-6'>
+                Case Studies
+              </h3>
+              <div className='space-y-3'>
+                {dynamicCaseStudies && dynamicCaseStudies.length > 0 ? (
+                  <>
+                    {dynamicCaseStudies.slice(0, 3).map((study, index) => (
+                      <Link prefetch={false} key={study._id || study.slug?.current || index} className="block" href={`/Blog/${study.slug?.current}`}>
+                        <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group'>
+                          <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                          <p className='text-gray-700 group-hover:text-[#FF5000] transition-colors duration-300 text-sm leading-tight'>
+                            {study.blogTitle || 'Untitled Post'}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                    
+                    {/* View all link */}
+                    <Link prefetch={false} className="block" href='/blog'>
+                      <div className='flex items-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 hover-scale group mt-4 pt-4 border-t border-gray-200'>
+                        <BsArrowRight size={16} className='mr-3 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                        <p className='text-gray-600 group-hover:text-[#FF5000] transition-colors duration-300 text-sm font-medium'>
+                          View All Case Studies
+                        </p>
+                      </div>
+                    </Link>
+                  </>
+                ) : (
+                  <div className='text-center py-4'>
+                    <Link prefetch={false} href='/blog'>
+                      <div className='flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-all duration-300 group'>
+                        <BsArrowRight size={16} className='mr-2 text-[#FF5000] group-hover:translate-x-1 transition-transform duration-300' />
+                        <p className='text-gray-600 group-hover:text-[#FF5000] transition-colors duration-300 text-sm'>
+                          Browse Case Studies
+                        </p>
+                      </div>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-          {/* Contacts */}
-          <div className='flex flex-col items-center md:items-start pb-6 w-full max-w-[320px] md:w-fit'>
-            <h3 className=' font-bold text-lg mb-3 w-full items-center justify-center text-center md:w-auto'>
-              Business Hours
-            </h3>
-            <div className='text-sm text-[#BECCC7] flex flex-col justify-between items-center md:items-start w-full'>
-              <div className='w-full '>
-                <p className='md:text-start'>
-                  Monday - Friday:
-                  <br />
-                  09.00 am - 08.00 pm.
-                </p>
-                {/* <hr className='border border-[#DB421B] w-full md:max-w-[200px] my-6' /> */}
-                <p className='mt-2 md:text-start'>
-                  Saturday - Sunday:
-                  <br />
-                  09.00 am - 12.00 pm.
-                </p>
-                {/* <p className='md:text-start w-full mt-4'>
-                We are at you&apos;re service
-              </p> */}
+            
+            {/* Contact us */}
+            <div className='p-6 animate-fade-in-up' style={{animationDelay: '0.2s'}}>
+              <h3 className='text-[#FF5000] font-bold text-xl mb-4'>
+                Contact us:
+              </h3>
+              <div className='space-y-4'>
+                <div className='bg-gray-50 rounded-lg p-4'>
+                  <p className='text-gray-700 text-sm leading-relaxed'>
+                    <span className='font-semibold'>Nairobi Office:</span><br/>
+                    Nazarene Complex Suite 1<br/>
+                    Central Church of the Nazarene,<br/>
+                    Ngong Road Nairobi KE
+                  </p>
+                </div>
+                <div className='bg-gray-50 rounded-lg p-4'>
+                  <p className='text-gray-700 text-sm leading-relaxed'>
+                    <span className='font-semibold'>Warehouse:</span><br/>
+                    Emerald Business Park Warehouse,<br/>
+                    Kutch Road, Off Mombasa Road
+                  </p>
+                </div>
+                <div className='bg-gray-50 rounded-lg p-4'>
+                  <p className='text-gray-700 text-sm leading-relaxed'>
+                    <span className='font-semibold'>Main Office:</span><br/>
+                    <a href='tel:0721410517' className='text-[#FF5000] hover:text-[#FF8A50] transition-colors'>0721 410 517</a> / <a href='tel:0759222111' className='text-[#FF5000] hover:text-[#FF8A50] transition-colors'>0759 222 111</a>
+                  </p>
+                </div>
+                <div className='bg-gray-50 rounded-lg p-4'>
+                  <p className='text-gray-700 text-sm leading-relaxed'>
+                    <span className='font-semibold'>WhatsApp:</span><br/>
+                    <WhatsAppButton placement="footer" target='_blank' rel='noreferrer' className='text-[#FF5000] hover:text-[#FF8A50] transition-colors'>0721 410 517</WhatsAppButton>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-
         </div>
 
         {/* <hr className='border border-[#313D39] w-full my-6' /> */}
 
-        <div className="container w-full row py-3 text-sm border-t-[2px] border-[#313D39]">
-          <div className="col-6">
-            <div className="py-1">
+        {/* Modern Footer Bottom */}
+        <div className="container w-full py-8 border-t border-gray-200 relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="flex flex-col items-center md:items-start mb-6 md:mb-0 animate-fade-in-left">
               {!logoImage ?
                 <Image
                   width={200}
-                  height={1}
-                  className='object-contain w-[150px] md:w-[250px]'
-
-                  // style={{ height: 'auto', width: 'auto' }}
-                  src={`/assets/General/logo-light.png?cb=${timestamp}`} alt='Taylor Movers Logo' />
+                  height={80}
+                  className='object-contain w-[180px] md:w-[280px] hover-scale transition-all duration-300'
+                  src={`/assets/General/logo.png?cb=${timestamp}`} 
+                  alt='Taylor Movers Logo' 
+                />
                 :
                 <Image
                   src={urlFor(logoImage?.image)?.url()}
                   alt={logoImage?.alt}
                   width={200}
-                  height={1}
-                  className='object-contain w-[150px] md:w-[250px]'
-
+                  height={80}
+                  className='object-contain w-[180px] md:w-[280px] hover-scale transition-all duration-300'
                 />
               }
-
-              <div className="my-1 text-sm font-[500]">Experience delightful moving!</div>
+              <p className="mt-4 text-lg font-semibold text-[#FF5000]">
+                Experience delightful moving!
+              </p>
+              <p className="text-sm text-gray-600 mt-2">
+                © {new Date().getFullYear()} Taylor Movers. All rights reserved.
+              </p>
+              {/* Developer Credit */}
+              <div className="mt-4 text-xs text-gray-500 flex items-center justify-center md:justify-start">
+                <span className="mr-1">♠</span>
+                <span>Designed by </span>
+                <span className="ml-1 text-gray-400">aceaaroncharles</span>
+                <span className="ml-1">♠</span>
+              </div>
             </div>
-          </div>
-          <div className="col-6">
-            <div className='float-end hidden md:flex flex-wrap justify-between py-4'>
-              <a href='https://web.facebook.com/taylormoversea' target="_blank">
-                <div className='mr-2 p-1 w-[40px] h-[40px] bg-[#313D39] flex items-center justify-center hover:bg-[#FD6038] text-white'>
-                  <FaFacebook size={20} />
-                </div>
-              </a>
-              <a href='https://web.instagram.com/taylormoversea' target="_blank">
-                <div className='mr-2 p-1 w-[40px] h-[40px] bg-[#313D39] flex items-center justify-center hover:bg-[#FD6038] text-white'>
-                  <BsInstagram size={20} />
-                </div>
-              </a>
-              <a href='https://twitter.com/taylormoverske' target="_blank">
-                <div className='mr-2 p-1 w-[40px] h-[40px] bg-[#313D39] flex items-center justify-center hover:bg-[#FD6038] text-white'>
-                  <RiTwitterXLine size={20} />
-                </div>
-              </a>
-              <a href='https://www.linkedin.com/company/taylor-movers-ea/?originalSubdomain=ke' target="_blank">
-                <div className='mr-2 p-1 w-[40px] h-[40px] bg-[#313D39] flex items-center justify-center hover:bg-[#FD6038] text-white'>
-                  <FaLinkedin size={20} />
-                </div>
-              </a>
+            
+            <div className='flex flex-col items-center animate-fade-in-right'>
+              <p className="text-lg font-semibold text-[#FF5000] mb-4">Follow Us</p>
+              <div className='flex space-x-4'>
+                <a
+                  href='https://www.facebook.com/taylormoversea'
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Taylor Movers on Facebook"
+                  className='social-icon-modern facebook-hover'
+                >
+                  <div className='w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200 flex items-center justify-center hover-scale hover:shadow-xl transition-all duration-300 hover:bg-[#1877F2]/10'>
+                    <FaFacebook size={20} className='text-[#1877F2]' />
+                  </div>
+                </a>
+                <a
+                  href='https://www.instagram.com/taylormoversea'
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Taylor Movers on Instagram"
+                  className='social-icon-modern instagram-hover'
+                >
+                  <div className='w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200 flex items-center justify-center hover-scale hover:shadow-xl transition-all duration-300 hover:bg-gradient-to-r hover:from-[#E4405F]/10 hover:to-[#FCCC63]/10'>
+                    <BsInstagram size={20} className='text-[#E4405F]' />
+                  </div>
+                </a>
+                <a
+                  href='https://twitter.com/taylormoverske'
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Taylor Movers on X"
+                  className='social-icon-modern twitter-hover'
+                >
+                  <div className='w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200 flex items-center justify-center hover-scale hover:shadow-xl transition-all duration-300 hover:bg-black/10'>
+                    <RiTwitterXLine size={20} className='text-black' />
+                  </div>
+                </a>
+                <a
+                  href='https://www.linkedin.com/company/taylor-movers-ea/'
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Taylor Movers on LinkedIn"
+                  className='social-icon-modern linkedin-hover'
+                >
+                  <div className='w-12 h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-50 border border-gray-200 flex items-center justify-center hover-scale hover:shadow-xl transition-all duration-300 hover:bg-[#0077B5]/10'>
+                    <FaLinkedin size={20} className='text-[#0077B5]' />
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
         </div>

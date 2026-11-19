@@ -1,6 +1,6 @@
 import Image from "next/image"
 import React from "react"
-import { Carousel } from "react-bootstrap"
+
 import HeroSection from "./hero-section"
 
 const Featured = ({ content, urlFor }) => {

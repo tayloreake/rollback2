@@ -1,254 +1,618 @@
-'use client'; // Required for interactivity in app directory
-import Image from 'next/image'
-import React, { useState, useEffect, useRef } from 'react'
-import { BsBookHalf, BsClipboard, BsFillTelephoneFill, BsPeopleFill, BsTruck, BsWhatsapp } from 'react-icons/bs'
-import { MdEmail, MdShareLocation } from 'react-icons/md'
 import Link from 'next/link'
-import { AiOutlineClose, AiOutlineCloseCircle, AiOutlineMenu } from 'react-icons/ai'
-import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa'
-import { Drawer } from 'antd';
+import Image from 'next/image'
+import { useState, useEffect, useRef } from 'react'
+import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai'
+import { FaTwitter, FaFacebook, FaLinkedin, FaChevronDown } from 'react-icons/fa'
+import { useRouter } from 'next/router'
+import client from '../sanity/config/client-config'
 import QuoteForm from './Quote/Form'
-import { set } from 'sanity';
-import { urlFor } from '../lib/sanity';
-
+import imageUrlBuilder from '@sanity/image-url'
+import { gtmTrackPhoneClick } from '../utils/gtm'
 
 const Navbar = () => {
     const [open, setOpen] = useState(false)
-    // const [open, setOpen] = useState(false);
-    const [placement, setPlacement] = useState('left');
-    const [logoImage, setLogoImage] = useState(null);
+    const [isClient, setIsClient] = useState(false)
+    const [logoImage, setLogoImage] = useState(null)
+    const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false)
+    const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
+    const servicesDropdownRef = useRef(null)
+    const router = useRouter()
+    
+    // Create urlFor function
+    const builder = imageUrlBuilder(client)
+    const urlFor = (source) => builder.image(source)
+    
+    // Phone click tracking
+    const handlePhoneClick = () => {
+        gtmTrackPhoneClick()
+    }
 
-    const showDrawer = () => {
-        setOpen(true);
-    };
-    const onClose = () => {
-        setOpen(false);
-    };
-    const onChange = (e) => {
-        setPlacement(e.target.value);
-    };
+    const mainServicesItems = [
+        { name: 'Residential Moving', href: '/services/home' },
+        { name: 'Office Relocation', href: '/services/office' },
+        { name: 'Corporate Staff Relocation', href: '/services/corporate' },
+        { name: 'International Moving', href: '/services/intl' },
+        { name: 'Storage Services', href: '/services/storage' },
+        { name: 'Long-Distance Moving', href: '/services/long' }
+    ]
 
-
-
-    const ShowQuote = () => {
-        const [open, setOpen] = useState(false);
-        const menuRef = useRef(null);
-        useEffect(() => {
-            // Add event listener to close the drawer when clicking outside of it
-            window.addEventListener("tayloreaFormSubmitted", () => setOpen(false));
-
-            return () => document.removeEventListener('tayloreaFormSubmitted', () => setOpen(false));
-        }, []);
-
-        useEffect(() => {
-            const handler = (e) => {
-                if (menuRef.current && !menuRef.current.contains(e.target)) {
-                    setOpen(false);
+    useEffect(() => {
+        setIsClient(true)
+        
+        const handleStorageChange = () => {
+            try {
+                const logos = localStorage.getItem("siteLogos")
+                if (logos) {
+                    const parsedLogos = JSON.parse(logos)
+                    setLogoImage(parsedLogos[0]?.headerLogo)
                 }
-            };
-            const handleManualStorageChange = () => {
-                const logos = localStorage.getItem("siteLogos");
-                setLogoImage(JSON.parse(logos)[0]?.headerLogo);
-            };
-            window.addEventListener("site-logos", handleManualStorageChange);
-            document.addEventListener('mousedown', handler);
-            return () => document.removeEventListener('mousedown', handler);
-        }, []);
+            } catch (error) {
+                console.error('Error parsing site logos:', error)
+            }
+        }
+        
+        window.addEventListener("site-logos", handleStorageChange)
+        handleStorageChange() // Call once on mount
+        
+        return () => {
+            window.removeEventListener("site-logos", handleStorageChange)
+        }
+    }, [])
+
+    // Handle click outside for services dropdown
+    useEffect(() => {
+        if (!isClient) return
+
+        const handleClickOutside = (event) => {
+            if (servicesDropdownRef.current && !servicesDropdownRef.current.contains(event.target)) {
+                setServicesDropdownOpen(false)
+            }
+        }
+
+        if (servicesDropdownOpen) {
+            document.addEventListener('mousedown', handleClickOutside)
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [servicesDropdownOpen, isClient])
+
+    // Prefetch key routes during idle (audit §2 P2: trimmed from 19)
+    useEffect(() => {
+        if (!router?.prefetch) return
+        const routesToPrefetch = [
+            '/', '/about', '/services', '/quote', '/contact'
+        ]
+        routesToPrefetch.forEach((r) => {
+            try { router.prefetch(r) } catch (e) {}
+        })
+    }, [router])
+
+
+    // Quote dropdown panel anchored under the button (responsive, no page overlay)
+    const ShowQuote = () => {
+        const [quoteOpen, setQuoteOpen] = useState(false)
+        const menuRef = useRef(null)
+
+        useEffect(() => {
+            if (!isClient) return
+            const handleClickOutside = (e) => {
+                if (menuRef.current && !menuRef.current.contains(e.target)) setQuoteOpen(false)
+            }
+            const handleFormSubmit = () => setQuoteOpen(false)
+            const handleEscape = (e) => { if (e.key === 'Escape') setQuoteOpen(false) }
+            document.addEventListener('mousedown', handleClickOutside)
+            document.addEventListener('keydown', handleEscape)
+            window.addEventListener("tayloreaFormSubmitted", handleFormSubmit)
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside)
+                document.removeEventListener('keydown', handleEscape)
+                window.removeEventListener('tayloreaFormSubmitted', handleFormSubmit)
+            }
+        }, [])
 
         return (
-            <div
-                className='relative inline-block mb-2 '>
-                <div
-                    onClick={() => setOpen(!open)}
-                    className=''>
-                    <div className='right-slanted-box items-center px-2 md:px-4 py-2 bg-[#FF5000] cursor-pointer text-white'>
-                        <span className='font-semibold md:text-sm text-xs'>Request a quote</span>
-                    </div>
-                </div>
+            <div ref={menuRef} className='relative inline-block mb-2'>
+                <button
+                    type='button'
+                    onClick={() => setQuoteOpen(!quoteOpen)}
+                    aria-expanded={quoteOpen}
+                    aria-haspopup='dialog'
+                    className='cursor-pointer rounded-lg shadow-sm px-4 py-2.5 bg-[#FF5000] hover:bg-[#e04400] transition-colors duration-200 min-h-[44px]'
+                >
+                    <span className='font-semibold text-sm text-white whitespace-nowrap'>Get Quote</span>
+                </button>
 
-                {open && (
+                {isClient && quoteOpen && (
                     <div
-                        className="absolute right-0 mt-2 bg-white rounded-md shadow-lg z-[9999]">
-                        <span className='close-toggle-quote-form' onClick={() => setOpen(false)}>X</span>
+                        className='fixed left-4 right-4 top-[118px] sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+10px)] z-[80] nav-quote-dropdown bg-white rounded-2xl shadow-2xl border border-slate-100 sm:origin-top-right'
+                        style={{
+                          width: 'min(440px, calc(100vw - 2rem))',
+                          maxWidth: 'calc(100vw - 2rem)',
+                          maxHeight: 'calc(100vh - 170px)',
+                          margin: '0 auto',
+                          overflowY: 'auto',
+                          overflowX: 'hidden',
+                          WebkitOverflowScrolling: 'touch',
+                          overscrollBehavior: 'contain',
+                          touchAction: 'pan-y',
+                        }}
+                    >
+                        <div className='sticky top-0 z-10 flex justify-end bg-white/95 backdrop-blur px-2 pt-2 pb-1'>
+                            <button
+                                type='button'
+                                onClick={() => setQuoteOpen(false)}
+                                aria-label='Close quote form'
+                                className='w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-[#0B1B33]/90 text-white text-xl hover:bg-black transition-colors'
+                            >
+                                ×
+                            </button>
+                        </div>
                         <QuoteForm />
                     </div>
                 )}
             </div>
-
         )
     }
 
+    // Services Dropdown Component
+    const ServicesDropdown = () => {
+        if (!isClient) {
+            return (
+                <Link href='/services' className='nav-link-modern'>
+                    <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm flex items-center space-x-1'>
+                        <span>Services</span>
+                        <FaChevronDown size={12} />
+                    </div>
+                </Link>
+            )
+        }
+
+        return (
+            <div className="relative" ref={servicesDropdownRef}>
+                <Link
+                    href='/services'
+                    onMouseEnter={() => setServicesDropdownOpen(true)}
+                    className="px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm flex items-center space-x-1"
+                >
+                    <span>Services</span>
+                    <FaChevronDown className={`transition-transform duration-200 ${servicesDropdownOpen ? 'rotate-180' : ''}`} size={12} />
+                </Link>
+                
+                {servicesDropdownOpen && (
+                    <div 
+                        className="absolute top-full left-0 mt-2 w-72 bg-white rounded-lg shadow-xl border border-gray-100 z-[70] animate-fade-in-down overflow-y-auto overscroll-contain"
+                        style={{
+                          maxHeight: 'calc(100vh - 250px)',
+                          overflowY: 'auto',
+                          overflowX: 'hidden',
+                          WebkitOverflowScrolling: 'touch',
+                          overscrollBehavior: 'contain',
+                          touchAction: 'pan-y',
+                        }}
+                        onMouseLeave={() => setServicesDropdownOpen(false)}
+                    >
+                        <div className="py-2">
+                            <Link 
+                                href='/services'
+                                className="block px-4 py-3 text-gray-700 font-semibold hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 text-sm border-b border-gray-100 mb-1"
+                                onClick={() => setServicesDropdownOpen(false)}
+                            >
+                                🏠 View All Services
+                            </Link>
+                            
+                            {/* All Services */}
+                            <div className="px-4 py-2">
+                                {mainServicesItems.map((item, index) => (
+                                    <div key={`service-${index}`} className="relative">
+                                        {/* Regular service items */}
+                                        <Link 
+                                            href={item.href}
+                                            className="block px-3 py-2 text-gray-700 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 font-medium text-sm rounded-md mb-1"
+                                            onClick={() => setServicesDropdownOpen(false)}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    </div>
+                                ))}
+                                
+                                {/* Specialized Services */}
+                                <div className="border-t border-gray-100 mt-2 pt-2">
+                                    <Link 
+                                        href="/services/special"
+                                        className="block px-3 py-2 text-gray-700 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 font-semibold text-sm rounded-md mb-1"
+                                        onClick={() => setServicesDropdownOpen(false)}
+                                    >
+                                        ✨ Special Services
+                                    </Link>
+                                    
+                                    {/* Sub-items under Special Services - indented */}
+                                    <div className="ml-4 space-y-1">
+                                        <Link 
+                                            href="/services/piano-moving"
+                                            className="block px-3 py-2 text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 text-sm rounded-md"
+                                            onClick={() => setServicesDropdownOpen(false)}
+                                        >
+                                            🎹 Piano Moving
+                                        </Link>
+                                        <Link 
+                                            href="/services/pet-relocation"
+                                            className="block px-3 py-2 text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5000]/10 hover:to-[#FF8A50]/10 hover:text-[#FF5000] transition-all duration-200 text-sm rounded-md"
+                                            onClick={() => setServicesDropdownOpen(false)}
+                                        >
+                                            🐾 Pet Relocation
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        )
+    }
+
+    // Use enhanced styling for all pages (standardized design)
+    const [isEnhancedHomePage, setIsEnhancedHomePage] = useState(true)
+    useEffect(() => {
+        // Always use enhanced styling for consistent design across all pages
+        setIsEnhancedHomePage(true)
+    }, [router?.asPath])
+
+    // Ensure dropdowns/drawers close on route change to avoid overlaying new pages
+    useEffect(() => {
+        setOpen(false)
+        setServicesDropdownOpen(false)
+        setMobileServicesOpen(false)
+    }, [router?.asPath])
+
     return (
-        <div className='w-full h-full z-50'>
-            <div className='h-full container'>
-                <div className='bg-[#]  w-full h-full flex flex-row items-center justify-center md:px-8'>
-                    <div className=' flex items-end justify-end w-full'>
-                        <a href='tel:+254721410517'
-                            className='flex flex-row justify-end font-bold text-[#FF5000] py-2'>
-                            <span className='text-gray-800 mr-2'>Call: </span>
-                            +254 721410517
-                        </a>
-                        {/* <div className='flex flex-row items-center text-white py-2'>
-                        <MdEmail className='mr-2'/>
-                        <p className='font-bold text-sm'>sales@taylorea.com</p>
-                    </div> */}
+        <div className="w-full">
+            {/* Phone number bar - always at top */}
+            <div className={`w-full hidden md:block ${
+                isEnhancedHomePage ? 'fixed top-0 left-0 right-0 z-[60]' : ''
+            }`}>
+                <div className={`w-full flex flex-row items-center justify-end px-8 py-2 ${
+                    isEnhancedHomePage 
+                        ? 'navbar-glass-phone' 
+                        : 'bg-gradient-to-r from-gray-50 to-white border-b border-gray-100'
+                }`}>
+                    <a href='tel:+254721410517'
+                        onClick={handlePhoneClick}
+                        className={`flex flex-row justify-end font-bold hover-glow rounded-lg px-3 py-1 transition-all duration-300 ${
+                            isEnhancedHomePage ? 'text-white' : 'text-[#FF5000]'
+                        }`}>
+                        <span className="mr-2 text-sm text-[#C73E00] font-semibold">Call: </span>
+                        <span className={`text-sm ${
+                            isEnhancedHomePage ? 'text-[#FF5000] font-bold' : 'gradient-text'
+                        }`}>+254 721410517</span>
+                    </a>
+                </div>
+            </div>
+                
+            {/* Mobile phone number bar */}
+            <div className={`md:hidden w-full ${
+                isEnhancedHomePage ? 'fixed top-0 left-0 right-0 z-[60]' : ''
+            }`}>
+                <div className={`w-full flex flex-row items-center justify-center px-4 py-2 ${
+                    isEnhancedHomePage 
+                        ? 'navbar-glass-phone' 
+                        : 'bg-gradient-to-r from-gray-50 to-white border-b border-gray-100'
+                }`}>
+                    <a href='tel:+254721410517'
+                        onClick={handlePhoneClick}
+                        className={`flex flex-row justify-center font-bold hover-glow rounded-lg px-3 py-1 transition-all duration-300 ${
+                            isEnhancedHomePage ? 'text-white' : 'text-[#FF5000]'
+                        }`}>
+                        <span className="mr-2 text-sm text-[#C73E00] font-semibold">Call: </span>
+                        <span className={`text-sm ${
+                            isEnhancedHomePage ? 'text-[#FF5000] font-bold' : 'gradient-text'
+                        }`}>+254 721410517</span>
+                    </a>
+                </div>
+            </div>
+                
+            {/* Mobile navbar */}
+            <div className={`md:hidden fixed left-0 right-0 z-[50] ${
+                isEnhancedHomePage 
+                    ? 'top-10' 
+                    : 'top-10 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm'
+            }`}>
+                <div className={`max-w-7xl mx-auto px-4 h-16 flex items-center justify-between ${
+                    isEnhancedHomePage 
+                        ? 'bg-white/10 backdrop-blur-md rounded-lg mx-4 my-2 border border-white/20' 
+                        : ''
+                }`}>
+                    <Link href='/' className='flex-shrink-0 transition-transform duration-200 hover:scale-105'>
+                        <Image 
+                            className='object-contain' 
+                            src={isClient && logoImage && urlFor ? urlFor(logoImage.image).url() : '/assets/General/logo.png'}
+                            width={100} 
+                            height={40} 
+                            alt='Taylor Movers Logo' 
+                        />
+                    </Link>
+                    
+                    <div className='flex items-center space-x-3'>
+                        <ShowQuote />
+                        <button 
+                            type="button"
+                            onClick={() => setOpen(true)}
+                            aria-label="Open menu"
+                            className={`p-2.5 rounded-lg transition-all duration-200 border shadow-sm ${
+                                isEnhancedHomePage 
+                                    ? 'bg-white/20 backdrop-blur-sm hover:bg-white/30 border-white/30 text-black' 
+                                    : 'bg-white/80 backdrop-blur-sm hover:bg-white/90 border-gray-200 text-black'
+                            }`}
+                        >
+                            <AiOutlineMenu size={20} className="text-black" />
+                        </button>
                     </div>
                 </div>
-                <div className='md:hidden py-2 my-2  md:px-4  flex-row justify-center items-center'>
-                    <div className='w-full flex flex-row items-center justify-between'>
-                        <Link href='/'>
-                            {!logoImage ?
-                                <Image className='object-contain' src='/assets/General/logo.png' width={120} height={100} alt='Taylor Movers Logo' />
-                                : <Image
-                                    src={urlFor(logoImage?.image).url()}
-                                    alt={logoImage?.alt}
-                                    width={120}
-                                    height={1}
-                                    className='object-contain'
+            </div>
+            
+            {/* Spacer to prevent content from hiding under fixed navbar */}
+            <div className={`md:hidden ${
+                isEnhancedHomePage ? 'h-[120px]' : 'h-[104px]'
+            }`}></div>
+
+            {/* Desktop navbar */}
+            <div className={`hidden md:flex w-full py-3 px-6 flex-row justify-center items-center ${
+                isEnhancedHomePage ? 'fixed top-10 left-0 right-0 z-[50]' : ''
+            }`}>
+                <div className={`w-full max-w-7xl flex flex-row justify-between items-center px-6 py-3 animate-fade-in-up ${
+                    isEnhancedHomePage 
+                        ? 'navbar-glass rounded-2xl shadow-2xl' 
+                        : 'glass-card backdrop-blur-md rounded-2xl shadow-xl'
+                }`}>
+                    <Link href='/' className='hover-scale animate-fade-in-left'>
+                        <Image 
+                            src={isClient && logoImage && urlFor ? urlFor(logoImage.image).url() : '/assets/General/logo.png'}
+                            width={180} 
+                            height={42} 
+                            alt='Taylor Movers Logo' 
+                            className='transition-all duration-300' 
+                        />
+                    </Link>
+                    <nav className={`flex items-center px-3 py-2 animate-fade-in-right ${
+                        isEnhancedHomePage 
+                            ? 'navbar-glass-nav rounded-xl shadow-lg' 
+                            : 'bg-gradient-to-r from-[#FF5000] to-[#FF8A50] rounded-xl shadow-lg'
+                    }`}>
+                        <Link href='/' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                Home
+                            </div>
+                        </Link>
+                        <Link href='/about' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                About us
+                            </div>
+                        </Link>
+                        <Link href='/gallery' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                Gallery
+                            </div>
+                        </Link>
+                        <ServicesDropdown />
+                        <Link href='/blog' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                Blog
+                            </div>
+                        </Link>
+                        <Link href='/faq' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                FAQ
+                            </div>
+                        </Link>
+                        <Link href='/contact' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                Contact Us
+                            </div>
+                        </Link>
+                        <Link href='/feedback' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                Feedback
+                            </div>
+                        </Link>
+                        <Link href='/jobs' className='nav-link-modern'>
+                            <div className='px-3 py-1.5 text-[#FF5000] font-medium hover:bg-white/20 rounded-lg transition-all duration-300 hover-scale text-sm'>
+                                Jobs
+                            </div>
+                        </Link>
+                    </nav>
+                    <ShowQuote />
+                </div>
+            </div>
+            
+            {/* Spacer for desktop navbar on enhanced home page */}
+            <div className={`hidden md:block ${
+                isEnhancedHomePage ? 'h-[100px]' : ''
+            }`}></div>
+
+            {/* Mobile drawer (custom — replaces Ant Design Drawer) */}
+            {isClient && open && (
+                <div className="fixed inset-0 z-[9995]" role="dialog" aria-modal="true" aria-label="Menu">
+                    <div
+                        className="absolute inset-0 bg-black/50"
+                        onClick={() => setOpen(false)}
+                    />
+                    <div className="absolute left-0 top-0 bottom-0 w-[320px] max-w-[85vw] bg-white shadow-2xl overflow-y-auto overscroll-contain">
+                <div className='flex flex-col w-full h-full'>
+                        {/* Header */}
+                        <div className='flex items-center justify-between p-6 border-b border-gray-200 bg-white'>
+                            <Link href='/' onClick={() => setOpen(false)} className='transition-transform duration-200 hover:scale-105'>
+                                <Image 
+                                    src={logoImage && urlFor ? urlFor(logoImage.image).url() : '/assets/General/logo.png'}
+                                    alt='Taylor Movers Logo' 
+                                    width='120' 
+                                    height='40' 
+                                    className='object-contain' 
                                 />
-                            }
-                        </Link>
-                        <AiOutlineMenu size={40} className='mx-2' onClick={() => setOpen(true)} />
-                        <ShowQuote />
-                    </div>
-                </div>
-
-
-                <div className='hidden md:flex w-full py-2 my-2 px-2  md:px-8  flex-row justify-center items-center'>
-                    <div className='w-full flex flex-row justify-between'>
-                        <Link href='/'>
-                            {!logoImage ?
-                                <Image src='/assets/General/logo.png' width={205} height={48} alt='Taylor Movers Logo' />
-                                : <Image
-                                    src={urlFor(logoImage?.image).url()}
-                                    alt={logoImage?.alt}
-                                    width={200}
-                                    height={1}
-                                    className='object-contain w-[150px] md:w-[250px]'
-                                />}
-                        </Link>
-                        <div className='mb-2 left-slanted-box !pl-[32px] text-white font-[500] bg-[#FF5000] px-3 flex flex-row items-center text-sm'>
-                            <Link href='/'>
-                                <div className='mr-6'>
-                                    Home
-                                </div>
                             </Link>
-                            <Link href='/About'>
-                                <div className='mr-6'>
-                                    About Us
-                                </div>
-                            </Link>
-                            <Link href='/Services'>
-                                <div className='mr-6'>
-                                    Services
-                                </div>
-                            </Link>
-                            <Link href='/Blog'>
-                                <div className='mr-6'>
-                                    Blog
-                                </div>
-                            </Link>
-                            <Link href='/Contacts'>
-                                <div className='mr-6'>
-                                    Contact Us
-                                </div>
-                            </Link>
-                            <Link href='/Gallery'>
-                                <div className='mr-6'>
-                                    Gallery
-                                </div>
-                            </Link>
-                            {/* <Link href='/Feedback'>
-                                <div className='mr-6'>
-                                    Feedback
-                                </div>
-                            </Link> */}
+                            <button 
+                                type="button"
+                                onClick={() => setOpen(false)} 
+                                aria-label="Close menu"
+                                className='p-2 rounded-full hover:bg-gray-100 transition-colors duration-200'
+                            >
+                                <AiOutlineClose size={20} className='text-gray-600' />
+                            </button>
                         </div>
 
-                        <ShowQuote />
+                        {/* Navigation */}
+                        <nav className='flex-1 px-6 py-8 bg-white'>
+                            <div className='space-y-1'>
+                                <Link href='/' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        Home
+                                    </div>
+                                </Link>
+                                
+                                <Link href='/about' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        About us
+                                    </div>
+                                </Link>
+                                
+                                <Link href='/gallery' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        Gallery
+                                    </div>
+                                </Link>
+                                
+                                {/* Services with dropdown */}
+                                <div>
+                                    <button 
+                                        onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
+                                        className='flex items-center justify-between w-full py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'
+                                    >
+                                        <span>Services</span>
+                                        <FaChevronDown 
+                                            size={14} 
+                                            className={`transition-transform duration-200 ${mobileServicesOpen ? 'rotate-180' : ''}`} 
+                                        />
+                                    </button>
+                                    
+                                    {mobileServicesOpen && (
+                                        <div className='ml-6 mt-2 space-y-3 animate-fade-in-down'>
+                                            {/* View all services link */}
+                                            <Link 
+                                                href='/services' 
+                                                onClick={() => {setOpen(false); setMobileServicesOpen(false);}} 
+                                                className='block py-2.5 px-3 text-sm font-semibold text-[#FF5000] hover:bg-[#FF5000]/10 rounded-md transition-all duration-200'
+                                            >
+                                                🏠 View All Services
+                                            </Link>
+                                            
+                                            {/* All Services */}
+                                            <div className='space-y-1'>
+                                                {mainServicesItems.map((item, index) => (
+                                                    <div key={`mobile-service-${index}`}>
+                                                        {/* Regular service items */}
+                                                        <Link 
+                                                            href={item.href} 
+                                                            onClick={() => {setOpen(false); setMobileServicesOpen(false);}} 
+                                                            className='block py-2.5 px-3 text-sm text-gray-600 hover:text-[#FF5000] hover:bg-gray-50 rounded-md transition-all duration-200'
+                                                        >
+                                                            {item.name}
+                                                        </Link>
+                                                    </div>
+                                                ))}
+                                                
+                                                {/* Specialized Services */}
+                                                <div className='border-t border-gray-100 mt-2 pt-2'>
+                                                    <Link 
+                                                        href='/services/special' 
+                                                        onClick={() => {setOpen(false); setMobileServicesOpen(false);}} 
+                                                        className='block py-2.5 px-3 text-sm font-semibold text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-md transition-all duration-200'
+                                                    >
+                                                        ✨ Special Services
+                                                    </Link>
+                                                    
+                                                    {/* Sub-items under Special Services - indented */}
+                                                    <div className='ml-4 mt-2 space-y-1'>
+                                                        <Link 
+                                                            href='/services/piano-moving' 
+                                                            onClick={() => {setOpen(false); setMobileServicesOpen(false);}} 
+                                                            className='block py-2 px-3 text-sm text-gray-600 hover:text-[#FF5000] hover:bg-gray-50 rounded-md transition-all duration-200'
+                                                        >
+                                                            🎹 Piano Moving
+                                                        </Link>
+                                                        <Link 
+                                                            href='/services/pet-relocation' 
+                                                            onClick={() => {setOpen(false); setMobileServicesOpen(false);}} 
+                                                            className='block py-2 px-3 text-sm text-gray-600 hover:text-[#FF5000] hover:bg-gray-50 rounded-md transition-all duration-200'
+                                                        >
+                                                            🐾 Pet Relocation
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <Link href='/blog' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        Blog
+                                    </div>
+                                </Link>
+                                
+                                <Link href='/faq' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        FAQ
+                                    </div>
+                                </Link>
+                                
+                                <Link href='/contact' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        Contact Us
+                                    </div>
+                                </Link>
+                                
+                                <Link href='/feedback' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        Feedback
+                                    </div>
+                                </Link>
+                                
+                                <Link href='/jobs' onClick={() => setOpen(false)} className='block'>
+                                    <div className='flex items-center py-3 px-3 text-gray-700 hover:text-[#FF5000] hover:bg-gray-50 rounded-lg transition-all duration-200 font-medium'>
+                                        Jobs
+                                    </div>
+                                </Link>
+                            </div>
+                        </nav>
 
-
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <Drawer closeIcon={false} placement="left" onClose={onClose} open={open}>
-                    <div className='flex flex-col w-full h-full '>
-                        <div className='flex w-full items-start justify-between'>
-                            <Link href='/'>
-                                <Image src='/assets/General/logo.png' alt='/' width='200' height='1' />
-                            </Link>
-                            <div onClick={() => setOpen(false)} className='rounded-full  p-1 cursor-pointer hover:animate-pulse'>
-                                <AiOutlineCloseCircle size={20} />
+                        {/* Footer */}
+                        <div className='px-6 py-6 border-t border-gray-100'>
+                            <div className='text-center'>
+                                <p className='text-sm text-gray-500 mb-4'>Connect with us</p>
+                                <div className='flex justify-center space-x-4'>
+                                    <Link href='https://www.linkedin.com/company/taylor-movers-ea/?originalSubdomain=ke'>
+                                        <div className='w-10 h-10 rounded-full bg-gray-100 hover:bg-[#FF5000] flex items-center justify-center transition-all duration-200 group'>
+                                            <FaLinkedin size={16} className='text-gray-600 group-hover:text-white transition-colors duration-200' />
+                                        </div>
+                                    </Link>
+                                    <Link href='https://twitter.com/taylormoverske'>
+                                        <div className='w-10 h-10 rounded-full bg-gray-100 hover:bg-[#FF5000] flex items-center justify-center transition-all duration-200 group'>
+                                            <FaTwitter size={16} className='text-gray-600 group-hover:text-white transition-colors duration-200' />
+                                        </div>
+                                    </Link>
+                                    <Link href='https://www.facebook.com/taylormoversea'>
+                                        <div className='w-10 h-10 rounded-full bg-gray-100 hover:bg-[#FF5000] flex items-center justify-center transition-all duration-200 group'>
+                                            <FaFacebook size={16} className='text-gray-600 group-hover:text-white transition-colors duration-200' />
+                                        </div>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
-
-                        <hr className='my-4 border-3 rounded-full' />
-
-                        <div className=' flex flex-col font-bold'>
-                            <Link href='/' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 items-center py-2'>
-                                    Home
-                                </div>
-                            </Link>
-                            <Link href='/About' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 items-center py-2'>
-                                    About us
-                                </div>
-                            </Link>
-                            <Link href='/Services?service=Household Moving&&subservice=Premoving' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 items-center py-2'>
-                                    Services
-                                </div>
-                            </Link>
-                            <Link href='/Blog' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 items-center py-2'>
-                                    Blog
-                                </div>
-                            </Link>
-                            <Link href='/Contacts' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 items-center py-2'>
-                                    Contact Us
-                                </div>
-                            </Link>
-                            <Link href='/Gallery' onClick={() => setOpen(false)}>
-                                <div className='flex flex-row px-4 items-center py-2'>
-                                    Gallery
-                                </div>
-                            </Link>
-                        </div>
-
-                        <div className='flex flex-col my-4 items-center'>
-                            <p className=' text-slate-400'> Follow us on:</p>
-                            <div className='flex flex-row w-full justify-evenly mt-4'>
-                                <Link href='https://www.linkedin.com/company/taylor-movers-ea/?originalSubdomain=ke'>
-                                    <div className='rounded-full border p-3 cursor-pointer hover:scale-105 ease-in duration-500'>
-                                        <FaLinkedin size={20} className='text-slate-500' />
-                                    </div>
-                                </Link>
-                                <Link href='https://twitter.com/taylormoverske'>
-                                    <div className='rounded-full border p-3 cursor-pointer hover:scale-105 ease-in duration-500'>
-                                        <FaTwitter size={20} className='text-slate-500' />
-                                    </div>
-                                </Link>
-                                <Link href='https://web.facebook.com/taylormoversea'>
-                                    <div className='rounded-full border p-3 cursor-pointer hover:scale-105 ease-in duration-500'>
-                                        <FaFacebook size={20} className='text-slate-500' />
-                                    </div>
-                                </Link>
-                                {/* <div className='rounded-full shadow-lg shadow-gray-400 p-3 cursor-pointer hover:scale-105 ease-in duration-500'>
-                            <BsFillPersonLinesFill/>
-                            </div> */}
-                            </div>
-                        </div>
                     </div>
-                </Drawer>
-            </div>
-
-
-
-
+                </div>
+                </div>
+            )}
         </div>
     )
 }

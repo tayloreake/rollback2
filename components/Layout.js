@@ -1,18 +1,22 @@
 import React from "react"
-// import Navbar from './Navbar'
-// import Footer from './Footer'
+import Navbar from './Navbar'
+import AnnouncementBar from './AnnouncementBar'
+import Footer from './Footer'
 import dynamic from "next/dynamic"
-// import Navbar from "./Navbar.jsx"
 
-const Footer = dynamic(() => import("./Footer"))
-const Navbar = dynamic(() => import("./Navbar"))
+// Load performance optimizers dynamically (client-side only)
+const RouteWarmup = dynamic(() => import("./RouteWarmup"), { ssr: false })
+const PerformanceOptimizer = dynamic(() => import("./PerformanceOptimizer"), { ssr: false })
 
-const Layout = ({ children }) => {
+const Layout = ({ children, caseStudies = [] }) => {
   return (
     <>
       <Navbar />
-      {children}
-      <Footer />
+      <AnnouncementBar />
+      <RouteWarmup />
+      <PerformanceOptimizer />
+      <main>{children}</main>
+      <Footer caseStudies={caseStudies} />
     </>
   )
 }

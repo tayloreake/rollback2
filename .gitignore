@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# secrets & local run artifacts (never commit)
+.env
+.env.local
+scripts/migration-log.jsonl
+
+# local data backups (customer PII — never commit)
+.backups/
+.env.production

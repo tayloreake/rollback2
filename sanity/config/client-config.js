@@ -1,9 +1,13 @@
+// Public client config — NEVER put an API token here.
+// Client queries run against the public `production` dataset and need no token.
+// Server-side mutations (API routes / getStaticProps) must use
+// `process.env.SANITY_API_TOKEN` via `sanity/config/server-client.js`.
 const config = {
   projectId: "bsg3746e",
   dataset: "production",
-  apiVersion: new Date().toISOString().split('T')[0],
-  token:
-    "skOIZWPqgTE6cFwT6u3RQ3r9f1eHfJ7CC1l29wlRsK0YyO21iUCuiZNuezGwIfNv7SHWq1vIxuYidCJJ06Xm140oeKv4Cp5zPaWc5ybkvJVczRsFH4mISePmqhDNqqiuOb3qhIRstZOeWfp2VVD7bg7xQlIovICLVHEKNNFoBQxEBM3u5fDH",
+  apiVersion: "2023-06-19",
+  useCdn: true, // Use CDN for faster content delivery
+  perspective: 'published', // Only fetch published content
 }
 
 export default config

@@ -1,6 +1,7 @@
 import Image from "next/image"
 import React, { useState, useRef } from "react"
-import ReCAPTCHA from "react-google-recaptcha"
+import ReCAPTCHA from "../SafeRecaptcha"
+import { getFormAttribution } from "../../utils/attribution"
 
 
 const ratingQuestions = [
@@ -62,7 +63,7 @@ const ReviewForm = ({setIsModalOpen}) => {
         }
     
         // Verify reCAPTCHA
-        const recaptchaValue = await recaptchaRef.current.executeAsync();
+        const recaptchaValue = await recaptchaRef.current?.executeAsync?.();
         if (!recaptchaValue) {
           // setError("Please verify that you are human");
           // return;
@@ -90,6 +91,7 @@ const ReviewForm = ({setIsModalOpen}) => {
               sentiment: selectedEmoji,
               review: review.trim(),
               recaptchaToken: recaptchaValue,
+              attribution: getFormAttribution(),
             }),
           });
     
@@ -125,7 +127,9 @@ const ReviewForm = ({setIsModalOpen}) => {
             body: JSON.stringify({
               to: "sales@taylorea.com",
               message: messageContent,
-              recaptchaToken: "recaptchaToken"
+              // Was the literal string "recaptchaToken" — Google always
+              // rejected it, so every review notification email failed.
+              recaptchaToken: recaptchaValue,
             }),
           });
           setSuccess(true);

@@ -2,45 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "Montserrat";
-  src: url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,200;0,400;0,600;0,700;1,300&display=swap");
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('../fonts/Montserrat-Light.ttf');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('../fonts/Montserrat-Regular.otf');
-  font-weight: normal;
-  font-style: normal;
-}
+/* Fonts are loaded via next/font/google (Montserrat, WOFF2, display:swap)
+   in pages/_app.js — no @font-face or external font <link> tags (audit §2 P1). */
 
 html {
   scroll-behavior: smooth;
 }
 
-@font-face {
-  font-family: 'Montserrat';
-  src: url('../fonts/Montserrat-Bold.otf');
-  font-weight: bold;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Montserrat';
-  src: url('../fonts/Montserrat-Italic.otf');
-  font-weight: normal;
-  font-style: italic;
+/* Instant page transition loading bar animation */
+@keyframes slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
 }
 
 body {
-  font-family: 'Montserrat';
+  font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 .rootClassName {
@@ -185,8 +165,1235 @@ pre {
   /* width: ; */
 }
 
+/* Ensure quote modal body is scrollable on small screens */
+.no-pad-modal .ant-modal-body {
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 0 !important;
+}
+
+/* Enhanced Quote Form Scrolling */
+.quote-form-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
+  position: relative;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb {
+  background: #FF5000;
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #e04400;
+}
+
+/* Quote Form Container Improvements */
+.quote-form-container {
+  padding-bottom: 20px;
+}
+
+/* Ensure form inputs are always visible and properly styled */
+.quote-form-container input,
+.quote-form-container select {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  font-size: 16px !important; /* Prevents zoom on iOS */
+}
+
+.quote-form-container input:focus,
+.quote-form-container select:focus {
+  outline: none !important;
+  border-color: #FF5000 !important;
+  box-shadow: 0 0 0 3px rgba(255, 80, 0, 0.1) !important;
+}
+
+.quote-form-container input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+/* Prevent form clearing issues */
+.quote-form-container form {
+  isolation: isolate;
+}
+
+.quote-form-container input,
+.quote-form-container select,
+.quote-form-container textarea {
+  will-change: auto;
+  transform: translateZ(0);
+}
+
+/* Internal scroll container to ensure touch scroll stays inside modal */
+.no-pad-modal .quote-scroll-container {
+  max-height: 82vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+}
+
+/* Enhanced quote modal styling */
+.quote-modal-enhanced .ant-modal-content {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.quote-modal-enhanced .ant-modal-body {
+  max-height: 85vh !important;
+  padding: 0 !important;
+}
+
+/* Enhanced Quote Form Scroll Container */
+.quote-form-scroll-container {
+  max-height: calc(95vh - 60px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #FF5000, #FF6B35);
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #e04400, #FF5000);
+}
+
+/* Quote Form Container Improvements */
+.quote-form-container {
+  padding-bottom: 20px;
+  min-height: auto;
+}
+
+/* Responsive navbar quote dropdown — always fits the viewport height
+   (vh fallback first for older browsers, dvh override where supported),
+   leaving room for the fixed navbar above + bottom safe margin. */
+.nav-quote-dropdown {
+  width: min(440px, calc(100vw - 2rem));
+  max-height: calc(100vh - 170px);
+  max-height: calc(100dvh - 170px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Ensure form inputs are always visible and accessible */
+.quote-form-container input,
+.quote-form-container select,
+.quote-form-container textarea {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  position: relative;
+  z-index: 1;
+}
+
+.quote-form-container input:focus,
+.quote-form-container select:focus,
+.quote-form-container textarea:focus {
+  outline: none !important;
+  border-color: #FF5000 !important;
+  box-shadow: 0 0 0 3px rgba(255, 80, 0, 0.1) !important;
+  background-color: #ffffff !important;
+  color: #374151 !important;
+}
+
+/* Prevent form clearing on blur/focus */
+.quote-form-container input:not(:focus):valid,
+.quote-form-container select:not(:focus):valid {
+  background-color: #ffffff !important;
+  color: #374151 !important;
+}
+
+/* Enhanced label visibility */
+.quote-form-container label {
+  background-color: #ffffff !important;
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+  z-index: 2;
+  position: relative;
+}
+
+/* Modal backdrop improvements */
+.modal-backdrop-enhanced {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden !important;
+  padding-right: 0 !important;
+  position: fixed;
+  width: 100%;
+}
+
+/* Custom scrollbar for webkit browsers */
+.quote-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quote-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.quote-scroll-container::-webkit-scrollbar-thumb {
+  background: #FF5000;
+  border-radius: 3px;
+}
+
+.quote-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #e04400;
+}
+
+/* Custom modal scrolling - ensures perfect scroll on all devices */
+.custom-quote-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.custom-quote-modal .modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+}
+
+.custom-quote-modal .modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-quote-modal .modal-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.custom-quote-modal .modal-content::-webkit-scrollbar-thumb {
+  background: #FF5000;
+  border-radius: 4px;
+}
+
+.custom-quote-modal .modal-content::-webkit-scrollbar-thumb:hover {
+  background: #e04400;
+}
+
+/* Ensure form fields are properly spaced */
+.quote-form-container {
+  padding-bottom: 20px;
+}
+
+/* Prevent background scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+  padding-right: 15px; /* Prevent layout shift */
+}
+
 .anticon svg {
   display: inline-block;
   font-weight: bold !important;
   color: white;
+}
+
+/* Modern Glassmorphism Effects */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Modern Hover Effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 30px rgba(255, 80, 0, 0.4);
+  transform: scale(1.02);
+}
+
+.hover-scale {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* Gradient Text Effect */
+.gradient-text {
+  background: linear-gradient(135deg, #FF5000, #FF8A50, #FFB380);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-rainbow {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientX 3s ease infinite;
+}
+
+/* Modern Button Styles */
+.btn-modern {
+  @apply px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform;
+  @apply bg-gradient-to-r from-[#FF5000] to-[#FF8A50];
+  @apply text-white shadow-lg hover:shadow-xl;
+  @apply hover:scale-105 hover:from-[#FF8A50] hover:to-[#FFB380];
+  @apply active:scale-95;
+}
+
+.btn-glass {
+  @apply px-8 py-3 rounded-xl font-semibold transition-all duration-300;
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+  @apply text-white shadow-lg hover:shadow-xl hover:bg-white/20;
+}
+
+.btn-outline-modern {
+  @apply px-8 py-3 rounded-xl font-semibold transition-all duration-300;
+  @apply border-2 border-[#FF5000] text-[#FF5000] hover:bg-[#FF5000] hover:text-white;
+  @apply hover:shadow-lg hover:scale-105 active:scale-95;
+}
+
+/* Card Animations */
+.card-modern {
+  @apply bg-white rounded-2xl shadow-xl transition-all duration-300;
+  @apply hover:shadow-2xl hover:-translate-y-2;
+}
+
+.card-glass {
+  @apply rounded-2xl shadow-xl transition-all duration-300;
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+  @apply hover:shadow-2xl hover:-translate-y-2 hover:bg-white/20;
+}
+
+/* Loading Animations */
+.loading-dots {
+  display: inline-block;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.loading-dots div {
+  position: absolute;
+  top: 27px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #FF5000;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+
+.loading-dots div:nth-child(1) {
+  left: 6px;
+  animation: loading-dots1 0.6s infinite;
+}
+
+.loading-dots div:nth-child(2) {
+  left: 6px;
+  animation: loading-dots2 0.6s infinite;
+}
+
+.loading-dots div:nth-child(3) {
+  left: 26px;
+  animation: loading-dots2 0.6s infinite;
+}
+
+.loading-dots div:nth-child(4) {
+  left: 45px;
+  animation: loading-dots3 0.6s infinite;
+}
+
+@keyframes loading-dots1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes loading-dots2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(19px, 0);
+  }
+}
+
+@keyframes loading-dots3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+/* Scroll Animation Utilities */
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+}
+
+.scroll-animate.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Modern Focus States */
+.focus-modern:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 80, 0, 0.3);
+  border-color: #FF5000;
+}
+
+/* Responsive Text Shadows */
+.text-shadow-sm {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow-lg {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Transparent Navbar Styles */
+.navbar-transparent {
+  background: transparent !important;
+}
+
+.navbar-glass {
+  background: rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.navbar-glass-phone {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.navbar-glass-nav {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Modern Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #FF5000, #FF8A50);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #FF8A50, #FFB380);
+}
+
+/* Smooth Page Transitions */
+.page-transition {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Mobile Responsive Animations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 3D Perspective and Transform Effects */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+.transform-gpu {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* 3D Card Hover Effects */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.card-3d:hover {
+  transform: rotateY(10deg) rotateX(-5deg) translateZ(20px);
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-12deg);
+  }
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transform: translateX(-100%) skewX(-12deg);
+  transition: transform 0.8s ease;
+}
+
+.shimmer:hover::after {
+  animation: shimmer 0.8s ease;
+}
+
+/* Gradient Border Animation */
+.gradient-border {
+  position: relative;
+  background: linear-gradient(45deg, #FF5000, #FF8A50, #FFB380, #FF5000);
+  background-size: 400% 400%;
+  border-radius: 16px;
+  padding: 2px;
+  animation: gradientBorder 4s ease infinite;
+}
+
+@keyframes gradientBorder {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: white;
+  border-radius: 14px;
+  z-index: -1;
+}
+
+/* Floating Animation Variants */
+.float-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-fast {
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(10px) rotate(2deg);
+  }
+}
+
+.float-reverse {
+  animation: float-reverse 4s ease-in-out infinite;
+}
+
+/* Logo specific animations */
+.logo-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-hover:hover {
+  transform: translateY(-8px) scale(1.05);
+  filter: brightness(1.1) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
+}
+
+/* Transparent navbar for enhanced home page */
+.navbar-transparent .glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar-transparent .nav-link-modern div {
+  color: white !important;
+}
+
+.navbar-transparent .nav-link-modern:hover div {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* FAQ Page Specific Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounce-gentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-bounce-gentle {
+  animation: bounce-gentle 2s ease-in-out infinite;
+}
+
+/* Blog Specific Styles */
+.blog-dark {
+  background: linear-gradient(135deg, #111827 0%, #1f2937 50%, #111827 100%);
+  min-height: 100vh;
+}
+
+.blog-card {
+  @apply bg-gray-800 border border-gray-700 rounded-lg transition-all duration-300;
+  @apply hover:border-gray-600 hover:shadow-xl;
+  @apply transform hover:-translate-y-1;
+}
+
+.blog-card:hover .blog-image {
+  @apply scale-105;
+}
+
+.blog-image {
+  @apply transition-transform duration-300;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Search Bar Styles */
+.search-bar {
+  @apply bg-gray-800 border border-gray-600 rounded-lg;
+  @apply transition-all duration-200;
+  @apply focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20;
+}
+
+/* Category Sidebar Styles */
+.category-item {
+  @apply p-3 rounded-lg transition-all duration-200;
+  @apply hover:bg-gray-700 cursor-pointer;
+  @apply border border-transparent;
+}
+
+.category-item.active {
+  @apply border-orange-500/30 bg-orange-500/10;
+}
+
+.category-item:hover {
+  @apply transform translate-x-1;
+}
+
+/* Comment Styles */
+.comment-bubble {
+  @apply bg-gray-800 rounded-lg p-3;
+  @apply shadow-lg border border-gray-700/50;
+}
+
+.comment-avatar {
+  @apply w-8 h-8 rounded-full overflow-hidden;
+  @apply border-2 border-gray-600;
+}
+
+/* Dark Scrollbar for Blog */
+.blog-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.blog-content::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 3px;
+}
+
+.blog-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  border-radius: 3px;
+}
+
+.blog-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #ea580c, #dc2626);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .blog-card {
+    @apply mx-2;
+  }
+  
+  .blog-sidebar {
+    @apply fixed inset-y-0 left-0 z-50 w-80;
+    @apply transform -translate-x-full transition-transform duration-300;
+  }
+  
+  .blog-sidebar.open {
+    @apply translate-x-0;
+  }
+  
+  .blog-overlay {
+    @apply fixed inset-0 bg-black/50 z-40;
+  }
+}
+
+/* Progress Bar for Reading */
+.reading-progress {
+  @apply fixed top-0 left-0 h-1 bg-gradient-to-r from-orange-400 to-red-400;
+  @apply z-50 transition-all duration-300;
+}
+
+/* Tag Styles */
+.blog-tag {
+  @apply text-orange-400 text-xs hover:text-orange-300;
+  @apply cursor-pointer transition-colors duration-200;
+  @apply hover:underline;
+}
+
+/* Engagement Buttons */
+.engagement-button {
+  @apply flex items-center space-x-1 text-sm;
+  @apply text-gray-400 hover:text-white;
+  @apply transition-all duration-200;
+  @apply p-2 rounded-lg hover:bg-gray-700;
+}
+
+.engagement-button.liked {
+  @apply text-red-500 hover:text-red-400;
+}
+
+.engagement-button.bookmarked {
+  @apply text-orange-500 hover:text-orange-400;
+  @apply bg-orange-500/10;
+}
+
+/* Loading States */
+.blog-skeleton {
+  @apply animate-pulse;
+}
+
+.blog-skeleton .skeleton-line {
+  @apply h-4 bg-gray-700 rounded mb-3;
+}
+
+.blog-skeleton .skeleton-image {
+  @apply h-48 bg-gray-700 rounded mb-4;
+}
+
+/* Accessibility Improvements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Clickability Fixes */
+.clickable {
+  pointer-events: auto !important;
+  cursor: pointer;
+}
+
+.non-clickable {
+  pointer-events: none;
+}
+
+/* Ensure decorative full-bleed overlays never block clicks */
+.absolute.inset-0 {
+  pointer-events: none;
+}
+
+/* Ensure proper stacking context for interactive elements */
+.interactive-layer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix for elements that might be covered by fixed navbar */
+.navbar-safe-margin {
+  margin-top: 100px;
+}
+
+@media (min-width: 768px) {
+  .navbar-safe-margin {
+    margin-top: 80px;
+  }
+}
+
+/* Ensure buttons and links are always clickable */
+a, button, [role="button"], .btn, .quote-modal-trigger {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fix for overlapping elements */
+.prevent-overlap {
+  isolation: isolate;
+}
+
+/* Debug helper - remove in production */
+.debug-clickable:hover {
+  outline: 2px solid red;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* Focus States for Dark Theme */
+.focus-ring-orange {
+  @apply focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+
+/* Smooth Transitions for Theme Changes */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Additional Quote Modal Fixes */
+.quote-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.quote-modal-content {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.quote-modal-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Force scrolling on mobile devices */
+@media (max-width: 768px) {
+  .quote-modal-scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: scroll !important;
+    height: auto;
+    max-height: calc(90vh - 60px);
+  }
+  
+  .quote-form-container {
+    padding-bottom: 40px !important;
+  }
+}
+
+/* Prevent form input clearing issues */
+.quote-form-container input,
+.quote-form-container select {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
+/* Ensure proper focus behavior */
+.quote-form-container input:focus,
+.quote-form-container select:focus {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Prevent iOS zoom on input focus */
+@media screen and (max-width: 768px) {
+  .quote-form-container input,
+  .quote-form-container select {
+    font-size: 16px !important;
+    transform: translateZ(0);
+    -webkit-appearance: none;
+  }
+  
+  /* Ensure modal scrolling on mobile */
+  .quote-modal-scroll {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: scroll !important;
+    height: auto !important;
+    max-height: calc(90vh - 60px) !important;
+  }
+}
+
+/* Force input visibility across all browsers */
+.quote-form-container input:not([type="hidden"]),
+.quote-form-container select,
+.quote-form-container textarea {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #374151 !important;
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  box-shadow: 0 0 0px 1000px white inset !important;
+  caret-color: #374151 !important;
+}
+
+/* Focus states for better visibility */
+.quote-form-container input:focus:not([type="hidden"]),
+.quote-form-container select:focus,
+.quote-form-container textarea:focus {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #374151 !important;
+  -webkit-box-shadow: 0 0 0px 1000px white inset, 0 0 0 3px rgba(255, 80, 0, 0.1) !important;
+  box-shadow: 0 0 0px 1000px white inset, 0 0 0 3px rgba(255, 80, 0, 0.1) !important;
+  caret-color: #374151 !important;
+  border-color: #FF5000 !important;
+}
+
+/* Placeholder text visibility */
+.quote-form-container input::placeholder,
+.quote-form-container textarea::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #9ca3af !important;
+}
+
+/* Override any conflicting styles */
+.quote-form-container input[type="text"],
+.quote-form-container input[type="email"],
+.quote-form-container input[type="tel"],
+.quote-form-container input[type="date"],
+.quote-form-container select,
+.quote-form-container textarea {
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  border: 1px solid #d1d5db !important;
+  transition: all 0.2s ease !important;
+  outline: none !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: block !important;
+}
+
+/* Enhanced scrollbar for quote forms */
+.quote-form-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #FF5000, #FF6B35);
+  border-radius: 4px;
+  border: 1px solid #f1f1f1;
+}
+
+.quote-form-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #e04400, #FF5000);
+}
+
+/* Form root flows naturally — the surrounding context scrolls
+   (navbar dropdown panel, modal, or page). Do NOT cap its height here,
+   or content below the fold (incl. submit) becomes unreachable. */
+.quote-form-container {
+  width: 100%;
+  position: relative;
+  display: block;
+  max-height: none;
+}
+
+/* Ensure scrollable area takes available space */
+.quote-form-scroll-container {
+  flex: 1 1 auto;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #FF5000 #f1f1f1;
+}
+
+/* Mobile optimization for quote form */
+@media screen and (max-width: 640px) {
+  .quote-form-container {
+    max-height: 100vh;
+  }
+  
+  .quote-form-scroll-container {
+    max-height: calc(100vh - 280px) !important;
+  }
+  
+  /* Ensure button container is always visible on mobile */
+  .quote-form-container > div:last-child {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    z-index: 10;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Page Transition Effects */
+body.page-transitioning {
+  cursor: wait;
+}
+
+body.page-transitioning main,
+body.page-transitioning #__next > div:not(.fixed) {
+  filter: blur(1px);
+  opacity: 0.95;
+  transition: filter 0.2s ease-out, opacity 0.2s ease-out;
+  /* IMPORTANT: Don't block pointer events during transition */
+  pointer-events: none;
+}
+
+/* Keep navigation clickable during transitions */
+body.page-transitioning nav,
+body.page-transitioning header {
+  pointer-events: auto;
+}
+
+/* Smooth fade-in for new pages */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+main {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Loading animation improvements */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Sticky mobile bar offset — keep footer content reachable above it (audit §3 P2) */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 60px;
+  }
+}
+
+/* Respect reduced motion (audit §5 P2) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Single-banner policy: ConsentBanner is the only cookie banner.
+   Zoho PageSense/SalesIQ load only after consent (see _app.js), so their own
+   banner should never appear — hide it as a backstop. */
+#zcb-banner {
+  display: none !important;
 }

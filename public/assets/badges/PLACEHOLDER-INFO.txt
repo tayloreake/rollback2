@@ -1,0 +1,17 @@
+IAM BADGE PLACEHOLDER NEEDED
+
+The IAM (International Association of Movers) Trusted Moving Professional badge 
+should be placed at:
+  /public/assets/badges/iam-trusted-badge.png
+
+The image from the user's message shows:
+- Blue shield-shaped badge
+- IAM logo with globe at top
+- Gold/bronze "TRUSTED" banner across middle
+- "Moving Professional" text at bottom
+- Dimensions: approximately 150x180 pixels
+
+Please save the official IAM badge image as "iam-trusted-badge.png" in this directory.
+
+Until the real badge is added, you may want to create a temporary placeholder or 
+the page will show a broken image icon in the footer.

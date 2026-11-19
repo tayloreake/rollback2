@@ -36,7 +36,7 @@ const ServiceCard = ({ inf }) => {
         ) : null}
         <p className='mt-4 text-white font-light'>{inf.title}</p>
         <p className='mt-2 text-white text-xs'>{inf.text}</p>
-        <Link href='/Services?service=Household%20Moving&&subservice=Premoving'>
+        <Link href='/services'>
           <button className='px-4 py-2 text-xs hover:bg-gray-100 transition-all  bg-white flex flex-row items-center w-full text-[#DB421B] max-w-[100px] rounded-2xl my-4'>
             View
             <BsArrowRightShort className='text-[#DB421B] ml-2' />

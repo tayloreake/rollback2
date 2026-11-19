@@ -1,55 +1,161 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react"
 import { toast } from "react-toastify"
-// import { createQuote } from "../sanity/sanity-utils"
-import ReCAPTCHA from "react-google-recaptcha"
-import { createQuote } from "../../sanity/sanity-utils"
+import ReCAPTCHA from "../SafeRecaptcha"
+import useFormPersistence from "../../hooks/useFormPersistence"
+import AttributionHiddenFields from "../AttributionHiddenFields"
+import { getFormAttribution } from "../../utils/attribution"
+import { newEventId, getMetaContext } from "../../utils/metaTracking"
+import { gtmPushLead } from "../../utils/gtm"
+import WhatsAppButton from "../WhatsAppButton"
+
+// Split a "Full Name" input into Zoho's required First_Name / Last_Name pair.
+const splitName = (raw) => {
+  const parts = String(raw || "").trim().split(/\s+/).filter(Boolean)
+  if (!parts.length) return { firstName: "", lastName: "" }
+  if (parts.length === 1) return { firstName: "", lastName: parts[0] }
+  return { firstName: parts[0], lastName: parts.slice(1).join(" ") }
+}
+
+// Helper function to get current date
+function getCurrentDate() {
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const day = String(currentDate.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Initial form data structure - defined outside component to prevent re-creation
+const getInitialFormData = () => ({
+  fname: "",
+  email: "",
+  location: "",
+  destination: "",
+  number: "",
+  moveType: "Local House Move",
+  bedrooms: "1 Bedroom",
+  moveDate: getCurrentDate(),
+  ref: "Referrals"
+});
+
+const MOVE_TYPES = [
+  "Local House Move",
+  "Office Move",
+  "International Move",
+  "Corporate Staff Relocation",
+  "Storage & Warehousing",
+  "Long-Distance Move",
+  "Business Move",
+  "Other",
+];
+
+const BEDROOM_OPTIONS = [
+  "Studio Apartment",
+  "1 Bedroom",
+  "2 Bedrooms",
+  "3 Bedrooms",
+  "4 Bedrooms",
+  "5 Bedrooms",
+  "6 Bedrooms",
+  "More than 6 Bedrooms",
+];
+
+const REFERRAL_OPTIONS = [
+  "Referrals",
+  "Social Media Pages",
+  "Internet Search",
+  "Door To Door Marketing",
+  "Taylor Mover Trucks",
+  "Previous Interactions",
+];
 
 const QuoteForm = () => {
-  const [fname, setFname] = useState("")
-  const [email, setEmail] = useState("")
-  const [location, setLocation] = useState("")
-  const [destination, setDestination] = useState("")
-  const [number, setNumber] = useState("")
-  const [moveType, setMoveType] = useState("Local House Move")
-  const [bedrooms, setBedrooms] = useState("1br")
-  const [moveDate, setMoveDate] = useState(getCurrentDate())
-  const [ref, setRef] = useState("Referal")
+  // Memoize initial data to prevent re-creation
+  const initialFormData = useMemo(() => getInitialFormData(), []);
+
+  // Use form persistence hook with stable initial data
+  const { 
+    formData, 
+    updateFormData, 
+    clearFormData, 
+    hasPersistedData 
+  } = useFormPersistence('main-quote-form', initialFormData, 300);
+  
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [lastSubmissionTime, setLastSubmissionTime] = useState(0)
+  const [showPersistedDataNotice, setShowPersistedDataNotice] = useState(false)
   const recaptchaRef = useRef(null)
+  const formRef = useRef(null)
+  const leadEventIdRef = useRef(null)
+
+  // Show notice if persisted data was loaded
+  useEffect(() => {
+    if (hasPersistedData) {
+      setShowPersistedDataNotice(true)
+      toast.info("Your previous form data has been restored. You can continue where you left off!", {
+        autoClose: 5000,
+        position: "top-center"
+      })
+      // Hide notice after 8 seconds
+      const timer = setTimeout(() => {
+        setShowPersistedDataNotice(false)
+      }, 8000)
+      return () => clearTimeout(timer)
+    }
+  }, [hasPersistedData])
 
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
+  // P0: accept international formats, normalise server-side to E.164 (default KE).
+  // Audit: was /^0\d{9}$/ which blocked +254/+44/+1 expat & embassy leads.
   const isValidPhoneNumber = (phoneNumber) => {
-    return /^\0\d{9}$/.test(phoneNumber)
+    if (!phoneNumber) return false
+    const v = phoneNumber.trim()
+    // International: optional + then digits with spaces, dashes, dots or parentheses; 7-15 digits total (E.164)
+    if (!/^\+?[0-9][0-9\s().-]{5,20}$/.test(v)) return false
+    const digits = v.replace(/\D/g, "")
+    return digits.length >= 7 && digits.length <= 15
   }
+
   useEffect(() => {
     if (formSubmitted) {
+      // T6/T7 — single lead push (GA4 key event + Google Ads conversion in
+      // GTM fire off `generate_lead`; it now carries campaign_id/gclid/utm_*).
+      gtmPushLead({
+        formId: "quote",
+        eventId: leadEventIdRef.current || undefined,
+        move_type: formData.moveType,
+        bedrooms: formData.bedrooms,
+        referral: formData.ref,
+        attribution: getFormAttribution(),
+      });
       window.dispatchEvent(new CustomEvent("tayloreaFormSubmitted", {
         detail: { status: "success", timestamp: Date.now() }
       }));
 
+      // Use Next.js router for better navigation
       window.location.href = "/ThankYou";
-
     }
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formSubmitted]);
 
   const isValidName = (name) => {
-    return name.length >= 2 && /^[a-zA-Z\s]+$/.test(name);
+    if (!name) return false
+    return /^[\p{L}\p{M}' .-]{2,80}$/u.test(name.trim());
   };
 
   const isValidLocation = (location) => {
     return location.length >= 3;
   };
 
+  // Single server-orchestrated submit (Sanity Security §7.3/§8):
+  // POSTs once to /api/submitQuote, which does ledger → SMS/email → Zoho.
+  // No direct Sanity writes from the browser, no dual fan-out.
   const handleSendMessage = async () => {
     const tayloreaMessageContent = formatMessageContent('taylorea');
-    const userMessageContent = formatMessageContent('user');
-
 
     try {
       // Check for rapid submissions (2 minutes cooldown)
@@ -62,94 +168,70 @@ const QuoteForm = () => {
 
       setIsSubmitting(true);
 
-      // First send SMS
-      const smsToken = await recaptchaRef.current.executeAsync();
-      if (!smsToken) {
-        throw new Error('Failed to verify reCAPTCHA for SMS');
+      // Create timeout promise for all operations
+      const createTimeoutPromise = (ms) => new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Operation timeout')), ms)
+      );
+
+      const token = await Promise.race([
+        recaptchaRef.current?.executeAsync?.(),
+        createTimeoutPromise(10000) // 10 second timeout
+      ]);
+
+      if (!token) {
+        throw new Error('Failed to verify reCAPTCHA');
       }
 
-      // the default phone number
-      // 254743505069
-      const smsResponse = await fetch("/api/sendSms", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: ["+254721410517"],
-          message: tayloreaMessageContent,
-          recaptchaToken: smsToken
+      // One event_id shared by browser pixel and server CAPI (dedupe)
+      leadEventIdRef.current = newEventId();
+
+      // Prepare quote data for the server
+      const nameParts = splitName(formData.fname)
+      const quoteDataForLogging = {
+        firstName: nameParts.firstName,
+        lastName: nameParts.lastName,
+        email: formData.email,
+        phoneNumber: formData.number,
+        location: formData.location,
+        destination: formData.destination,
+        moveType: formData.moveType,
+        bedrooms: formData.bedrooms,
+        moveDate: formData.moveDate,
+        referrals: formData.ref,
+        attribution: getFormAttribution(),
+      };
+
+      const response = await Promise.race([
+        fetch("/api/submitQuote", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: tayloreaMessageContent,
+            recaptchaToken: token,
+            quoteData: quoteDataForLogging,
+            meta: getMetaContext(leadEventIdRef.current),
+          }),
         }),
-      });
+        createTimeoutPromise(30000) // 30 second timeout
+      ]);
 
-      if (!smsResponse.ok) {
-        const errorData = await smsResponse.json();
-        // throw new Error(errorData.error || errorData.message || 'Failed to send SMS');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to submit quote request');
       }
 
-      // Reset reCAPTCHA for email
-      // Reset reCAPTCHA for email
-      recaptchaRef.current.reset();
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for reset
-
-      // Then send email
-      const emailToken = await recaptchaRef.current.executeAsync();
-      if (!emailToken) {
-        throw new Error('Failed to verify reCAPTCHA for email');
-      }
-
-
-      const emailResponse = await fetch("/api/sendEmail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: "sales@taylorea.com",
-          message: userMessageContent,
-          recaptchaToken: emailToken
-        }),
-      });
-
-      if (!emailResponse.ok) {
-        const errorData = await emailResponse.json();
-        throw new Error(errorData.message || 'Failed to send email');
-      }
-
-
-
-      // Save Skip to Sanity
-      // try {
-      //   await createQuote(
-      //     fname,
-      //     email,
-      //     number,
-      //     location,
-      //     destination,
-      //     moveType,
-      //     bedrooms,
-      //     moveDate,
-      //     ref
-      //   );
-      // } catch (error) {
-      //   console.error("Error saving quote to Sanity did not submit..:", error);
-      // }
+      // No direct Sanity writes from the browser (Sanity Security §2/§7).
+      // The server route owns ledger + notifications + Zoho.
 
       setLastSubmissionTime(now);
       toast.success("Quote request submitted successfully! We'll contact you soon.");
-
-      // Reset form
-      setFname("");
-      setEmail("");
-      setLocation("");
-      setDestination("");
-      setNumber("");
+      clearFormData();
       setFormSubmitted(true);
-      setMoveType("Local House Move");
 
     } catch (error) {
       console.error("Error:", error);
-      toast.success("Quote request submitted successfully! We'll contact you soon.");
       toast.error(error.message || "Failed to submit quote request. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -160,77 +242,70 @@ const QuoteForm = () => {
   const formatMessageContent = (to) => {
     const message = `
       New Move Request:
-      ${to == 'user' ? 'dear ' + fname + '\n' + 'This is a confirmation email that you have made a new move request with the following details:' : ''}
-      Name: ${fname}
-      Email: ${email}
-      Phone Number: ${number}
-      Move Type: ${moveType}
-      Bedrooms: ${bedrooms}
-      Move Date: ${moveDate}
-      From: ${location}
-      To: ${destination}
-      How did you hear about us: ${ref}
+      ${to == 'user' ? 'dear ' + formData.fname + '\n' + 'This is a confirmation email that you have made a new move request with the following details:' : ''}
+      Name: ${formData.fname}
+      Email: ${formData.email}
+      Phone Number: ${formData.number}
+      Move Type: ${formData.moveType}
+      Bedrooms: ${formData.bedrooms}
+      Move Date: ${formData.moveDate}
+      From: ${formData.location}
+      To: ${formData.destination}
+      How did you hear about us: ${formData.ref}
     `;
     return message;
   }
 
-  function getCurrentDate() {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDate.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
+
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
     const currentDate = new Date().toISOString().split('T')[0];
 
     if (selectedDate >= currentDate) {
-      setMoveDate(selectedDate);
+      updateFormData('moveDate', selectedDate);
     } else {
       toast.error('Please select a date from today onwards');
     }
   };
 
   function validateFields() {
-    if (!fname || !isValidName(fname)) {
+    if (!formData.fname || !isValidName(formData.fname)) {
       toast.error("Please enter a valid name (letters and spaces only)");
       return false;
     }
 
-    if (!email || !isValidEmail(email)) {
-      toast.error("Please enter a valid email address");
+    if (formData.email && !isValidEmail(formData.email)) {
+      toast.error("Please enter a valid email address or leave it empty");
       return false;
     }
-    if (isValidPhoneNumber(number)) {
-      toast.error(`Please enter a valid phone number (07/01XXXXXXXX), ${number + " " + isValidPhoneNumber(number)}`);
+    if (!isValidPhoneNumber(formData.number)) {
+      toast.error(`Please enter a valid phone number with country code (e.g. +254 721 410 517 or +44 20 7946 0958)`);
       return false;
     }
 
-    if (!isValidLocation(location)) {
+    if (!isValidLocation(formData.location)) {
       toast.error("Please enter a valid current location (at least 3 characters)");
       return false;
     }
 
-    if (!isValidLocation(destination)) {
+    if (!isValidLocation(formData.destination)) {
       toast.error("Please enter a valid destination (at least 3 characters)");
       return false;
     }
 
-    if (!moveDate) {
+    if (!formData.moveDate) {
       toast.error("Please select a move date");
       return false;
     }
 
-    const selectedDate = new Date(moveDate);
+    const selectedDate = new Date(formData.moveDate);
     const currentDate = new Date();
     selectedDate.setHours(0, 0, 0, 0);
     currentDate.setHours(0, 0, 0, 0);
 
-    console.log("Selected Date:", selectedDate, "Current Date:", currentDate);
     if (selectedDate < currentDate) {
-      toast.error("Please select a future date for the move");
+      toast.error("Please select today or a future date for the move");
       return false;
     }
     return true;
@@ -249,7 +324,7 @@ const QuoteForm = () => {
     }
 
     try {
-      const recaptchaValue = await recaptchaRef.current.executeAsync();
+      const recaptchaValue = await recaptchaRef.current?.executeAsync?.();
       if (!recaptchaValue) {
         toast.error("Please verify that you are human");
         return;
@@ -261,209 +336,124 @@ const QuoteForm = () => {
     }
   }
 
+  const inputCls = 'border border-slate-200 px-4 py-3 w-full rounded-xl focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/20 transition-all duration-200 text-[15px] text-gray-900 bg-white placeholder:text-gray-400'
+  const labelCls = 'block text-[13px] font-semibold text-slate-700 mb-1.5'
+
   return (
-    <div className='w-[320px] md:w-[320px]'>
-      <div className='py-4 flex flex-col px-4 mx-auto mb-4 bg-[#DB421B]'>
-        <h1 className="font-bold text-2xl text-white">Request a Quote</h1>
-        <h2 className='mb-2 text-white '>Feel Free To Ask</h2>
-
+    <div className='w-full max-w-[480px] mx-auto quote-form-container bg-white rounded-2xl shadow-[0_20px_60px_-15px_rgba(11,27,51,0.35)] border border-slate-100 overflow-hidden'>
+      {/* Enterprise header */}
+      <div className='bg-[#0B1B33] px-6 pt-6 pb-5 relative overflow-hidden'>
+        <div className='absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF5000] via-[#FF8A50] to-[#FF5000]' />
+        <div className='flex items-center gap-2 mb-3'>
+          <span className='text-[11px] font-bold tracking-widest uppercase bg-white/10 text-white px-2.5 py-1 rounded-full border border-white/15'>Taylor Movers • Since 2008</span>
+          {showPersistedDataNotice && (
+            <span className='text-[11px] text-white/90 bg-white/10 px-2.5 py-1 rounded-full'>Draft restored</span>
+          )}
+        </div>
+        <h2 className='font-bold text-[22px] leading-tight text-white'>Get Your Free Moving Quote</h2>
+        <p className='text-slate-300 text-sm mt-1'>Transparent pricing • No hidden fees • Response within 30 minutes</p>
+        <div className='flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-[12px] text-slate-200'>
+          <span>IAM Member</span><span className='text-white/20'>|</span>
+          <span>40,000+ Successful Moves</span><span className='text-white/20'>|</span>
+          <span>4.9★ from 4,000+ reviews</span>
+        </div>
+        {hasPersistedData && (
+          <div className='mt-3 flex items-center justify-between bg-white/10 border border-white/15 rounded-lg px-3 py-2'>
+            <span className='text-white text-xs'>Continue from where you left off</span>
+            <button type='button' onClick={clearFormData} className='text-white/70 hover:text-white text-xs underline'>Start fresh</button>
+          </div>
+        )}
       </div>
-      <div className='flwe flex-col w-full px-4 mb-4'>
-        {/* <h3 className='text-lg mb-4'>Contact Us</h3> */}
-        <form
-          onSubmit={handleSubmit}
-          className='w-full flex flex-col items-center justify-center'>
-          <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className=' rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-              <input
-                type='text'
-                value={fname}
-                required
-                placeholder="John Doe"
-                onChange={(e) => setFname(e.target.value)}
-                className='border border-slate-300 px-2 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Full Name
-              </label>
-            </div>
-            <div className=' relative w-full max-w-[351px] mb-4 md:mr-2'>
-              {/* <PhoneInput
-                  country={"ke"}
-                  value={number}
-                  onChange={(number) => setNumber(number)}
-                  className='px-4 py-2 w-full rounded-xl'
-                /> */}
-              <input
-                type='text'
-                value={number}
-                required
-                onChange={(e) => setNumber(e.target.value)}
-                className='border border-slate-300 rounded-xl py-2 px-2 w-full rounded-xl'
-                placeholder="0700000000"
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Mobile
-              </label>
-            </div>
-          </div>
-          <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-              <input
-                type='email'
-                value={email}
-                placeholder="john@gmail.com"
-                onChange={(e) => setEmail(e.target.value)}
-                className='px-4 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Email
-              </label>
-            </div>
 
-          </div>
-          <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-              <input
-                type='text'
-                value={location}
-                placeholder=""
-                onChange={(e) => setLocation(e.target.value)}
-                className='px-4 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Current Location
-              </label>
-            </div>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
+      {/* Trust strip */}
+      <div className='grid grid-cols-3 divide-x divide-slate-100 bg-slate-50 border-b border-slate-100 text-center'>
+        <div className='py-2.5 px-2'><p className='text-[13px] font-bold text-slate-900'>Licensed</p><p className='text-[11px] text-slate-500'>& Insured</p></div>
+        <div className='py-2.5 px-2'><p className='text-[13px] font-bold text-slate-900'>Free Survey</p><p className='text-[11px] text-slate-500'>On request</p></div>
+        <div className='py-2.5 px-2'><p className='text-[13px] font-bold text-slate-900'>0712 410 517</p><p className='text-[11px] text-slate-500'>Call / WhatsApp</p></div>
+      </div>
 
-              <input
-                type='text'
-                value={destination}
-                placeholder="Nairobi CBD"
-                onChange={(e) => setDestination(e.target.value)}
-                className='px-4 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Destination Location
-              </label>
-            </div>
-
-          </div>
-          <div className='flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-              <select
-                onChange={(e) => setMoveType(e.target.value)}
-                value={moveType}
-                className='px-4 py-2 w-full rounded-xl'>
-                <option onClick={() => setMoveType("Local House Move")}>
-                  {" "}
-                  Local House Move{" "}
-                </option>
-                <option onClick={() => setMoveType("International Move")}>
-                  {" "}
-                  International Move{" "}
-                </option>
-                <option onClick={() => setMoveType("Business Move")}>
-                  {" "}
-                  Business Move{" "}
-                </option>
-                <option onClick={() => setMoveType("Other")}> Other </option>
-              </select>
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Move Type
-              </label>
-            </div>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-              {/* <input type='text' value={email} onChange={() => setEmail(email)} className='px-4 py-2 rounded-xl' /> */}
-              <select
-                onChange={(e) => setBedrooms(e.target.value)}
-                value={bedrooms}
-                className='px-4 py-2 w-full rounded-xl'>
-                <option onClick={() => setBedrooms("1br")}> 1br </option>
-                <option onClick={() => setBedrooms("2br")}> 2br </option>
-                <option onClick={() => setBedrooms("3br")}> 3br </option>
-                <option onClick={() => setBedrooms("4br")}> 4br </option>
-                <option onClick={() => setBedrooms("5br")}> 5br </option>
-                <option onClick={() => setBedrooms("6br")}> 6br </option>
-                <option onClick={() => setBedrooms("More than 6br")}>
-                  {" "}
-                  More than 6br{" "}
-                </option>
-                <option onClick={() => setBedrooms("studio")}> Studio Apartment</option>
-
-              </select>
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Number of bedrooms
-              </label>
-            </div>
-
-          </div>
-          <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-              <input
-                type='date'
-                value={moveDate}
-                onChange={handleDateChange}
-                className='px-4 py-2 w-full rounded-xl'
-              />
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                Move Date
-              </label>
+      <div className='px-6 py-5'>
+        <form ref={formRef} onSubmit={handleSubmit} className='w-full flex flex-col gap-5'>
+          {/* Filled by Zoho zcga.js with the Google Ads click id */}
+          <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
+          <div>
+            <p className='text-[11px] font-bold tracking-widest uppercase text-[#FF5000] mb-3'>1 • Contact details</p>
+            <div className='flex flex-col gap-4'>
+              <div>
+                <label htmlFor='quote-fname' className={labelCls}>Full Name <span className='text-[#FF5000]'>*</span></label>
+                <input type='text' id='quote-fname' name='name' autoComplete='name' value={formData.fname} required placeholder='e.g. Jane Wanjiru-Kamau' onChange={(e) => updateFormData('fname', e.target.value)} className={inputCls} />
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div>
+                  <label htmlFor='quote-phone' className={labelCls}>Phone / WhatsApp <span className='text-[#FF5000]'>*</span></label>
+                  <input type='tel' inputMode='tel' id='quote-phone' name='phone' autoComplete='tel' value={formData.number} required placeholder='+254 721 410 517 / +44 20 7946 0958' onChange={(e) => updateFormData('number', e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label htmlFor='quote-email' className={labelCls}>Email</label>
+                  <input type='email' id='quote-email' name='email' autoComplete='email' value={formData.email} placeholder='you@company.com (optional)' onChange={(e) => updateFormData('email', e.target.value)} className={inputCls} />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className='flex flex-col md:flex-row w-full max-w-[800px] justify-between'>
+          <div className='h-px bg-slate-100' />
 
-            <div className='border border-slate-300 rounded-xl relative w-full max-w-[351px] mb-4 md:mr-2'>
-              <select
-                onChange={(e) => setRef(e.target.value)}
-                value={ref}
-                className='px-4 py-2 w-full rounded-xl'>
-                <option onClick={() => setRef("Referals")}> Referals </option>
-                <option onClick={() => setRef("Social Media Pages")}>
-                  {" "}
-                  Social Media Pages{" "}
-                </option>
-                <option onClick={() => setRef("Internet Search")}>
-                  {" "}
-                  Internet Search{" "}
-                </option>
-                <option onClick={() => setRef("Door To Door Marketing")}>
-                  {" "}
-                  Door To Door Marketing{" "}
-                </option>
-                <option onClick={() => setRef("Taylor Mover Trucks")}>
-                  {" "}
-                  Taylor Mover Trucks{" "}
-                </option>
-                <option onClick={() => setRef("Previous Interactions")}>
-                  {" "}
-                  Previous Interactions{" "}
-                </option>
-              </select>
-              <label className='absolute top-[-8px] bg-white left-5 text-xs px-2 text-gray-400'>
-                How you found us
-              </label>
+          <div>
+            <p className='text-[11px] font-bold tracking-widest uppercase text-[#FF5000] mb-3'>2 • Move details</p>
+            <div className='flex flex-col gap-4'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div>
+                  <label htmlFor='quote-from' className={labelCls}>Moving From <span className='text-[#FF5000]'>*</span></label>
+                  <input type='text' id='quote-from' name='from' autoComplete='address-level2' value={formData.location} required placeholder='Westlands, Nairobi' onChange={(e) => updateFormData('location', e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label htmlFor='quote-to' className={labelCls}>Moving To <span className='text-[#FF5000]'>*</span></label>
+                  <input type='text' id='quote-to' name='to' value={formData.destination} required placeholder='Kileleshwa, Nairobi' onChange={(e) => updateFormData('destination', e.target.value)} className={inputCls} />
+                </div>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div>
+                  <label htmlFor='quote-type' className={labelCls}>Move Type <span className='text-[#FF5000]'>*</span></label>
+                  <select id='quote-type' name='moveType' value={formData.moveType} onChange={(e) => updateFormData('moveType', e.target.value)} className={inputCls + ' cursor-pointer'}>
+                    {MOVE_TYPES.map((m) => (<option key={m} value={m}>{m}</option>))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor='quote-size' className={labelCls}>Property Size <span className='text-[#FF5000]'>*</span></label>
+                  <select id='quote-size' name='bedrooms' value={formData.bedrooms} onChange={(e) => updateFormData('bedrooms', e.target.value)} className={inputCls + ' cursor-pointer'}>
+                    {BEDROOM_OPTIONS.map((b) => (<option key={b} value={b}>{b}</option>))}
+                  </select>
+                </div>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+                <div>
+                  <label htmlFor='quote-date' className={labelCls}>Preferred Move Date <span className='text-[#FF5000]'>*</span></label>
+                  <input type='date' id='quote-date' name='moveDate' value={formData.moveDate} onChange={handleDateChange} className={inputCls} />
+                </div>
+                <div>
+                  <label htmlFor='quote-ref' className={labelCls}>How did you hear about us?</label>
+                  <select id='quote-ref' name='referral' value={formData.ref} onChange={(e) => updateFormData('ref', e.target.value)} className={inputCls + ' cursor-pointer'}>
+                    {REFERRAL_OPTIONS.map((r) => (<option key={r} value={r}>{r}</option>))}
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* <textarea value={message} onChange={() => setMessage(message)} cols="30" rows="10" className='my-4 border border-grey-500 rounded-xl w-full max-w-[351px] md:max-w-[800px]'/> */}
-
-          <div className="mb-6">
-            <ReCAPTCHA
-              ref={recaptchaRef}
-              size="invisible"
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-            />
+          <div className='w-full'>
+            <ReCAPTCHA ref={recaptchaRef} size='invisible' sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} />
           </div>
-          <button
-            type='submit'
-            disabled={isSubmitting}
-            className='bg-[#DB421B] text-white px-6 py-3 rounded-xl hover:bg-[#c13817] transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
-            {isSubmitting ? 'Submitting...' : 'Submit Quote Request'}
-          </button>
+
+          {/* T7 — hidden UTM/GCLID/Campaign_ID attribution fields */}
+          <AttributionHiddenFields />
         </form>
+      </div>
+
+      <div className='px-6 pb-6 pt-4 bg-white border-t border-slate-100'>
+        <button type='submit' onClick={(e) => { e.preventDefault(); if (formRef.current) { formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); } }} disabled={isSubmitting} className='w-full bg-[#FF5000] text-white px-6 py-4 rounded-xl hover:bg-[#D94300] transition-all font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_10px_25px_-8px_rgba(255,80,0,0.7)]'>
+          {isSubmitting ? (<span className='flex items-center justify-center gap-2'><span className='animate-spin rounded-full h-5 w-5 border-b-2 border-white' />Submitting secure request…</span>) : (<span>Request My Free Quote →</span>)}
+        </button>
+        <p className='text-center text-[12px] text-slate-500 mt-3'>🔒 Your details are encrypted & never shared. Prefer chat? <WhatsAppButton placement="quote-form" target='_blank' rel='noreferrer' className='font-semibold text-[#0B1B33] underline'>WhatsApp us</WhatsAppButton> • <a href='tel:+254721410517' className='font-semibold text-[#0B1B33] underline'>Call 0721 410 517</a></p>
       </div>
     </div>
   )

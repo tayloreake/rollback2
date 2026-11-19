@@ -1,10 +1,10 @@
 import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import { BiChevronRight } from "react-icons/bi"
-import Accordion from 'react-bootstrap/Accordion';
+
 import Reviews from "../Reviews/reviews";
 import { isMobile } from "react-device-detect";
-import { Tab, Tabs } from "react-bootstrap";
+
 import Link from "next/link";
 import { portableTextComponents } from "../../components/portable-text"
 import { PortableText } from '@portabletext/react';
@@ -22,7 +22,7 @@ const About = ({ content }) => {
                         <PortableText value={content?.text} components={portableTextComponents} />
                     </div>
                     <div>
-                        <Link href={"/About"}>
+                        <Link href={"/about"}>
                             <button className="hover:opacity-60 btn rounded-2xl px-3 py-2 text-white !bg-[#F05423] my-5">ABOUT US</button>
                         </Link>
                     </div>
