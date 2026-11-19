@@ -1,5 +1,6 @@
 import { rateLimiter } from "./middleware/rateLimiter"
 import { syncInquiryToZoho } from "../../utils/zoho"
+import { recaptchaVerdict, captchaOptions, suspiciousName, botSignals } from "../../utils/spamGuard"
 
 const limiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -17,7 +18,10 @@ async function verifyRecaptcha(token) {
     });
 
     const data = await response.json();
-    return data.success;
+    return recaptchaVerdict(
+      { success: Boolean(data.success), score: typeof data.score === 'number' ? data.score : null },
+      captchaOptions()
+    ).ok;
   } catch (error) {
     console.error('reCAPTCHA verification error:', error);
     return false;
@@ -52,6 +56,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'reCAPTCHA verification failed' });
     }
     
+    if (botSignals(req.body).length || suspiciousName(name) || /https?:|www\./i.test(String(review))) {
+      return res.status(400).json({ message: 'Submission could not be accepted' });
+    }
+
     // Reviews go to Zoho Website Inquiries (Lead_Source "Review") — never to
     // public Sanity (same exposure class as quotes). Display stays gated by
     // the CMS `approved` flag.

@@ -1,3 +1,4 @@
+import useBotTrap from "../hooks/useBotTrap"
 import React, { useState, useRef } from "react"
 import Head from "next/head"
 import Jumbotron from "../components/jumbotron"
@@ -358,6 +359,7 @@ const JobApplicationForm = ({ job, onClose }) => {
   const [error, setError] = useState('')
   const [lastSubmissionTime, setLastSubmissionTime] = useState(0)
   const recaptchaRef = useRef(null)
+  const { trap, getBotFields } = useBotTrap()
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -421,6 +423,7 @@ reCAPTCHA: ${recaptchaToken ? 'verified' : 'not provided'}
           subject: `Job Application - ${formData.position} - ${formData.fullName}`,
           message: message,
           recaptchaToken: recaptchaToken,
+          ...getBotFields(),
           inquiry: {
             name: formData.fullName,
             email: formData.email,
@@ -465,6 +468,7 @@ reCAPTCHA: ${recaptchaToken ? 'verified' : 'not provided'}
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {trap}
       {/* Filled by Zoho zcga.js with the Google Ads click id */}
       <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
       <h3 className="text-xl font-bold text-[#FF5000] mb-4">Apply for this Position</h3>

@@ -7,6 +7,7 @@ const limiter = rateLimiter({ windowMs: 15 * 60 * 1000, max: 10 })
 // ever lost), (2) Zoho Campaigns list when configured. Visitor always gets success.
 import { subscribeNewsletter } from "../../utils/zohoCampaigns";
 import { syncInquiryToZoho } from "../../utils/zoho";
+import { botSignals, looksLikeToken } from "../../utils/spamGuard";
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ success: false, message: "Method not allowed" })
@@ -18,7 +19,10 @@ export default async function handler(req, res) {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ success: false, message: "Please enter a valid email address" })
     }
-    console.log("Newsletter signup:", email)
+    // Bots: honeypot / token-like mailbox get a fake success and no CRM write.
+    if (botSignals(req.body).length || looksLikeToken(email.split("@")[0])) {
+      return res.status(200).json({ success: true, message: "Thanks for subscribing! You'll hear from us soon.", synced: false, zoho: "skipped" })
+    }
     // Option B (no Campaigns access on the account): every signup becomes a
     // Website Inquiries record (Lead_Source "Newsletter") — exportable to
     // Campaigns later in one bulk move.
