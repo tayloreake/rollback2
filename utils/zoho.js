@@ -4,7 +4,7 @@
 // optional ZOHO_DC ("com" | "eu" | "in", default "com").
 // recaptchaScore is intentionally never sent. Failures returned, never thrown.
 
-import { deriveLeadSource, derivePlatform } from "./attribution"
+import { deriveLeadSource, derivePlatform } from "./attribution.js"
 
 const DC = {
   com: { accounts: "https://accounts.zoho.com", api: "https://www.zohoapis.com" },
@@ -65,14 +65,20 @@ const api = async (path, method = "GET", body) => {
   let parsed = null
   try { parsed = text ? JSON.parse(text) : null } catch { /* non-JSON body */ }
 
-  if (!r.ok) {
-    const detail = parsed?.message || parsed?.error?.message || text.slice(0, 200) || r.statusText
+  // Zoho reports write failures PER RECORD (data[i].status === "error"), often
+  // inside an HTTP 200, and for single-record 400s the code/details live on the
+  // row rather than the envelope. Read both so no failure is mistaken for success.
+  const rows = Array.isArray(parsed?.data) ? parsed.data : []
+  const badRow = rows.find((row) => String(row?.status || "").toLowerCase() === "error")
+
+  if (!r.ok || badRow) {
+    const detail = badRow?.message || parsed?.message || parsed?.error?.message || text.slice(0, 200) || r.statusText
     const err = new Error(`Zoho ${method} ${path} → HTTP ${r.status}: ${detail}`)
     // Carry Zoho's machine-readable error so a bad custom field can be
     // identified and dropped instead of failing the whole lead write.
-    err.status = r.status
-    err.code = parsed?.code || parsed?.error?.code || null
-    err.details = parsed?.details || parsed?.error?.details || null
+    err.status = r.ok ? 400 : r.status
+    err.code = badRow?.code || parsed?.code || parsed?.error?.code || null
+    err.details = badRow?.details || parsed?.details || parsed?.error?.details || null
     throw err
   }
 
@@ -129,7 +135,7 @@ const ATTRIBUTION_FIELDS = [
 // Fields that identify the lead itself. Zoho's Leads module mandates
 // Last_Name; everything else is optional and may be dropped, so a CRM schema
 // mismatch can never cost us a lead.
-const CORE_FIELDS = new Set(["First_Name", "Last_Name", "Email", "Phone"])
+const CORE_FIELDS = new Set(["First_Name", "Last_Name", "Name", "Email", "Phone"])
 // Least critical first: the order we sacrifice optional fields when Zoho
 // rejects the record without naming the field. Keep the Zoho `$gclid` property
 // and Google_Click_ID until last because Google Ads attribution depends on them.
@@ -173,6 +179,15 @@ const SACRIFICE_ORDER = [
   "$gclid",
   "Google_Click_ID",
   "Lead_Status",
+  // Website_Quotes optional extras.
+  "Quote_Notes",
+  "Landing_Page",
+  "Visitor_Id",
+  "SalesIQ_Visitor_ID",
+  "Move_Type",
+  "Move_From",
+  "Move_To",
+  "Move_Date",
 ]
 const isDroppable = (name) => !CORE_FIELDS.has(name)
 
@@ -215,25 +230,38 @@ const offendingField = (err) => {
   return null
 }
 
-// Create (or upsert) a lead, dropping rejected attribution fields one at a
-// time. Returns { id, dropped: ["Field_Name", ...] }.
-async function writeLead(record, existingId) {
+// Create (or upsert) a record, dropping rejected optional fields one at a
+// time. Returns { id, dropped: [...], duplicate }. Per-record Zoho errors are
+// thrown by api(); a "success" row without an id is treated as a failure.
+async function writeRecord(record, existingId, moduleName = "Leads") {
   let current = { ...record }
   const dropped = []
-  for (let attempt = 0; attempt <= SACRIFICE_ORDER.length; attempt++) {
+  for (let attempt = 0; attempt <= SACRIFICE_ORDER.length + 8; attempt++) {
     try {
       if (existingId) {
         // duplicate_check_fields makes the upsert idempotent on Email.
-        await api("/Leads/upsert?duplicate_check_fields=Email", "POST", {
+        const res = await api(`/${moduleName}/upsert?duplicate_check_fields=Email`, "POST", {
           data: [{ ...current, id: existingId }],
         })
-        return { id: existingId, dropped }
+        const row = res?.data?.[0]
+        if (!row || String(row.status).toLowerCase() !== "success") {
+          throw new Error(row?.message || `${moduleName} upsert returned no success row`)
+        }
+        return { id: row?.details?.id || existingId, dropped, duplicate: false }
       }
-      const created = await api("/Leads", "POST", { data: [current] })
-      const id = created?.data?.[0]?.details?.id || null
-      if (!id) throw new Error(created?.data?.[0]?.message || "Lead create returned no id")
-      return { id, dropped }
+      const created = await api(`/${moduleName}`, "POST", { data: [current] })
+      const row = created?.data?.[0]
+      const id = row?.details?.id || null
+      if (!row || String(row.status).toLowerCase() !== "success" || !id) {
+        throw new Error(row?.message || `${moduleName} create returned no id`)
+      }
+      return { id, dropped, duplicate: false }
     } catch (err) {
+      // A duplicate is an outcome, not a failure: reuse the existing record.
+      if (err?.code === "DUPLICATE_DATA") {
+        const dupId = err?.details?.id || err?.details?.duplicate_record?.id || null
+        if (dupId) return { id: dupId, dropped, duplicate: true }
+      }
       if (!isFieldError(err)) throw err
       // Never sacrifice a core field (name/phone) to make a write pass.
       let name = offendingField(err)
@@ -248,13 +276,15 @@ async function writeLead(record, existingId) {
       delete current[name]
       dropped.push(name)
       console.warn(
-        `Zoho rejected field "${name}" (${err.code || err.status}) — retrying without it. ` +
-          `Create/fix the field on the Leads module to keep campaign attribution.`
+        `Zoho rejected field "${name}" (${err.code || err.status}) on ${moduleName} — retrying without it. ` +
+          `Create/fix the field on the ${moduleName} module to keep campaign attribution.`
       )
     }
   }
-  throw new Error("Zoho lead write failed after dropping attribution fields")
+  throw new Error(`Zoho ${moduleName} write failed after dropping optional fields`)
 }
+
+const writeLead = (record, existingId) => writeRecord(record, existingId, "Leads")
 
 // Every attribution value a website lead carries into CRM. Fields are
 // optional extras: a schema mismatch drops only the offending field.
@@ -315,6 +345,18 @@ const attributionRecord = (attribution = {}, rawReferral = "", form = {}) => {
   }
 }
 
+// First-touch fields: when a lead already exists, never overwrite how it was
+// originally acquired with a later (often direct/organic) visit.
+const FIRST_TOUCH_FIELDS = [
+  "Lead_Source", "Platform", "Ad_Account_Name", "Campaign_ID", "Campaign_Name",
+  "Advert_ID", "Advert_Name", "AdGroup_Name", "Click_Type", "Device_Type", "Ad_Network",
+  "Keyword", "Form_Name", "Form_ID", "Page_Name", "Referrer_URL",
+  "UTM_Source", "UTM_Medium", "UTM_Campaign", "UTM_Term", "UTM_Content",
+  "How_did_you_hear_about_us",
+]
+
+// Genuine moving quotes only -> Leads. Callers must pass VALIDATED data
+// (see validateQuoteData / assessQuote); this function does no spam checks.
 export async function syncQuoteToZoho(quote = {}, attribution = {}) {
   if (!zohoConfigured()) {
     warnNotConfigured("syncQuoteToZoho")
@@ -331,9 +373,7 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
       firstName = split.firstName
       lastName = split.lastName
     }
-    // Dedupe is best-effort: a search failure must NEVER block the write
-    // (this is what silently dropped every quote — the throw aborted before
-    // the create). Fall through to a plain create instead.
+    // Dedupe is best-effort: a search failure must NEVER block the write.
     let recordId = null
     if (email) {
       try {
@@ -342,9 +382,6 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
         console.warn("Zoho lead dedupe search failed (creating anyway):", e?.message)
       }
     }
-    // Every field below exists on this org's Leads module. Attribution fields
-    // are still treated as optional extras by writeLead(), so a future CRM
-    // schema change drops one field instead of the whole lead.
     const record = {
       First_Name: firstName || undefined,
       Last_Name: lastName || firstName || "Website Lead",
@@ -357,63 +394,83 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
       Property_Size: String(quote.bedrooms || "").slice(0, 100) || undefined,
       Proposed_Move_Date: String(quote.moveDate || "").slice(0, 50) || undefined,
       // Zoho leaves this null on API-created leads, which hides them from
-      // status-filtered views ("My Open Leads" etc.). Set the standard
-      // starting status explicitly.
+      // status-filtered views ("My Open Leads" etc.).
       Lead_Status: "Not Contacted",
-      // T7 — campaign + ad attribution (playbook §4 field mapping)
       ...attributionRecord(attribution, quote.referrals || quote.ref || "", {
         name: "Quote Form",
         id: "quote",
       }),
     }
+    if (recordId) {
+      // Updating an existing lead: keep first-touch attribution and do not
+      // reset its status; refresh contact + move details only.
+      for (const k of FIRST_TOUCH_FIELDS) delete record[k]
+      delete record.Lead_Status
+    }
     const { id, dropped } = await writeLead(record, recordId)
-    return { ok: true, leadId: id, droppedAttribution: dropped }
+    return { ok: true, leadId: id, droppedAttribution: dropped, module: "Leads" }
   } catch (e) {
     return { ok: false, error: e?.message || "Zoho sync failed" }
   }
 }
 
-// Generic non-quote inquiry (contact / feedback / job application) → Zoho Leads
-// module, distinguished by How_did_you_hear_about_us. Carries the same T7
-// attribution fields as quotes when the visitor arrived from a campaign.
-export async function syncInquiryToZoho({ name, email, phone, source, notes, gclid, attribution = {} } = {}) {
+const NEWSLETTER_SOURCE = "Newsletter"
+
+const websiteQuoteSearch = async (email, source) => {
+  const criteria = encodeURIComponent(`((Email:equals:${email})and(Lead_Source:equals:${source}))`)
+  const found = await api(`/Website_Quotes/search?criteria=${criteria}`)
+  return found?.data?.[0]?.id || null
+}
+
+// Every non-quote website interaction (contact, job application, feedback,
+// review, newsletter, WhatsApp click) -> Website_Quotes ("Website Inquiries"),
+// NEVER the Leads module. Fields are the exact Website_Quotes API names.
+export async function syncInquiryToZoho({ name, email, phone, source, notes, gclid, siq_visitor_id, attribution = {} } = {}) {
   if (!zohoConfigured()) {
     warnNotConfigured("syncInquiryToZoho")
     return { skipped: true, reason: "not_configured", missing: missingZohoEnv() }
   }
   try {
-    // attribution = utils/attribution cookie (UTMs, campaign_id, landing, referrer).
-    // Optional so existing callers (reviews, newsletter) keep working; explicit gclid/siq args win.
     const att = attribution || {}
     const g = gclid || att.gclid || ""
-    const full = String(name || "").trim()
-    const split = splitName(full)
-    const formName = String(source || "Website Inquiry").slice(0, 255)
-    const formId = formName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 80) || "inquiry"
-    // Every field below exists on this org's Leads module. Description is the
-    // standard notes field; attribution extras are dropped individually if a
-    // future schema change rejects one.
-    const record = {
-      First_Name: split.firstName || undefined,
-      // Zoho Leads mandates Last_Name.
-      Last_Name: split.lastName || full.slice(0, 80) || "Website Inquiry",
-      Email: String(email || "").trim() || undefined,
-      Phone: String(phone || "").slice(0, 30) || undefined,
-      How_did_you_hear_about_us: String(source || "Website").slice(0, 100),
-      Description: String(notes || "").slice(0, 500) || undefined,
-      // Without a status, API-created leads are hidden by status-filtered views.
-      Lead_Status: "Not Contacted",
-      ...attributionRecord({ ...att, ...(g ? { gclid: g } : {}) }, source || "", {
-        name: formName,
-        id: formId,
-      }),
+    const siq = siq_visitor_id || att.siq_visitor_id || ""
+    const fullName = String(name || "").trim().slice(0, 120) || "Website Inquiry"
+    const src = String(source || "Website").slice(0, 100)
+    const cleanEmail = String(email || "").trim().slice(0, 100)
+    const a = attributionRecord({ ...att, ...(g ? { gclid: g } : {}) }, src, {})
+
+    // Newsletter signups are idempotent per email: a repeat signup must not
+    // create another row.
+    if (src === NEWSLETTER_SOURCE && cleanEmail) {
+      try {
+        const existing = await websiteQuoteSearch(cleanEmail, NEWSLETTER_SOURCE)
+        if (existing) return { ok: true, leadId: existing, droppedAttribution: [], module: "Website_Quotes", duplicate: true }
+      } catch (e) {
+        console.warn("Website_Quotes newsletter dedupe search failed (creating anyway):", e?.message)
+      }
     }
-    const { id, dropped } = await writeLead(record, null)
-    return { ok: true, leadId: id, droppedAttribution: dropped }
+
+    const record = {
+      Name: fullName,
+      Email: cleanEmail || undefined,
+      Phone: String(phone || "").slice(0, 30) || undefined,
+      // Lead_Source on Website_Quotes is the inquiry TYPE (Contact Form,
+      // Review, Newsletter, Job Application, ...), so reports can split them.
+      Lead_Source: src,
+      Quote_Notes: String(notes || "").slice(0, 255) || undefined,
+      GCLID: clean(g, 100),
+      Campaign_ID: clean(a.Campaign_ID, 100),
+      UTM_Source: a.UTM_Source,
+      UTM_Medium: a.UTM_Medium,
+      UTM_Campaign: a.UTM_Campaign,
+      UTM_Term: a.UTM_Term,
+      UTM_Content: a.UTM_Content,
+      Landing_Page: clean(att.landing_page, 255),
+      Referrer_URL: a.Referrer_URL,
+      SalesIQ_Visitor_ID: clean(siq, 100),
+    }
+    const { id, dropped } = await writeRecord(record, null, "Website_Quotes")
+    return { ok: true, leadId: id, droppedAttribution: dropped, module: "Website_Quotes" }
   } catch (e) {
     return { ok: false, error: e?.message || "Zoho sync failed" }
   }

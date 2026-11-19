@@ -1,3 +1,4 @@
+import useBotTrap from "../hooks/useBotTrap"
 import React from 'react';
 import { getClientCategories, getClientLogos, getClientReviews, getLandingAbout, getLandingPageData, getLandingServices, getSiteLogos, getCaseStudyBlogs } from "../sanity/sanity-utils"
 import imageUrlBuilder from "@sanity/image-url"
@@ -73,6 +74,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
   
   // Newsletter state
   const [newsletterEmail, setNewsletterEmail] = useState('')
+  const { trap, getBotFields } = useBotTrap()
   const [newsletterStatus, setNewsletterStatus] = useState(null)
   
   // GTM Section tracking refs
@@ -150,7 +152,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
       const r = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newsletterEmail }),
+        body: JSON.stringify({ ...getBotFields(), email: newsletterEmail }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.message || 'Subscription failed');
@@ -381,6 +383,7 @@ export default function Home({ landingPage, reviews, clients, clientCategories, 
                 Be the first to receive moving tips, special offers, and updates from Kenya’s trusted moving company
               </p>
               <form method="post" onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 justify-center">
+{trap}
                 <input
                   type="email"
                   required

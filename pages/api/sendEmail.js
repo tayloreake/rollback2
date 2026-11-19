@@ -6,6 +6,7 @@
 import { rateLimiter } from "./middleware/rateLimiter";
 import { verifyRecaptcha, sendSalesEmail } from "../../utils/leadNotify";
 import { syncInquiryToZoho } from "../../utils/zoho";
+import { recaptchaVerdict, captchaOptions, botSignals, suspiciousName } from "../../utils/spamGuard";
 
 const limiter = rateLimiter({
   windowMs: 15 * 60 * 1000,
@@ -47,12 +48,17 @@ export default async function handler(req, res) {
     }
 
     const recaptchaResult = await verifyRecaptcha(recaptchaToken);
-    if (!recaptchaResult.success) {
+    const verdict = recaptchaVerdict(recaptchaResult, captchaOptions());
+    if (!verdict.ok) {
+      console.warn(`Email blocked (${verdict.reason}) score=${recaptchaResult.score}`);
       return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
     }
-
-    if (recaptchaResult.score !== null && recaptchaResult.score < 0.5) {
-      console.warn(`Low reCAPTCHA score detected: ${recaptchaResult.score}`);
+    if (botSignals(req.body).length) {
+      return res.status(200).json({ success: true, message: "Email sent successfully", zoho: "skipped" });
+    }
+    if (inquiry && (suspiciousName(inquiry.name) || /https?:|www\./i.test(String(inquiry.notes || "")))) {
+      console.warn("Inquiry blocked as spam (name/notes)");
+      return res.status(400).json({ success: false, message: "Submission could not be accepted" });
     }
 
     if (!message) {

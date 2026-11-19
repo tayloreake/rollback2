@@ -1,3 +1,4 @@
+import useBotTrap from "../../hooks/useBotTrap"
 import React, { useMemo, useRef, useState } from "react"
 import ReCAPTCHA from "../SafeRecaptcha"
 import { getFormAttribution } from "../../utils/attribution"
@@ -41,6 +42,7 @@ const FeedbackForm = () => {
   const [success, setSuccess] = useState(false)
   const [lastSubmissionTime, setLastSubmissionTime] = useState(0)
   const recaptchaRef = useRef(null)
+  const { trap, getBotFields } = useBotTrap()
 
   const selectedMoveTypes = useMemo(() => {
     const types = Object.keys(moveTypes).filter((k) => moveTypes[k])
@@ -134,6 +136,7 @@ const FeedbackForm = () => {
           to: "marykc@taylorea.com,stephaniem@taylorea.com",
           message,
           recaptchaToken: token,
+          ...getBotFields(),
           inquiry: {
             name: contactName.trim() || "Feedback Submitter",
             email: contactInfo.includes("@") ? contactInfo.trim() : "",
@@ -176,6 +179,7 @@ const FeedbackForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
+      {trap}
       {/* Filled by Zoho zcga.js with the Google Ads click id */}
       <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
       <div className="grid grid-cols-1 gap-6">

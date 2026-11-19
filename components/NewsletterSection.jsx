@@ -1,3 +1,4 @@
+import useBotTrap from "../hooks/useBotTrap"
 import React, { useState } from 'react'
 import { getFormAttribution } from '../utils/attribution'
 
@@ -8,6 +9,7 @@ const NewsletterSection = ({
   containerClass = "container py-20"
 }) => {
   const [newsletterEmail, setNewsletterEmail] = useState('')
+  const { trap, getBotFields } = useBotTrap()
   const [newsletterStatus, setNewsletterStatus] = useState(null)
 
   const handleNewsletterSubmit = async (e) => {
@@ -16,7 +18,7 @@ const NewsletterSection = ({
       const r = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newsletterEmail, attribution: getFormAttribution() }),
+        body: JSON.stringify({ ...getBotFields(), email: newsletterEmail, attribution: getFormAttribution() }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.message || 'Subscription failed');
@@ -39,6 +41,7 @@ const NewsletterSection = ({
           {subtitle}
         </p>
         <form method="post" onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
+{trap}
           <input
             type="email"
             required

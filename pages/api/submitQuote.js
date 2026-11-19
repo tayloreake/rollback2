@@ -6,25 +6,12 @@
 // Nothing here writes to the public Sanity dataset.
 import { rateLimiter } from "./middleware/rateLimiter"
 import { getClientIp, getDetailedIpInfo, getGeolocation } from "../../utils/getClientIp"
-import { verifyRecaptcha, validateQuoteData, sendSalesEmail, sendLeadSms } from "../../utils/leadNotify"
+import { verifyRecaptcha, validateQuoteData, buildQuoteMessage, sendSalesEmail, sendLeadSms } from "../../utils/leadNotify"
+import { recaptchaVerdict, botSignals, captchaOptions } from "../../utils/spamGuard"
 import { syncQuoteToZoho } from "../../utils/zoho"
 import { sendLeadToMeta } from "../../utils/metaCapi"
 
 const limiter = rateLimiter({ windowMs: 15 * 60 * 1000, max: 5 })
-
-const buildMessage = (q) =>
-  [
-    "New Move Request:",
-    `Name: ${q.firstName || ""} ${q.lastName || ""}`.trim(),
-    `Email: ${q.email || ""}`,
-    `Phone Number: ${q.phoneNumber || ""}`,
-    `Move Type: ${q.moveType || ""}`,
-    `Bedrooms: ${q.bedrooms || ""}`,
-    `Move Date: ${q.moveDate || ""}`,
-    `From: ${q.location || ""}`,
-    `To: ${q.destination || ""}`,
-    `How did you hear about us: ${q.referrals || q.ref || ""}`,
-  ].join("\n")
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -33,27 +20,32 @@ export default async function handler(req, res) {
   const ipAddress = getClientIp(req)
   try {
     await limiter(req)
-    const { message, recaptchaToken, quoteData, meta } = req.body
+    const { recaptchaToken, quoteData, meta } = req.body
     if (!recaptchaToken) {
       return res.status(400).json({ success: false, message: "reCAPTCHA token is required" })
     }
     const recaptchaResult = await verifyRecaptcha(recaptchaToken)
-    if (!recaptchaResult.success) {
+    const verdict = recaptchaVerdict(recaptchaResult, captchaOptions())
+    if (!verdict.ok) {
+      console.warn(`Quote blocked (${verdict.reason}) score=${recaptchaResult.score} ip=${ipAddress}`)
       return res.status(400).json({ success: false, message: "reCAPTCHA verification failed" })
-    }
-    if (recaptchaResult.score !== null && recaptchaResult.score < 0.5) {
-      console.warn(`Low reCAPTCHA score: ${recaptchaResult.score} from IP: ${ipAddress}`)
     }
     if (!quoteData) {
       return res.status(400).json({ success: false, message: "Missing quote data" })
     }
+    const signals = botSignals(req.body)
+    if (signals.length) {
+      console.warn(`Quote blocked (${signals.join(",")}) ip=${ipAddress}`)
+      // Look successful to the bot; deliver nothing.
+      return res.status(200).json({ success: true, message: "Quote request submitted successfully", zoho: "skipped" })
+    }
     const valid = validateQuoteData(quoteData)
     if (!valid.ok) {
+      if (valid.spam) console.warn(`Quote blocked as spam (${valid.reasons.join(",")}) ip=${ipAddress}`)
       return res.status(400).json({ success: false, message: valid.error })
     }
-    if (!message) {
-      return res.status(400).json({ success: false, message: "'message' field is required" })
-    }
+    // Built from the validated quote — the client-supplied message is ignored.
+    const message = buildQuoteMessage(quoteData)
     const attribution = quoteData.attribution || {}
     const ipDetails = getDetailedIpInfo(req)
     const geolocation = getGeolocation(req)

@@ -6,8 +6,10 @@ import ReCAPTCHA from "react-google-recaptcha"
 // Renders nothing without a key; callers must use
 // recaptchaRef.current?.executeAsync?.() and handle a falsy token.
 const SafeRecaptcha = React.forwardRef((props, ref) => {
-  if (!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) return null
-  return <ReCAPTCHA ref={ref} {...props} sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY} />
+  // The deployed key carried a trailing newline (k=...%0A in the widget URL); trim it.
+  const siteKey = String(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "").trim()
+  if (!siteKey) return null
+  return <ReCAPTCHA ref={ref} {...props} sitekey={siteKey} />
 })
 SafeRecaptcha.displayName = "SafeRecaptcha"
 

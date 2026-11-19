@@ -4,17 +4,26 @@
 // Nothing here touches the public Sanity production dataset.
 import nodemailer from "nodemailer"
 import AfricaTalking from "africastalking"
-import config from "../africastalking.config"
+import config from "../africastalking.config.js"
+import { assessQuote } from "./spamGuard.js"
 
 export async function verifyRecaptcha(token) {
   try {
+    // Env values pasted into Vercel often carry a trailing newline; trim it.
+    const secret = String(process.env.RECAPTCHA_SECRET_KEY || "").trim()
     const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
+      body: new URLSearchParams({ secret, response: String(token || "") }).toString(),
     })
     const data = await response.json()
-    return { success: data.success, score: data.score || null, action: data.action || null }
+    return {
+      success: Boolean(data.success),
+      score: typeof data.score === "number" ? data.score : null,
+      action: data.action || null,
+      hostname: data.hostname || null,
+      challengeTs: data.challenge_ts || null,
+    }
   } catch (error) {
     console.error("reCAPTCHA verification error:", error)
     return { success: false, score: null }
@@ -49,7 +58,7 @@ export function splitFullName(raw, max = 80) {
 // quote forms only collected a full name, and Zoho's Leads create requires a
 // Last_Name, so we split here instead of rejecting an otherwise valid lead.
 export function validateQuoteData(quoteData) {
-  if (!quoteData) return { ok: false, error: "Missing quote data" }
+  if (!quoteData || typeof quoteData !== "object") return { ok: false, error: "Missing quote data" }
   const phoneOk = /^\+?\d[\d\s-]{7,15}$/.test(String(quoteData.phoneNumber || "").trim())
   if (!phoneOk) return { ok: false, error: "Invalid phone number" }
 
@@ -64,11 +73,40 @@ export function validateQuoteData(quoteData) {
   if (!lastName || !nameRe.test(lastName)) return { ok: false, error: "Invalid name" }
   if (firstName && !nameRe.test(firstName)) return { ok: false, error: "Invalid name" }
 
+  if (typeof quoteData.email === "string" && quoteData.email.trim()) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(quoteData.email.trim())) return { ok: false, error: "Invalid email" }
+  }
+
   quoteData.phoneNumber = normalizePhone(quoteData.phoneNumber)
   quoteData.firstName = firstName.slice(0, 80)
   quoteData.lastName = lastName.slice(0, 80)
   if (typeof quoteData.email === "string") quoteData.email = quoteData.email.trim().slice(0, 120)
+  // Clamp free-text fields so the SAME bounded values feed CRM, SMS and email.
+  for (const [k, max] of [["location", 255], ["destination", 255], ["moveType", 100], ["bedrooms", 100], ["moveDate", 50], ["referrals", 100], ["ref", 100]]) {
+    if (quoteData[k] !== undefined) quoteData[k] = String(quoteData[k] ?? "").trim().slice(0, max)
+  }
+
+  const spam = assessQuote(quoteData)
+  if (!spam.ok) return { ok: false, error: "Submission could not be accepted", spam: true, reasons: spam.reasons }
   return { ok: true }
+}
+
+// ONE message builder for SMS + sales email, derived from the validated quote
+// data (never from a client-supplied free-text message), so CRM, SMS and email
+// can never disagree.
+export function buildQuoteMessage(q = {}) {
+  return [
+    "New Move Request:",
+    `Name: ${q.firstName || ""} ${q.lastName || ""}`.trim(),
+    `Email: ${q.email || ""}`,
+    `Phone Number: ${q.phoneNumber || ""}`,
+    `Move Type: ${q.moveType || ""}`,
+    `Bedrooms: ${q.bedrooms || ""}`,
+    `Move Date: ${q.moveDate || ""}`,
+    `From: ${q.location || ""}`,
+    `To: ${q.destination || ""}`,
+    `How did you hear about us: ${q.referrals || q.ref || ""}`,
+  ].join("\n")
 }
 
 export function formatAttributionBlock(attribution = {}) {
