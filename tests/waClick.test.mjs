@@ -45,6 +45,27 @@ test("WhatsApp click is written to the Leads module (never Website_Quotes)", asy
   assert.equal(rec.GCLID, "G1")
   assert.equal(rec.UTM_Source, "google")
   assert.equal(rec.Page_Name, "/services/home")
+  assert.equal(rec.Platform, "Google Ads")
+  assert.equal(rec.Google_Click_ID, "G1")
+  assert.equal(rec.Form_Name, "WhatsApp Click")
+})
+
+test("WhatsApp click records its traffic source (facebook / organic / direct)", async () => {
+  calls.length = 0
+  await run({ ref: "22222222", placement: "footer", page: "/", referrer: "https://www.google.com/", utm: {} }, "10.0.0.3")
+  let rec = JSON.parse(calls.find((c) => !c.url.includes("/oauth/")).body).data[0]
+  assert.equal(rec.Platform, "Google Organic")
+  assert.equal(rec.Referrer_URL, "https://www.google.com/")
+  calls.length = 0
+  await run({ ref: "33333333", placement: "hero", page: "/", utm: { fbclid: "FB1", utm_source: "facebook", utm_medium: "paid" } }, "10.0.0.4")
+  rec = JSON.parse(calls.find((c) => !c.url.includes("/oauth/")).body).data[0]
+  assert.equal(rec.Platform, "Facebook Ads")
+  assert.equal(rec.FB_Click_ID, "FB1")
+  calls.length = 0
+  await run({ ref: "44444444", placement: "hero", page: "/quote", utm: {} }, "10.0.0.5")
+  rec = JSON.parse(calls.find((c) => !c.url.includes("/oauth/")).body).data[0]
+  assert.equal(rec.Platform, "Direct")
+  assert.equal(rec.Page_Name, "/quote")
 })
 
 test("invalid WhatsApp ref is rejected without a CRM write", async () => {

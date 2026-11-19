@@ -1,3 +1,5 @@
+import { attributionRecord } from "../../utils/zoho.js"
+
 const BODY_LIMIT = 8 * 1024
 const RATE_WINDOW_MS = 60 * 1000
 const RATE_MAX = 15
@@ -109,22 +111,24 @@ const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm }) => {
   // every other website interaction goes to Website_Quotes (Website Inquiries).
   // WA ref/placement have no Leads columns (Zoho ignored them), so they ride in
   // Description. Field names below all exist on the Leads module.
+  // Same attribution mapping as quote leads, so WhatsApp traffic is traceable
+  // to its channel: Platform (e.g. Google Ads / Facebook Ads / Google Organic /
+  // Direct), UTMs, campaign/ad ids, click ids, landing page and referrer.
+  // Lead_Source keeps the team's "Web - WhatsApp" convention.
+  const attribution = {
+    ...utm,
+    landing_page: utm.landing_page || page,
+    referrer: utm.referrer || referrer,
+  }
   const fields = {
+    ...attributionRecord(attribution, "", { name: "WhatsApp Click", id: "whatsapp" }),
     Last_Name: `WhatsApp visitor ${ref}`,
     Lead_Source: "Web - WhatsApp",
     Lead_Status: "Unverified",
     Description: `WA_Ref ${ref} | ${placement}`.slice(0, 500),
-    Page_Name: (utm.landing_page || page || "").slice(0, 255),
-    Referrer_URL: (utm.referrer || referrer || "").slice(0, 255),
-    UTM_Source: (utm.utm_source || "").slice(0, 100),
-    UTM_Medium: (utm.utm_medium || "").slice(0, 100),
-    UTM_Campaign: (utm.utm_campaign || "").slice(0, 255),
-    UTM_Term: (utm.utm_term || "").slice(0, 255),
-    UTM_Content: (utm.utm_content || "").slice(0, 255),
-    Campaign_ID: (utm.campaign_id || utm.campaignid || "").slice(0, 100),
-    GCLID: (utm.gclid || "").slice(0, 150),
-    "$gclid": (utm.gclid || "").slice(0, 255),
   }
+  // Zoho rejects nothing for undefined values; drop them from the payload.
+  for (const k of Object.keys(fields)) if (fields[k] === undefined || fields[k] === "") delete fields[k]
   const response = await fetch(`${apiUrl}/crm/v6/Leads`, {
     method: "POST",
     headers: {
