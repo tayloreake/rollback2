@@ -3,6 +3,7 @@
 import { rateLimiter } from "./middleware/rateLimiter"
 import { getClientIp, getDetailedIpInfo } from "../../utils/getClientIp";
 import { verifyRecaptcha, sendLeadSms } from "../../utils/leadNotify"
+import { recaptchaVerdict, captchaOptions } from "../../utils/spamGuard"
 
 const limiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -31,13 +32,10 @@ export default async function handler(req, res) {
 
     // Verify reCAPTCHA
     const recaptchaResult = await verifyRecaptcha(recaptchaToken);
-    if (!recaptchaResult.success) {
+    const verdict = recaptchaVerdict(recaptchaResult, captchaOptions());
+    if (!verdict.ok) {
+      console.warn(`SMS blocked (${verdict.reason}) score=${recaptchaResult.score} ip=${ipAddress}`);
       return res.status(400).json({ success: false, message: 'reCAPTCHA verification failed' });
-    }
-
-    // Warn on low score
-    if (recaptchaResult.score !== null && recaptchaResult.score < 0.5) {
-      console.warn(`Low reCAPTCHA score in SMS: ${recaptchaResult.score} from IP: ${ipAddress}`);
     }
 
     if (!message) {
