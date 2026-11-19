@@ -55,13 +55,13 @@ test("quote -> Leads (never Website_Quotes)", async () => {
 
 test("inquiry -> Website_Quotes only, never Leads, attribution preserved", async () => {
   reset([{ ...rec(/^POST \/Website_Quotes$/), ...created("W1") }])
-  const r = await syncInquiryToZoho({ name: "Jane Doe", email: "j@example.com", phone: "+254700000000", source: "Contact Form", notes: "hi", attribution: ATT, siq_visitor_id: "SIQ1" })
+  const r = await syncInquiryToZoho({ name: "Jane Doe", email: "j@example.com", phone: "+254700000000", source: "Feedback", notes: "hi", attribution: ATT, siq_visitor_id: "SIQ1" })
   assert.equal(r.ok, true)
   assert.equal(r.module, "Website_Quotes")
   assert.ok(calls.every((c) => !/^\/Leads/.test(c.path)))
   const b = calls[0].body.data[0]
   assert.equal(b.Name, "Jane Doe")
-  assert.equal(b.Lead_Source, "Contact Form")
+  assert.equal(b.Lead_Source, "Feedback")
   assert.equal(b.GCLID, "G123")
   assert.equal(b.Campaign_ID, "99")
   assert.equal(b.UTM_Source, "google")

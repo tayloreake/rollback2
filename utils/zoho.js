@@ -288,7 +288,7 @@ const writeLead = (record, existingId) => writeRecord(record, existingId, "Leads
 
 // Every attribution value a website lead carries into CRM. Fields are
 // optional extras: a schema mismatch drops only the offending field.
-const attributionRecord = (attribution = {}, rawReferral = "", form = {}) => {
+export const attributionRecord = (attribution = {}, rawReferral = "", form = {}) => {
   const utmContent = String(attribution.utm_content || "").trim()
   // For Meta, utm_content is usually the ad id/name; store a numeric value in
   // Advert_ID as well as the human-readable Advert_Name.
@@ -415,6 +415,8 @@ export async function syncQuoteToZoho(quote = {}, attribution = {}) {
 }
 
 const NEWSLETTER_SOURCE = "Newsletter"
+// Inquiry sources that may turn into a sale and therefore belong in Leads.
+const LEAD_ROUTED_SOURCES = new Set(["Contact Form"])
 
 const websiteQuoteSearch = async (email, source) => {
   const criteria = encodeURIComponent(`((Email:equals:${email})and(Lead_Source:equals:${source}))`)
@@ -437,6 +439,27 @@ export async function syncInquiryToZoho({ name, email, phone, source, notes, gcl
     const fullName = String(name || "").trim().slice(0, 120) || "Website Inquiry"
     const src = String(source || "Website").slice(0, 100)
     const cleanEmail = String(email || "").trim().slice(0, 100)
+
+    // Anything that can become a sale (contact enquiries) is a LEAD, with the
+    // full traffic-source attribution a quote carries. Everything else
+    // (newsletter, reviews, feedback, job applications) is a Website Inquiry.
+    if (LEAD_ROUTED_SOURCES.has(src)) {
+      const split = splitName(fullName)
+      const formId = src.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "inquiry"
+      const leadRecord = {
+        First_Name: split.firstName || undefined,
+        Last_Name: split.lastName || fullName.slice(0, 80) || "Website Inquiry",
+        Email: cleanEmail || undefined,
+        Phone: String(phone || "").slice(0, 30) || undefined,
+        How_did_you_hear_about_us: src,
+        Description: String(notes || "").slice(0, 500) || undefined,
+        Lead_Status: "Not Contacted",
+        ...attributionRecord({ ...att, ...(g ? { gclid: g } : {}) }, "", { name: src, id: formId }),
+      }
+      const { id, dropped } = await writeLead(leadRecord, null)
+      return { ok: true, leadId: id, droppedAttribution: dropped, module: "Leads" }
+    }
+
     const a = attributionRecord({ ...att, ...(g ? { gclid: g } : {}) }, src, {})
 
     // Newsletter signups are idempotent per email: a repeat signup must not
