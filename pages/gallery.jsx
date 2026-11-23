@@ -7,6 +7,7 @@ import PageTitle from "../components/PageTitle"
 import getPageMetadata from "../SEO/seo"
 import { getGalleryAlbums } from "../sanity/sanity-utils"
 import { buildGallery, sanityImageUrl } from "../utils/gallery"
+import Portal from "../components/Portal"
 
 // Photos shipped with the site before the Sanity gallery existed. They are all
 // office moves. They only show until the Sanity "Office Moves" album is
@@ -139,8 +140,9 @@ const Gallery = ({ albums = [] }) => {
       </div>
 
       {current && (
+        <Portal>
         <div
-          className="fixed inset-0 z-[1000] bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[10000] bg-black/90 flex items-center justify-center p-4"
           role="dialog"
           aria-modal="true"
           aria-label={current.alt}
@@ -169,6 +171,7 @@ const Gallery = ({ albums = [] }) => {
             {current.caption && <figcaption className="text-white mt-3 text-center">{current.caption}</figcaption>}
           </figure>
         </div>
+        </Portal>
       )}
     </>
   )

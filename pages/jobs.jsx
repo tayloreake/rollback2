@@ -7,6 +7,7 @@ import { BsCheckCircle, BsPeople, BsClock, BsGeoAlt } from "react-icons/bs"
 import { FaTruck, FaBoxes, FaUsers, FaHeadset } from "react-icons/fa"
 import ReCAPTCHA from "../components/SafeRecaptcha"
 import { getFormAttribution } from "../utils/attribution"
+import Portal from "../components/Portal"
 
 const Jobs = ({ jobs }) => {
   // Get SEO metadata
@@ -276,7 +277,8 @@ const Jobs = ({ jobs }) => {
 // Job Details Modal Component
 const JobDetailsModal = ({ job, onClose }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <Portal>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[10000] p-4" role="dialog" aria-modal="true" aria-label={`Job details for ${job.title}`}>
       <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-200">
           <div className="flex justify-between items-start">
@@ -340,6 +342,7 @@ const JobDetailsModal = ({ job, onClose }) => {
         </div>
       </div>
     </div>
+    </Portal>
   )
 }
 

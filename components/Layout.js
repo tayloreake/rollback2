@@ -8,7 +8,7 @@ import dynamic from "next/dynamic"
 const RouteWarmup = dynamic(() => import("./RouteWarmup"), { ssr: false })
 const PerformanceOptimizer = dynamic(() => import("./PerformanceOptimizer"), { ssr: false })
 
-const Layout = ({ children, caseStudies = [] }) => {
+const Layout = ({ children, caseStudies = [], overlays = null }) => {
   return (
     <>
       <Navbar />
@@ -17,6 +17,7 @@ const Layout = ({ children, caseStudies = [] }) => {
       <PerformanceOptimizer />
       <main>{children}</main>
       <Footer caseStudies={caseStudies} />
+      {overlays}
     </>
   )
 }

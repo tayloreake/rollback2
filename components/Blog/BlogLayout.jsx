@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { BsFilter, BsX } from 'react-icons/bs'
 import { useBlogTheme } from '../../contexts/BlogThemeContext'
 import ThemeToggle from './ThemeToggle'
+import Portal from '../Portal'
 
 const BlogLayout = ({ children, sidebar }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -31,15 +32,16 @@ const BlogLayout = ({ children, sidebar }) => {
 
           {/* Mobile Sidebar Overlay */}
           {sidebarOpen && (
+            <Portal>
             <>
               {/* Backdrop */}
               <div 
-                className="fixed inset-0 bg-black/50 z-50 lg:hidden"
+                className="fixed inset-0 bg-black/50 z-[9996] lg:hidden"
                 onClick={() => setSidebarOpen(false)}
               />
               
               {/* Sidebar */}
-              <aside className={`fixed top-0 left-0 h-full w-80 border-r z-50 lg:hidden overflow-y-auto transition-colors ${
+              <aside className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] border-r z-[9996] lg:hidden overflow-y-auto overscroll-contain transition-colors ${
                 theme === 'dark' 
                   ? 'bg-gray-900 border-gray-700' 
                   : 'bg-white border-gray-200'
@@ -65,6 +67,7 @@ const BlogLayout = ({ children, sidebar }) => {
                 </div>
               </aside>
             </>
+            </Portal>
           )}
 
           {/* Main content */}

@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Portal from '../Portal';
 
 // Page Transition Wrapper
 export const PageTransition = ({ children, className = '' }) => {
@@ -197,6 +198,7 @@ export const RouteTransition = ({ children, router }) => {
 // Modal/Popup Transition
 export const ModalTransition = ({ children, isOpen, onClose }) => {
   return (
+    <Portal>
     <AnimatePresence>
       {isOpen && (
         <>
@@ -204,7 +206,7 @@ export const ModalTransition = ({ children, isOpen, onClose }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999]"
             onClick={onClose}
           />
           <motion.div
@@ -212,7 +214,7 @@ export const ModalTransition = ({ children, isOpen, onClose }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed inset-0 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 flex items-center justify-center z-[10000] p-4"
           >
             <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
               {children}
@@ -221,6 +223,7 @@ export const ModalTransition = ({ children, isOpen, onClose }) => {
         </>
       )}
     </AnimatePresence>
+    </Portal>
   );
 };
 

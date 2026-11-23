@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from "react"
 import SafeRecaptcha from "./SafeRecaptcha"
+import Portal from "./Portal"
 import useBotTrap from "../hooks/useBotTrap"
 import { getFormAttribution } from "../utils/attribution"
 import { gtmPushLead, gtmPushWhatsAppClick } from "../utils/gtm"
@@ -221,8 +222,10 @@ export default function WhatsAppButton({ placement, children, initialData, ...pr
       </button>
 
       {isOpen && (
+        <Portal>
         <div
           className="fixed inset-0 z-[10000] flex items-end justify-center bg-slate-950/60 p-0 sm:items-center sm:p-4"
+          style={{ paddingBottom: "max(env(safe-area-inset-bottom), 0.5rem)" }}
           onMouseDown={(event) => {
             if (event.target === event.currentTarget && !isSubmitting) setIsOpen(false)
           }}
@@ -342,6 +345,7 @@ export default function WhatsAppButton({ placement, children, initialData, ...pr
             )}
           </section>
         </div>
+        </Portal>
       )}
     </>
   )

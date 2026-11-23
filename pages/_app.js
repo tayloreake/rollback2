@@ -105,7 +105,19 @@ function MyApp({ Component, pageProps }) {
       {/* Page transition loader */}
       <PageTransitionLoader />
       <div className={montserrat.className}>
-      <Layout caseStudies={pageProps.caseStudies || []}>
+      <Layout
+        caseStudies={pageProps.caseStudies || []}
+        overlays={(
+          <>
+            <WebVitals />
+            <ConsentBanner />
+            <ConsentGatedTags />
+            <StickyMobileBar />
+            <ToastContainer position="top-center" />
+            <div id="modal-root" />
+          </>
+        )}
+      >
         {/* Single GTM loader lives in _document.js. This idle loader handles
             ONLY Zoho (PageSense + SalesIQ) to avoid double gtm.js pushes. */}
         <Script id="3p-after-idle" strategy="afterInteractive">
@@ -162,19 +174,8 @@ function MyApp({ Component, pageProps }) {
           `}
         </Script>
 
-      {/* Web Vitals Tracking */}
-      <WebVitals />
-
-      {/* Consent Mode v2 banner + consent-gated ad tags */}
-      <ConsentBanner />
-      <ConsentGatedTags />
-
-      {/* Sticky mobile call/WhatsApp/quote bar */}
-      <StickyMobileBar />
-      
-      <ToastContainer position="top-center" />
-      <Component {...pageProps} />
-    </Layout>
+        <Component {...pageProps} />
+      </Layout>
       </div>
     </>
   )

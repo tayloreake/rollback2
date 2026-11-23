@@ -2,6 +2,7 @@ import Image from "next/image"
 import React, { useState, useRef } from "react"
 import ReCAPTCHA from "../SafeRecaptcha"
 import { getFormAttribution } from "../../utils/attribution"
+import Portal from "../Portal"
 
 
 const ratingQuestions = [
@@ -290,13 +291,18 @@ const ReviewForm = ({setIsModalOpen}) => {
             <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
           )}
           {success && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                <div className="text-4xl mb-2">✅</div>
-                <p className="text-xl font-semibold text-green-600">Thank you for your review!</p>
-                <p className="text-gray-600">Your feedback has been submitted successfully.</p>
+            <Portal>
+              <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Review submission confirmation">
+                <div className="w-full max-w-md max-h-[90dvh] overflow-y-auto bg-white p-5 sm:p-6 rounded-2xl shadow-lg text-center">
+                  <div className="text-4xl mb-2">✅</div>
+                  <p className="text-xl font-semibold text-green-600">Thank you for your review!</p>
+                  <p className="text-gray-600">Your feedback has been submitted successfully.</p>
+                  <button type="button" onClick={() => setSuccess(false)} className="mt-4 min-h-[44px] rounded-full bg-[#DB421B] px-6 py-2 font-semibold text-white hover:bg-[#c13918]">
+                    Close
+                  </button>
+                </div>
               </div>
-            </div>
+            </Portal>
           )}
         </div>        
         </>

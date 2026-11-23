@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react"
 import QuoteForm from "./Form"
 import { gtmTrackButtonClick } from '../../utils/gtm'
 import ErrorBoundary from '../ErrorBoundary'
+import Portal from '../Portal'
 
 const QuoteModal = ({ quotebtn }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -126,7 +127,10 @@ const QuoteModal = ({ quotebtn }) => {
       
       {/* Enhanced Custom Modal */}
       {isModalOpen && (
-        <div 
+        <Portal>
+        <div
+          role="dialog"
+          aria-modal="true"
           className="fixed inset-0 z-[9999] bg-black bg-opacity-60 backdrop-blur-sm"
           onClick={handleBackdropClick}
         >
@@ -184,6 +188,7 @@ const QuoteModal = ({ quotebtn }) => {
             </div>
           </div>
         </div>
+        </Portal>
       )}
     </>
   )
