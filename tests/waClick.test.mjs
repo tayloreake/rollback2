@@ -9,6 +9,7 @@ process.env.ZOHO_DC = "com"
 process.env.RECAPTCHA_SECRET_KEY = "captcha-secret"
 
 const { default: handler } = await import("../pages/api/wa-click.js")
+const { buildWhatsAppMessage } = await import("../utils/whatsappMessage.js")
 
 const calls = []
 let crmResponse = { ok: true, status: 201, json: async () => ({ data: [{ status: "success", code: "SUCCESS", details: { id: "L1" } }] }) }
@@ -87,7 +88,9 @@ test("WhatsApp enquiry saves full customer and move details to Leads before open
   assert.equal(record.Lead_Source, "Web - WhatsApp")
   assert.equal(record.Form_Name, "WhatsApp Enquiry")
   assert.equal(record.Form_ID, "whatsapp")
-  assert.match(record.Description, /WA_Ref 12345678/)
+  assert.match(record.Description, /^Ref WA-12345678 \|/)
+  const zohoRef = record.Description.match(/^Ref (WA-\d{8})/)[1]
+  assert.ok(buildWhatsAppMessage({ firstName: "A" }, "12345678").endsWith(`Ref: ${zohoRef}`))
   assert.match(record.Description, /WhatsApp consent: yes/)
   assert.equal(record.Google_Click_ID, "G1")
   assert.equal(record.Page_Name, "/services/home")

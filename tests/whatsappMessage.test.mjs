@@ -19,7 +19,7 @@ test("WhatsApp draft is personalized from the move request and includes the CRM 
   assert.doesNotMatch(message, /Westlands|Karen/)
   assert.match(message, /2099-12-31/)
   assert.match(message, /2 Bedrooms/)
-  assert.match(message, /12345678/)
+  assert.match(message, /Ref: WA-12345678$/)
   assert.doesNotMatch(message, /amina@example.com/)
   assert.doesNotMatch(message, /\+254712345678/)
 })

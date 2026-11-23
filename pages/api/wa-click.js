@@ -1,6 +1,7 @@
 import { attributionRecord } from "../../utils/zoho.js"
 import { validateQuoteData, verifyRecaptcha } from "../../utils/leadNotify.js"
 import { botSignals, captchaOptions, recaptchaVerdict } from "../../utils/spamGuard.js"
+import { formatWaRef } from "../../utils/whatsappMessage.js"
 
 const BODY_LIMIT = 8 * 1024
 const RATE_WINDOW_MS = 60 * 1000
@@ -136,7 +137,7 @@ const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm, quote }) 
     Proposed_Move_Date: quote.moveDate,
     Lead_Source: "Web - WhatsApp",
     Lead_Status: "Unverified",
-    Description: `WA_Ref ${ref} | ${placement} | WhatsApp consent: yes | ${new Date().toISOString()}`.slice(0, 500),
+    Description: `Ref ${formatWaRef(ref)} | ${placement} | WhatsApp consent: yes | ${new Date().toISOString()}`.slice(0, 500),
   }
   // Zoho rejects nothing for undefined values; drop them from the payload.
   for (const k of Object.keys(fields)) if (fields[k] === undefined || fields[k] === "") delete fields[k]

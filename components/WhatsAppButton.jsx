@@ -4,7 +4,7 @@ import Portal from "./Portal"
 import useBotTrap from "../hooks/useBotTrap"
 import { getFormAttribution } from "../utils/attribution"
 import { gtmPushLead, gtmPushWhatsAppClick } from "../utils/gtm"
-import { buildWhatsAppMessage } from "../utils/whatsappMessage.js"
+import { buildWhatsAppMessage, formatWaRef } from "../utils/whatsappMessage.js"
 import { withTimeout } from "../utils/withTimeout.js"
 
 // Invisible reCAPTCHA can show an image challenge; 10s cut real users off mid-challenge.
@@ -318,7 +318,7 @@ export default function WhatsAppButton({ placement, children, initialData, ...pr
             ) : (
               <div className="space-y-4">
                 <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm font-medium text-emerald-800">
-                  Enquiry saved. Reference: <strong>{savedRef}</strong>. Review the draft, then choose whether to send it to Taylor Movers.
+                  Enquiry saved. Reference: <strong>{formatWaRef(savedRef)}</strong>. Review the draft, then choose whether to send it to Taylor Movers.
                 </p>
                 <label htmlFor={`${formId}-message`} className={labelClass}>Your WhatsApp message</label>
                 <textarea
