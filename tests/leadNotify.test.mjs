@@ -13,6 +13,11 @@ test("genuine quote passes and phone is normalised", () => {
   assert.equal(q.phoneNumber, "+254712345678")
 })
 
+test("same origin and destination is valid for a local move", () => {
+  const q = { ...base(), location: "Westlands", destination: "Westlands" }
+  assert.equal(validateQuoteData(q).ok, true)
+})
+
 test("compact legitimate addresses are not rejected", () => {
   for (const [from, to] of [["Kilimani", "Karen"], ["Ngong Rd", "LR209/1234"], ["Hse 4 Kileleshwa", "Apt B12"], ["Syokimau", "Nyali, Mombasa"]]) {
     const q = { ...base(), location: from, destination: to }
@@ -36,6 +41,13 @@ test("token-like destination alone is rejected", () => {
 test("invalid email and phone are rejected", () => {
   assert.equal(validateQuoteData({ ...base(), email: "not-an-email" }).ok, false)
   assert.equal(validateQuoteData({ ...base(), phoneNumber: "abc" }).ok, false)
+})
+
+test("phone numbers over 15 digits are rejected before normalization can truncate them", () => {
+  const phoneNumber = "+1234567890123456"
+  const q = { ...base(), phoneNumber }
+  assert.equal(validateQuoteData(q).ok, false)
+  assert.equal(q.phoneNumber, phoneNumber)
 })
 
 test("SMS/email message is built from validated fields only", () => {

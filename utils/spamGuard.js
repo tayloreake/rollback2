@@ -128,7 +128,11 @@ export function assessQuote(q = {}) {
   if (suspiciousName(q.firstName) || suspiciousName(q.lastName)) reasons.push("name")
   if (suspiciousAddress(q.location)) reasons.push("origin")
   if (suspiciousAddress(q.destination)) reasons.push("destination")
-  if (repeatedAcrossFields([q.firstName, q.lastName, q.location, q.destination])) reasons.push("repeated_fields")
+  // Origin and destination may legitimately be the same neighborhood/address.
+  // Still flag duplicate names and name/address echoes as likely bot submissions.
+  if (repeatedAcrossFields([q.firstName, q.lastName, q.location]) || repeatedAcrossFields([q.firstName, q.lastName, q.destination])) {
+    reasons.push("repeated_fields")
+  }
   const email = String(q.email || "")
   if (email) {
     const local = email.split("@")[0] || ""

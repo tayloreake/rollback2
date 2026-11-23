@@ -1,4 +1,6 @@
 import { attributionRecord } from "../../utils/zoho.js"
+import { validateQuoteData, verifyRecaptcha } from "../../utils/leadNotify.js"
+import { botSignals, captchaOptions, recaptchaVerdict } from "../../utils/spamGuard.js"
 
 const BODY_LIMIT = 8 * 1024
 const RATE_WINDOW_MS = 60 * 1000
@@ -87,6 +89,7 @@ const getZohoToken = async () => {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: params.toString(),
+      signal: typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(10000) : undefined,
     })
     const data = await response.json()
     if (!response.ok || !data?.access_token) {
@@ -103,7 +106,7 @@ const getZohoToken = async () => {
   }
 }
 
-const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm }) => {
+const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm, quote }) => {
   const zohoDomain = ZOHO_DATA_CENTERS[process.env.ZOHO_DC || "com"] || ZOHO_DATA_CENTERS.com
   const apiUrl = (process.env.ZOHO_API_URL || zohoDomain.api).replace(/\/+$/, "")
   const token = await getZohoToken()
@@ -121,11 +124,19 @@ const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm }) => {
     referrer: utm.referrer || referrer,
   }
   const fields = {
-    ...attributionRecord(attribution, "", { name: "WhatsApp Click", id: "whatsapp" }),
-    Last_Name: `WhatsApp visitor ${ref}`,
+    ...attributionRecord(attribution, "", { name: "WhatsApp Enquiry", id: "whatsapp" }),
+    First_Name: quote.firstName || undefined,
+    Last_Name: quote.lastName || quote.firstName || "Website Lead",
+    Email: quote.email,
+    Phone: quote.phoneNumber,
+    Move_Types: quote.moveType,
+    Origin_Address_Street_Address: quote.location,
+    Destination_Address_Street_Address: quote.destination,
+    Property_Size: quote.bedrooms,
+    Proposed_Move_Date: quote.moveDate,
     Lead_Source: "Web - WhatsApp",
     Lead_Status: "Unverified",
-    Description: `WA_Ref ${ref} | ${placement}`.slice(0, 500),
+    Description: `WA_Ref ${ref} | ${placement} | WhatsApp consent: yes | ${new Date().toISOString()}`.slice(0, 500),
   }
   // Zoho rejects nothing for undefined values; drop them from the payload.
   for (const k of Object.keys(fields)) if (fields[k] === undefined || fields[k] === "") delete fields[k]
@@ -136,6 +147,7 @@ const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm }) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ data: [fields] }),
+    signal: typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(10000) : undefined,
   })
   const data = await response.json().catch(() => null)
   const row = data?.data?.[0]
@@ -144,33 +156,67 @@ const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm }) => {
   }
 }
 
+const jsonError = (res, status, message) => res.status(status).json({ success: false, message })
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end()
 
   try {
-    if (Number(req.headers["content-length"] || 0) > BODY_LIMIT) return res.status(413).end()
-    if (!allowRequest(requestIp(req))) return res.status(429).end()
+    if (Number(req.headers["content-length"] || 0) > BODY_LIMIT) return jsonError(res, 413, "Request is too large")
+    if (!allowRequest(requestIp(req))) return jsonError(res, 429, "Too many requests. Please try again later.")
 
     const raw = await readRequestBody(req)
     let payload
     try {
       payload = JSON.parse(raw || "{}")
     } catch {
-      return res.status(400).end()
+      return jsonError(res, 400, "Invalid request")
     }
-    if (!payload || typeof payload !== "object" || Array.isArray(payload)) return res.status(400).end()
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) return jsonError(res, 400, "Invalid request")
     const ref = safeText(payload.ref, 8)
-    if (!/^\d{8}$/.test(ref)) return res.status(400).end()
+    if (!/^\d{8}$/.test(ref)) return jsonError(res, 400, "Invalid enquiry reference")
+    if (payload.whatsappConsent !== true) return jsonError(res, 400, "WhatsApp contact permission is required")
 
     const placement = safeText(payload.placement, 80)
     const page = safeText(payload.page, 500)
     const referrer = safeText(payload.referrer, 1000)
     const utm = sanitizeUtm(payload.utm)
+    if (!payload.quoteData || typeof payload.quoteData !== "object" || Array.isArray(payload.quoteData)) {
+      return jsonError(res, 400, "Please provide your contact and move details")
+    }
 
-    await saveWhatsAppLead({ ref, placement, page, referrer, utm })
-    return res.status(204).end()
+    const quote = { ...payload.quoteData }
+    if (!safeText(quote.email, 120)) return jsonError(res, 400, "Please provide an email address")
+    const valid = validateQuoteData(quote)
+    if (!valid.ok) return jsonError(res, 400, valid.error || "Please check your details")
+    const phoneDigits = String(quote.phoneNumber || "").replace(/\D/g, "")
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) return jsonError(res, 400, "Invalid phone number")
+    if (String(quote.location || "").length < 3 || String(quote.destination || "").length < 3 || !quote.moveType || !quote.bedrooms) {
+      return jsonError(res, 400, "Please provide your move details")
+    }
+    const date = String(quote.moveDate || "")
+    const parsedDate = new Date(`${date}T00:00:00.000Z`)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== date) {
+      return jsonError(res, 400, "Please provide a valid move date")
+    }
+
+    const recaptchaToken = safeText(payload.recaptchaToken, 4096)
+    if (!recaptchaToken) return jsonError(res, 400, "Please verify that you are human")
+    const recaptchaResult = await verifyRecaptcha(recaptchaToken)
+    const verdict = recaptchaVerdict(recaptchaResult, captchaOptions())
+    if (!verdict.ok) return jsonError(res, 400, "Human verification failed. Please try again.")
+
+    const signals = botSignals(payload)
+    if (signals.length) return jsonError(res, 400, "Please try again")
+
+    await saveWhatsAppLead({ ref, placement, page, referrer, utm, quote })
+    return res.status(201).json({ success: true, ref })
   } catch (error) {
-    console.error("WhatsApp click Zoho sync failed:", error?.message || error)
-    return res.status(error?.status === 413 ? 413 : 204).end()
+    if (error?.status === 413) return jsonError(res, 413, "Request is too large")
+    if (error?.status === 429 || error?.message === "Too many requests") {
+      return jsonError(res, 429, "Too many requests. Please try again later.")
+    }
+    console.error("WhatsApp lead save failed:", error?.message || error)
+    return jsonError(res, 502, "We couldn't save your enquiry. Please try again; WhatsApp has not opened.")
   }
 }

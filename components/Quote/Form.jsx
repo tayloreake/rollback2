@@ -457,7 +457,7 @@ const QuoteForm = () => {
         <button type='submit' onClick={(e) => { e.preventDefault(); if (formRef.current) { formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); } }} disabled={isSubmitting} className='w-full bg-[#FF5000] text-white px-6 py-4 rounded-xl hover:bg-[#D94300] transition-all font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_10px_25px_-8px_rgba(255,80,0,0.7)]'>
           {isSubmitting ? (<span className='flex items-center justify-center gap-2'><span className='animate-spin rounded-full h-5 w-5 border-b-2 border-white' />Submitting secure request…</span>) : (<span>Request My Free Quote →</span>)}
         </button>
-        <p className='text-center text-[12px] text-slate-500 mt-3'>🔒 Your details are encrypted & never shared. Prefer chat? <WhatsAppButton placement="quote-form" target='_blank' rel='noreferrer' className='font-semibold text-[#0B1B33] underline'>WhatsApp us</WhatsAppButton> • <a href='tel:+254721410517' className='font-semibold text-[#0B1B33] underline'>Call 0721 410 517</a></p>
+        <p className='text-center text-[12px] text-slate-500 mt-3'>🔒 Your details are encrypted & never shared. Prefer chat? <WhatsAppButton placement="quote-form" initialData={{ fullName: formData.fname, phoneNumber: formData.number, email: formData.email, location: formData.location, destination: formData.destination, moveType: formData.moveType, bedrooms: formData.bedrooms, moveDate: formData.moveDate }} target='_blank' rel='noreferrer' className='font-semibold text-[#0B1B33] underline'>WhatsApp us</WhatsAppButton> • <a href='tel:+254721410517' className='font-semibold text-[#0B1B33] underline'>Call 0721 410 517</a></p>
       </div>
     </div>
   )

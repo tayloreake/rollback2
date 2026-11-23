@@ -47,7 +47,7 @@ test("assessQuote: genuine quote passes", () => {
 test("assessQuote: bot submission flagged", () => {
   const r = assessQuote({ firstName: "kXjPqLmNoPrStUv", lastName: "ZxCvBnMqWrTyUiOp", email: "qwrtpsdfghjklzxcv@gmail.com", location: "HfKdLsPqWmZxNcVb", destination: "HfKdLsPqWmZxNcVb" })
   assert.equal(r.ok, false)
-  assert.ok(r.reasons.includes("repeated_fields"))
+  assert.ok(r.reasons.includes("destination"))
   assert.ok(r.reasons.includes("origin"))
 })
 

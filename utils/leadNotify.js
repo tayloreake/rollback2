@@ -15,6 +15,7 @@ export async function verifyRecaptcha(token) {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ secret, response: String(token || "") }).toString(),
+      signal: typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(10000) : undefined,
     })
     const data = await response.json()
     return {
@@ -59,7 +60,9 @@ export function splitFullName(raw, max = 80) {
 // Last_Name, so we split here instead of rejecting an otherwise valid lead.
 export function validateQuoteData(quoteData) {
   if (!quoteData || typeof quoteData !== "object") return { ok: false, error: "Missing quote data" }
-  const phoneOk = /^\+?\d[\d\s-]{7,15}$/.test(String(quoteData.phoneNumber || "").trim())
+  const rawPhone = String(quoteData.phoneNumber || "").trim()
+  const phoneDigits = rawPhone.replace(/\D/g, "")
+  const phoneOk = /^\+?\d[\d\s-]{7,15}$/.test(rawPhone) && phoneDigits.length >= 7 && phoneDigits.length <= 15
   if (!phoneOk) return { ok: false, error: "Invalid phone number" }
 
   let firstName = String(quoteData.firstName || "").trim()
