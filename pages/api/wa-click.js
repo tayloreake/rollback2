@@ -151,9 +151,14 @@ const saveWhatsAppLead = async ({ ref, placement, page, referrer, utm, quote }) 
   })
   const data = await response.json().catch(() => null)
   const row = data?.data?.[0]
-  if (!response.ok || row?.status !== "success") {
-    throw new Error(`Zoho WhatsApp lead create failed (${response.status}): ${row?.message || data?.message || "unknown error"}`)
+  const leadId = String(row?.details?.id || "").trim()
+  if (!response.ok || row?.status !== "success" || !leadId) {
+    const reason = row?.status === "success" && !leadId
+      ? "Zoho did not return a Lead ID"
+      : row?.message || data?.message || "unknown error"
+    throw new Error(`Zoho WhatsApp lead create failed (${response.status}): ${reason}`)
   }
+  return leadId
 }
 
 const jsonError = (res, status, message) => res.status(status).json({ success: false, message })

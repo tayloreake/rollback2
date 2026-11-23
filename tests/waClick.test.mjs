@@ -165,3 +165,12 @@ test("Zoho failure is surfaced so the client does not open WhatsApp before CRM s
   assert.equal(calls.some((call) => /\/crm\/v6\/Leads$/.test(call.url)), true)
   crmResponse = { ok: true, status: 201, json: async () => ({ data: [{ status: "success", code: "SUCCESS", details: { id: "L1" } }] }) }
 })
+
+test("Zoho success without a created Lead ID is not treated as a saved enquiry", async () => {
+  calls.length = 0
+  crmResponse = { ok: true, status: 201, json: async () => ({ data: [{ status: "success", code: "SUCCESS", details: {} }] }) }
+  const result = await run(validPayload(), "10.0.0.9")
+  assert.equal(result.status, 502)
+  assert.equal(result.body.success, false)
+  crmResponse = { ok: true, status: 201, json: async () => ({ data: [{ status: "success", code: "SUCCESS", details: { id: "L1" } }] }) }
+})

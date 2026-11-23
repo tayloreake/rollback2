@@ -5,6 +5,7 @@ import useBotTrap from "../hooks/useBotTrap"
 import { getFormAttribution } from "../utils/attribution"
 import { gtmPushLead, gtmPushWhatsAppClick } from "../utils/gtm"
 import { buildWhatsAppMessage } from "../utils/whatsappMessage.js"
+import { withTimeout } from "../utils/withTimeout.js"
 
 const PHONE = "254721410517"
 const BASE_HREF = `https://wa.me/${PHONE}`
@@ -151,8 +152,12 @@ export default function WhatsAppButton({ placement, children, initialData, ...pr
     setError("")
     setIsSubmitting(true)
     try {
-      const recaptchaToken = await recaptchaRef.current?.executeAsync?.()
-      if (!recaptchaToken) throw new Error("Human verification failed. Please try again.")
+      const recaptchaToken = await withTimeout(
+        () => recaptchaRef.current?.executeAsync?.(),
+        10000,
+        "Human verification timed out. Please refresh and try again."
+      )
+      if (!recaptchaToken) throw new Error("Human verification failed. Please refresh and try again.")
 
       const ref = refRef.current || createRef()
       const name = splitName(form.fullName)
