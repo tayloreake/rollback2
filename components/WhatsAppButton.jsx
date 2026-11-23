@@ -7,6 +7,8 @@ import { gtmPushLead, gtmPushWhatsAppClick } from "../utils/gtm"
 import { buildWhatsAppMessage } from "../utils/whatsappMessage.js"
 import { withTimeout } from "../utils/withTimeout.js"
 
+// Invisible reCAPTCHA can show an image challenge; 10s cut real users off mid-challenge.
+const CAPTCHA_TIMEOUT_MS = 45000
 const PHONE = "254721410517"
 const BASE_HREF = `https://wa.me/${PHONE}`
 const MOVE_TYPES = [
@@ -154,7 +156,7 @@ export default function WhatsAppButton({ placement, children, initialData, ...pr
     try {
       const recaptchaToken = await withTimeout(
         () => recaptchaRef.current?.executeAsync?.(),
-        10000,
+        CAPTCHA_TIMEOUT_MS,
         "Human verification timed out. Please refresh and try again."
       )
       if (!recaptchaToken) throw new Error("Human verification failed. Please refresh and try again.")
