@@ -489,10 +489,10 @@ export const EnhancedHero = ({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.8 }}
                 >
-                  <span className="block">Trusted</span>
+                  <span className="block">Trusted</span>{" "}
                   <span className="block text-yellow-400 drop-shadow-lg">
                     Professional
-                  </span>
+                  </span>{" "}
                   <span className="block">Movers</span>
                 </motion.h1>
                 

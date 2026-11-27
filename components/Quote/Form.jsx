@@ -7,6 +7,7 @@ import AttributionHiddenFields from "../AttributionHiddenFields"
 import { getFormAttribution } from "../../utils/attribution"
 import { newEventId, getMetaContext } from "../../utils/metaTracking"
 import { gtmPushLead } from "../../utils/gtm"
+import useQuoteFormStart from "../../hooks/useQuoteFormStart"
 import WhatsAppButton from "../WhatsAppButton"
 
 // Split a "Full Name" input into Zoho's required First_Name / Last_Name pair.
@@ -89,6 +90,7 @@ const QuoteForm = () => {
   const recaptchaRef = useRef(null)
   const formRef = useRef(null)
   const { trap, getBotFields } = useBotTrap()
+  const trackQuoteFormStart = useQuoteFormStart("quote_modal")
   const leadEventIdRef = useRef(null)
 
   // Show notice if persisted data was loaded
@@ -376,7 +378,7 @@ const QuoteForm = () => {
       </div>
 
       <div className='px-6 py-5'>
-        <form ref={formRef} onSubmit={handleSubmit} className='w-full flex flex-col gap-5'>
+        <form ref={formRef} onSubmit={handleSubmit} onChange={trackQuoteFormStart} className='w-full flex flex-col gap-5'>
           {trap}
           {/* Filled by Zoho zcga.js with the Google Ads click id */}
           <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />

@@ -9,11 +9,13 @@ const { syncQuoteToZoho, syncInquiryToZoho } = await import("../utils/zoho.js")
 // Routing contract: quotes + contact enquiries -> Leads; contact/job/feedback/review/newsletter -> Website_Quotes.
 // (WhatsApp -> Leads is covered in waClick.test.mjs.)
 const paths = []
+const leadWrites = []
 globalThis.fetch = async (url, init = {}) => {
   const u = String(url)
   if (u.includes("/oauth/")) return { ok: true, status: 200, text: async () => JSON.stringify({ access_token: "t" }), json: async () => ({ access_token: "t" }) }
   const path = u.replace(/^.*\/crm\/v8/, "")
   paths.push(`${init.method || "GET"} ${path}`)
+  if (path === "/Leads" && init.method === "POST") leadWrites.push(JSON.parse(init.body).data[0])
   const body = (init.method || "GET") === "GET" ? "" : JSON.stringify({ data: [{ status: "success", code: "SUCCESS", details: { id: "X1" } }] })
   return { ok: true, status: body ? 201 : 204, text: async () => body }
 }
@@ -68,3 +70,18 @@ test("Contact Form -> Leads with full traffic-source attribution", async () => {
   assert.equal(lead.Form_Name, "Contact Form")
   assert.equal(lead.Lead_Status, "Not Contacted")
 })
+
+for (const [source, platform] of [["whatsapp", "WhatsApp"], ["instagram", "Instagram Organic"], ["facebook", "Facebook Organic"]]) {
+  test(`quote preserves ${source} UTM source and campaign ID in the Zoho Leads payload`, async () => {
+    leadWrites.length = 0
+    const campaign = `CAM-${source.toUpperCase()}-20261016-001`
+    await syncQuoteToZoho({ firstName: "Jane", lastName: "Doe", email: "qa@example.com" }, {
+      utm_source: source, utm_medium: "social", utm_campaign: campaign, utm_id: campaign,
+    })
+    assert.equal(leadWrites.length, 1)
+    assert.equal(leadWrites[0].Platform, platform)
+    assert.equal(leadWrites[0].UTM_Source, source)
+    assert.equal(leadWrites[0].UTM_Campaign, campaign)
+    assert.equal(leadWrites[0].Campaign_ID, campaign)
+  })
+}
