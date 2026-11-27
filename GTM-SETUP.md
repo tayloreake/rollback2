@@ -77,6 +77,20 @@ payload uses the same source (`getFormAttribution()`), so DOM and CRM agree.
 | `generate_lead` | Quote + Contact submit (`gtmPushLead`) | `form_id`, `lead_source` (normalised), `referral_answer`, `campaign_id`, `gclid`, `utm_source/medium/campaign`, `user_id`, `move_type`, `bedrooms`, `value`, `currency`, `timestamp` |
 | `whatsapp_click` | any `wa.me` link (`useClickTracking`) | `whatsapp_ref`, `channel`, `campaign_id` |
 | `phone_click` | any `tel:` link + Navbar | `phone_number`, `campaign_id` |
+| `quote_form_start` | first field change on the quote page or quote modal (once per mounted form) | `form_id`, `placement` (`quote_page` or `quote_modal`) |
+
+In GTM Preview, trigger `quote_form_start` by editing two fields in one form.
+Expect one event and no `generate_lead`. If there is no GA4 event tag for it,
+create a GA4 Event tag on the exact custom event `quote_form_start`; pass
+`form_id` and `placement` from Data Layer Variables. Verify in GA4 DebugView.
+Keep this separate from the existing lead key event and Google Ads conversion.
+
+Organic social links use `utm_id` equal to `utm_campaign` so the same campaign
+identifier appears in GA4 and the Zoho Leads `Campaign_ID` field:
+
+- WhatsApp: https://taylorea.com/?utm_source=whatsapp&utm_medium=social&utm_campaign=CAM-WHATSAPP-20261016-001&utm_id=CAM-WHATSAPP-20261016-001
+- Instagram: https://taylorea.com/?utm_source=instagram&utm_medium=social&utm_campaign=CAM-INSTAGRAM-20261016-001&utm_id=CAM-INSTAGRAM-20261016-001
+- Facebook: https://taylorea.com/?utm_source=facebook&utm_medium=social&utm_campaign=CAM-FACEBOOK-20261016-001&utm_id=CAM-FACEBOOK-20261016-001
 
 **The playbook calls the lead event `lead`. This site pushes `generate_lead`**
 because the GA4 key event *and* the Google Ads conversion (AW-966026451) are

@@ -9,6 +9,7 @@ import Head from 'next/head'
 import { getFormAttribution } from '../utils/attribution'
 import { newEventId, getMetaContext } from '../utils/metaTracking'
 import { gtmPushLead } from '../utils/gtm'
+import useQuoteFormStart from '../hooks/useQuoteFormStart'
 import AttributionHiddenFields from '../components/AttributionHiddenFields'
 import WhatsAppButton from '../components/WhatsAppButton'
 
@@ -34,6 +35,7 @@ const Quote = () => {
   const [lastSubmissionTime, setLastSubmissionTime] = useState(0)
   const recaptchaRef = useRef(null)
   const { trap, getBotFields } = useBotTrap()
+  const trackQuoteFormStart = useQuoteFormStart("quote_page")
 
   const isValidEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -292,7 +294,7 @@ const Quote = () => {
             </div>
             <div className='flex gap-2 text-[12px]'><WhatsAppButton placement="quote-page" initialData={{ fullName: fname, phoneNumber: number, email, location, destination, moveType, bedrooms, moveDate }} target='_blank' rel='noreferrer' className='px-3 py-2 rounded-lg bg-green-600 text-white font-semibold'>WhatsApp</WhatsAppButton><a href='tel:+254721410517' className='px-3 py-2 rounded-lg bg-slate-900 text-white font-semibold'>Call Sales</a></div>
           </div>
-          <form onSubmit={handleSubmit} className='px-6 md:px-8 py-6 grid md:grid-cols-2 gap-5'>
+          <form onSubmit={handleSubmit} onChange={trackQuoteFormStart} className='px-6 md:px-8 py-6 grid md:grid-cols-2 gap-5'>
             {trap}
             {/* Filled by Zoho zcga.js with the Google Ads click id */}
             <input type="hidden" id="zc_gad" name="zc_gad" defaultValue="" />
